@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Escape Theorie · Mentee-Bereich</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
+
+<!-- =========================================================================
+     ❶  HIER PFLEGST DU ALLES — kein Code-Wissen nötig.
+        Texte, Termine, Links & das Passwort einfach zwischen den
+        Anführungszeichen ändern. Danach Datei speichern & neu hochladen.
+     ========================================================================= -->
+<script>
+const DASHBOARD = {
+
+  /* --- Zugang ----------------------------------------------------------- */
+  passwort: "TeamAnne",          // ← Passwort, das du deinen Mentees gibst
+
+  /* --- Begrüßung -------------------------------------------------------- */
+  begruessung: {
+    titel: "Schön, dass du da bist 💛",
+    text: "Das hier ist dein geschützter Bereich in der Begleitung. Alle Termine und Calls an einem Ort – und ich bin nur einen Klick entfernt.",
+    signatur: "Deine Anne",
+  },
+
+  /* --- Text fürs große Highlight oben ----------------------------------- */
+  // Datum + Meet-Link kommen AUTOMATISCH aus dem jeweils nächsten Termin
+  // der Liste `teamTreffen` weiter unten. Hier nur die Texte pflegen.
+  treffenInfo: {
+    titel: "Team Treffen – Business Begleiter Sprechstunde",
+    dauer: "60 Min · Teilnahme freiwillig",
+    beschreibung: "Schnelle Fragen, direkter Austausch, gemeinsam am Ball bleiben.",
+  },
+
+  /* --- 1:1 Termine buchen (deine Buchungslinks einsetzen) --------------- */
+  buchung: {
+    link15: "https://businessbegleitung-checkin.youcanbook.me/",   // ← 15-Min Check-in Link
+    link30: "https://call-anne-siebenkees-30.youcanbook.me",       // ← 30-Min Strategie Link
+  },
+
+  /* --- Kalender: alle kommenden Team-Treffen ---------------------------- */
+  // Neuen Termin = neue Zeile nach dem Muster. Vergangene einfach löschen.
+  teamTreffen: [
+    // Treffen ist unregelmäßig (mal Di, mal Fr). Einfach jeden bekannten Termin als Zeile
+    // eintragen – vergangene werden automatisch ausgeblendet, das nächste rückt oben ins
+    // Highlight. ACHTUNG: jeder Termin hat seinen EIGENEN Meet-Link!
+    { datum: "2026-06-26 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
+    // Special-Call (einmalig, per Zoom) – eigener Titel + eigene Texte. Optionale Felder
+    // dauer/beschreibung überschreiben für diesen Termin die Standardtexte aus `treffenInfo`.
+    { datum: "2026-06-29 18:00", titel: "🎉 BUILD-Special: Das Fundament deines Social-Media-Auftritts", meetLink: "https://zoom.us/j/94972862528", dauer: "60 Min · Special-Call für meine Mentees", beschreibung: "Warum dein Auftritt ohne Content-Säulen nicht hält. Per Zoom." },
+    { datum: "2026-06-30 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
+    // 06.–21.07.2026: Sommerpause / Urlaub – keine Sprechstunde
+    { datum: "2026-07-24 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
+    { datum: "2026-07-31 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
+    { datum: "2026-08-04 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
+    { datum: "2026-08-14 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
+    { datum: "2026-08-18 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
+    { datum: "2026-08-28 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
+    { datum: "2026-09-01 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
+  ],
+
+  /* --- News & Updates von dir ------------------------------------------- */
+  // Neueste oben. Datum nur als Anzeige-Text.
+  news: [
+    {
+      datum: "Sommerpause",
+      titel: "Keine Sprechstunde vom 06.–21. Juli",
+      text: "Ich bin im Urlaub – die nächste Sprechstunde nach der Pause ist Freitag, 24. Juli um 09:00 Uhr. Nutz die Zeit fürs Umsetzen! 🌞",
+    },
+    {
+      datum: "19. Juni 2026",
+      titel: "Willkommen in deinem neuen Mentee-Bereich",
+      text: "Ab jetzt findest du hier alles gebündelt: unsere Team-Treffen, deine 1:1-Buchung und alle Materialien. Speicher dir die Seite als Lesezeichen.",
+    },
+  ],
+
+  /* --- Material & Ressourcen -------------------------------------------- */
+  // Noch leer – der Bereich zeigt dann einen Platzhalter. Sobald du Material hast,
+  // einfach Einträge ergänzen, z. B.:
+  // { titel: "Funnel-Workbook (PDF)", beschreibung: "Dein Leitfaden", link: "https://..." },
+  material: [],
+
+  /* --- Plattformen & Tools (Weiterleitungslinks) ------------------------ */
+  // Mentees melden sich dort selbst an. Einfach Link/Beschreibung anpassen.
+  plattformen: [
+    {
+      platform: "Circle",
+      name: "The Escape Theory Community",
+      beschreibung: "Austausch, Workshops & alle Calls an einem Ort.",
+      link: "https://members.the-escape-theory.com",
+      cta: "Zur Community",
+    },
+    {
+      platform: "Miro",
+      name: "Miro Boards",
+      beschreibung: "Gemeinsame Boards für Strategie & Visualisierung.",
+      link: "https://miro.com/login/",
+      cta: "Zu Miro",
+    },
+  ],
+};
+</script>
+<!-- =========================================================================
+     ❷  AB HIER NICHTS MEHR ÄNDERN — das ist Design & Technik.
+     ========================================================================= -->
+
+<style>
+  :root {
+    --navy:   #0d1c32;
+    --navy-2: #142844;
+    --blue:   #b3dde9;
+    --camel:  #cdb08f;
+    --white:  #ffffff;
+    --cream:  #f5f1ea;
+    --ink:    #0d1c32;
+    --muted:  rgba(13,28,50,.62);
+    --line:   rgba(13,28,50,.10);
+    --shadow: 0 18px 50px -20px rgba(13,28,50,.35);
+    --radius: 22px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Jost', sans-serif;
+    letter-spacing: -.01em;
+    color: var(--ink);
+    background: var(--cream);
+    -webkit-font-smoothing: antialiased;
+  }
+  .serif { font-family: 'Playfair Display', serif; letter-spacing: 0; }
+
+  /* ---------- LOGIN GATE ---------- */
+  #gate {
+    position: fixed; inset: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(120% 90% at 80% -10%, rgba(179,221,233,.18), transparent 55%),
+      radial-gradient(110% 80% at 0% 110%, rgba(205,176,143,.20), transparent 55%),
+      var(--navy);
+    padding: 24px;
+  }
+  .gate-card {
+    width: 100%; max-width: 420px;
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 44px 38px 38px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .gate-mark {
+    font-family:'Jost'; font-weight:600; letter-spacing:.32em;
+    font-size:11px; text-transform:uppercase; color:var(--camel);
+    margin-bottom: 18px;
+  }
+  .gate-card h1 { font-size: 27px; font-weight: 600; margin-bottom: 8px; }
+  .gate-card p  { color: var(--muted); font-size: 15px; margin-bottom: 26px; }
+  .gate-card input {
+    width: 100%; padding: 15px 18px; font-size: 15px; font-family:'Jost';
+    border: 1.5px solid var(--line); border-radius: 14px; outline: none;
+    transition: border-color .2s; text-align:center; letter-spacing:.04em;
+  }
+  .gate-card input:focus { border-color: var(--camel); }
+  .gate-card button {
+    width: 100%; margin-top: 14px; padding: 15px; font-size: 15px; font-weight: 500;
+    font-family:'Jost'; color: var(--white); background: var(--navy);
+    border: none; border-radius: 14px; cursor: pointer; transition: transform .12s, background .2s;
+    letter-spacing:.02em;
+  }
+  .gate-card button:hover { background: var(--navy-2); transform: translateY(-1px); }
+  .gate-error { color: #b4452f; font-size: 13.5px; margin-top: 14px; min-height: 18px; }
+
+  /* ---------- APP ---------- */
+  #app { display: none; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 22px; }
+
+  /* Header */
+  header {
+    background:
+      radial-gradient(130% 120% at 90% -20%, rgba(179,221,233,.20), transparent 55%),
+      var(--navy);
+    color: var(--white);
+    padding: 30px 0 130px;
+    position: relative;
+  }
+  .topbar { display:flex; align-items:center; justify-content:space-between; }
+  .brand { font-weight:600; letter-spacing:.3em; font-size:11px; text-transform:uppercase; color: var(--blue); }
+  .logout {
+    background: rgba(255,255,255,.08); color: var(--white); border:1px solid rgba(255,255,255,.18);
+    font-family:'Jost'; font-size:12.5px; padding:8px 16px; border-radius: 100px; cursor:pointer;
+    transition: background .2s;
+  }
+  .logout:hover { background: rgba(255,255,255,.16); }
+  .hero { margin-top: 40px; max-width: 640px; }
+  .hero h1 { font-size: 40px; font-weight: 600; line-height: 1.12; margin-bottom: 16px; }
+  .hero p  { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,.78); }
+  .hero .sig { margin-top: 16px; font-style: italic; color: var(--blue); font-size: 16px; }
+
+  /* Content pulled up over header */
+  main { margin-top: -90px; padding-bottom: 70px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .card {
+    background: var(--white); border-radius: var(--radius); padding: 28px;
+    box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.6);
+  }
+  .card.span { grid-column: 1 / -1; }
+  .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase;
+    color: var(--camel); margin-bottom: 14px; display:flex; align-items:center; gap:8px;
+  }
+  .card h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+
+  /* Next meeting highlight */
+  .next {
+    background:
+      linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+    color: var(--white); position: relative; overflow:hidden;
+  }
+  .next::after {
+    content:""; position:absolute; right:-60px; top:-60px; width:200px; height:200px;
+    background: radial-gradient(circle, rgba(179,221,233,.22), transparent 70%);
+  }
+  .next .eyebrow { color: var(--blue); }
+  .next h2 { color: var(--white); font-size: 24px; }
+  .next .when { font-size: 16px; color: rgba(255,255,255,.8); margin: 10px 0 4px; }
+  .next .meta { font-size: 14px; color: rgba(255,255,255,.6); margin-bottom: 18px; }
+  .countdown { display:flex; gap: 14px; margin: 18px 0 22px; }
+  .cd-box { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius: 14px; padding: 12px 0; flex:1; text-align:center; }
+  .cd-num { font-size: 26px; font-weight: 600; font-family:'Playfair Display',serif; }
+  .cd-lbl { font-size: 10.5px; letter-spacing:.14em; text-transform:uppercase; color: rgba(255,255,255,.6); margin-top: 2px; }
+
+  .btn {
+    display:inline-flex; align-items:center; gap:9px; justify-content:center;
+    font-family:'Jost'; font-weight:500; font-size:15px; text-decoration:none;
+    padding: 14px 24px; border-radius: 100px; cursor:pointer; transition: transform .12s, box-shadow .2s, background .2s;
+    border: none;
+  }
+  .btn-primary { background: var(--blue); color: var(--navy); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 26px -10px rgba(179,221,233,.6); }
+  .btn-light { background: var(--white); color: var(--navy); }
+  .btn-light:hover { transform: translateY(-2px); }
+  .btn-outline { background: transparent; color: var(--navy); border:1.5px solid var(--line); }
+  .btn-outline:hover { border-color: var(--camel); background: var(--cream); }
+  .btn-full { width:100%; }
+
+  /* Booking cards */
+  .book-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 6px; }
+  .book {
+    border: 1.5px solid var(--line); border-radius: 18px; padding: 22px;
+    display:flex; flex-direction:column; gap: 6px; transition: border-color .2s, transform .15s;
+  }
+  .book:hover { border-color: var(--camel); transform: translateY(-3px); }
+  .book .dur { font-family:'Playfair Display',serif; font-size: 30px; font-weight: 600; }
+  .book .dur span { font-size: 16px; font-weight:500; color: var(--muted); }
+  .book .desc { font-size: 14px; color: var(--muted); line-height:1.5; flex:1; margin-bottom: 8px; }
+  .intro-line { font-size:15px; color:var(--muted); line-height:1.6; margin-bottom:18px; }
+
+  /* Calendar list */
+  .cal-item {
+    display:flex; align-items:center; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line);
+  }
+  .cal-item:last-child { border-bottom: none; }
+  .cal-date {
+    flex-shrink:0; width: 62px; text-align:center; background: var(--cream); border-radius: 14px; padding: 8px 0;
+  }
+  .cal-date .d { font-size: 22px; font-weight: 600; font-family:'Playfair Display',serif; line-height:1; }
+  .cal-date .m { font-size: 10.5px; letter-spacing:.12em; text-transform:uppercase; color: var(--muted); margin-top:3px; }
+  .cal-info { flex:1; }
+  .cal-info .t { font-weight: 500; font-size: 15.5px; }
+  .cal-info .s { font-size: 13.5px; color: var(--muted); margin-top:2px; }
+  .cal-item .btn { padding: 9px 18px; font-size: 13.5px; }
+  .cal-soon { font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--camel); }
+
+  /* News */
+  .news-item { padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .news-item:first-child { padding-top: 4px; }
+  .news-item:last-child { border-bottom:none; padding-bottom: 0; }
+  .news-date { font-size: 12px; letter-spacing:.08em; text-transform:uppercase; color: var(--camel); font-weight:500; }
+  .news-item h3 { font-size: 17px; font-weight: 600; margin: 6px 0; }
+  .news-item p { font-size: 14.5px; color: var(--muted); line-height: 1.6; }
+
+  /* Material */
+  .mat-list { display:flex; flex-direction:column; gap: 12px; }
+  .mat {
+    display:flex; align-items:center; gap: 16px; text-decoration:none; color:inherit;
+    border:1.5px solid var(--line); border-radius: 16px; padding: 16px 18px; transition: border-color .2s, transform .15s, background .2s;
+  }
+  .mat:hover { border-color: var(--camel); transform: translateX(4px); background: var(--cream); }
+  .mat-ico {
+    flex-shrink:0; width:42px; height:42px; border-radius: 12px; background: var(--navy);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .mat-ico svg { width:20px; height:20px; stroke: var(--blue); }
+  .mat-txt .t { font-weight: 500; font-size: 15px; }
+  .mat-txt .s { font-size: 13px; color: var(--muted); margin-top:1px; }
+  .mat .arr { margin-left:auto; color: var(--muted); }
+
+  /* Plattformen */
+  .plat-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:6px; }
+  .plat {
+    display:flex; flex-direction:column; gap:6px; text-decoration:none; color:inherit;
+    border:1.5px solid var(--line); border-radius:18px; padding:22px;
+    transition: border-color .2s, transform .15s, background .2s;
+  }
+  .plat:hover { border-color:var(--camel); transform:translateY(-3px); background:var(--cream); }
+  .plat-tag { font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--camel); }
+  .plat-name { font-weight:600; font-size:18px; }
+  .plat-desc { font-size:14px; color:var(--muted); line-height:1.5; flex:1; margin-bottom:4px; }
+  .plat-cta { font-weight:500; font-size:14.5px; color:var(--navy); }
+
+  footer { text-align:center; padding: 30px 0 50px; color: var(--muted); font-size: 13px; }
+  footer .brand-f { color: var(--navy); font-weight:600; letter-spacing:.2em; text-transform:uppercase; font-size:11px; }
+
+  .icn { width:15px; height:15px; stroke-width:2; }
+
+  /* Responsive */
+  @media (max-width: 820px) {
+    .grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 32px; }
+    .book-grid { grid-template-columns: 1fr; }
+    .plat-grid { grid-template-columns: 1fr; }
+    header { padding-bottom: 110px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-mark">The Escape Theorie</div>
+    <h1 class="serif">Mentee-Bereich</h1>
+    <p>Dein geschützter Raum in der Begleitung.<br />Bitte gib dein Zugangswort ein.</p>
+    <form id="gateForm" autocomplete="off">
+      <input id="pw" type="password" placeholder="Zugangswort" aria-label="Zugangswort" />
+      <button type="submit">Eintreten</button>
+      <div class="gate-error" id="err"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app">
+  <header>
+    <div class="wrap">
+      <div class="topbar">
+        <div class="brand">The Escape Theorie · Mentoring</div>
+        <button class="logout" id="logout">Abmelden</button>
+      </div>
+      <div class="hero">
+        <h1 class="serif" id="h-titel"></h1>
+        <p id="h-text"></p>
+        <div class="sig" id="h-sig"></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="grid">
+
+        <!-- Next meeting -->
+        <div class="card next span">
+          <div class="eyebrow">★ Dein nächstes Treffen</div>
+          <h2 class="serif" id="nx-titel"></h2>
+          <div class="when" id="nx-when"></div>
+          <div class="meta" id="nx-meta"></div>
+          <div class="countdown" id="countdown"></div>
+          <a class="btn btn-primary" id="nx-link" target="_blank" rel="noopener">
+            <svg class="icn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            Mit Google Meet beitreten
+          </a>
+        </div>
+
+        <!-- Booking -->
+        <div class="card span">
+          <div class="eyebrow">⏱ Termin bei mir buchen</div>
+          <h2 class="serif">Freier Zugriff auf meinen Kalender</h2>
+          <p class="intro-line">Bucht euch eure Termine selbst – ganz wie ihr sie braucht.</p>
+          <div class="book-grid">
+            <div class="book">
+              <div class="dur">15 <span>Min</span></div>
+              <div class="desc">Check-in für die schnellen Dinge und zum Am-Ball-Bleiben.</div>
+              <a class="btn btn-outline btn-full" id="bk-15" target="_blank" rel="noopener">Check-in buchen</a>
+            </div>
+            <div class="book">
+              <div class="dur">30 <span>Min</span></div>
+              <div class="desc">Strategie, Funnel & Tiefenarbeit – wenn's um die großen Schritte geht.</div>
+              <a class="btn btn-light btn-full" id="bk-30" target="_blank" rel="noopener" style="border:1.5px solid var(--line)">Strategie-Call buchen</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendar -->
+        <div class="card">
+          <div class="eyebrow">🗓 Alle Team-Treffen</div>
+          <h2 class="serif">Kalender</h2>
+          <p class="intro-line">Eure Team-Treffen & Calls auf einen Blick. Teilnahme freiwillig.</p>
+          <div id="calList"></div>
+        </div>
+
+        <!-- News -->
+        <div class="card">
+          <div class="eyebrow">✦ Neues von mir</div>
+          <h2 class="serif">Updates</h2>
+          <div id="newsList" style="margin-top:10px"></div>
+        </div>
+
+        <!-- Material -->
+        <div class="card span">
+          <div class="eyebrow">▣ Für dich</div>
+          <h2 class="serif" style="margin-bottom:16px">Material & Ressourcen</h2>
+          <div class="mat-list" id="matList"></div>
+        </div>
+
+        <!-- Plattformen -->
+        <div class="card span">
+          <div class="eyebrow">▢ Plattformen & Tools</div>
+          <h2 class="serif">Eure Arbeits-Plattformen</h2>
+          <p class="intro-line">Hier arbeiten wir gemeinsam – einfach einloggen und loslegen.</p>
+          <div class="plat-grid" id="platList"></div>
+        </div>
+
+      </div>
+    </div>
+    <footer>
+      <div class="brand-f">The Escape Theorie</div>
+      <div style="margin-top:6px">Dein geschützter Mentee-Bereich · Mit 💛 für dich gebaut</div>
+    </footer>
+  </main>
+</div>
+
+<script>
+/* ---------- Helpers ---------- */
+const MON = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+const MONL = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const TAG = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+const $ = id => document.getElementById(id);
+function parseDate(s){ const [d,t]=s.split(" "); const [y,m,day]=d.split("-").map(Number); const [h,min]=t.split(":").map(Number); return new Date(y,m-1,day,h,min); }
+function fmtLong(dt){ return `${TAG[dt.getDay()]}, ${dt.getDate()}. ${MONL[dt.getMonth()]} ${dt.getFullYear()} · ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')} Uhr`; }
+
+/* ---------- Login ---------- */
+const SKEY = "tet_mentee_auth";
+function showApp(){ $("gate").style.display="none"; $("app").style.display="block"; render(); }
+$("gateForm").addEventListener("submit", e=>{
+  e.preventDefault();
+  if ($("pw").value.trim() === DASHBOARD.passwort){ sessionStorage.setItem(SKEY,"1"); showApp(); }
+  else { $("err").textContent = "Das Zugangswort stimmt leider nicht. Versuch es nochmal."; $("pw").value=""; }
+});
+$("logout").addEventListener("click", ()=>{ sessionStorage.removeItem(SKEY); location.reload(); });
+
+/* ---------- Render ---------- */
+function render(){
+  const D = DASHBOARD;
+
+  // Greeting
+  $("h-titel").textContent = D.begruessung.titel;
+  $("h-text").textContent  = D.begruessung.text;
+  $("h-sig").textContent   = "— " + D.begruessung.signatur;
+
+  // Kommende Treffen – eine einzige Quelle: die Liste `teamTreffen`.
+  // Chronologisch sortiert, vergangene Termine fallen automatisch raus.
+  const now = new Date();
+  const upcoming = D.teamTreffen
+    .map(t => ({ ...t, dt: parseDate(t.datum) }))
+    .filter(t => t.dt >= new Date(now.getTime() - 3600*1000))
+    .sort((a, b) => a.dt - b.dt);
+
+  // Nächstes Treffen (großes Highlight) = das erste kommende aus der Liste.
+  // Pro-Termin-Felder (titel/dauer/beschreibung) haben Vorrang vor den Standardtexten.
+  const info = D.treffenInfo, nx = upcoming[0];
+  const meetIcon = '<svg class="icn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
+  if (nx) {
+    $("nx-titel").textContent = nx.titel || info.titel;
+    $("nx-when").textContent  = fmtLong(nx.dt);
+    $("nx-meta").textContent  = [nx.dauer || info.dauer, nx.beschreibung || info.beschreibung].filter(Boolean).join(" · ");
+    $("nx-link").href = nx.meetLink;
+    $("nx-link").innerHTML = meetIcon + " " + ((nx.meetLink || "").includes("zoom") ? "Per Zoom beitreten" : "Mit Google Meet beitreten");
+    $("nx-link").style.display = "";
+    startCountdown(nx.dt);
+  } else {
+    $("nx-titel").textContent = info.titel;
+    $("nx-when").textContent  = "Aktuell ist kein Termin geplant.";
+    $("nx-meta").textContent  = "Neue Termine folgen in Kürze 💛";
+    $("nx-link").style.display = "none";
+    $("countdown").innerHTML  = "";
+  }
+
+  // Booking
+  $("bk-15").href = D.buchung.link15;
+  $("bk-30").href = D.buchung.link30;
+
+  // Calendar (nutzt dieselbe `upcoming`-Liste von oben)
+  $("calList").innerHTML = upcoming.length ? upcoming.map((t,i)=>`
+    <div class="cal-item">
+      <div class="cal-date"><div class="d">${t.dt.getDate()}</div><div class="m">${MON[t.dt.getMonth()]}</div></div>
+      <div class="cal-info">
+        <div class="t">${t.titel} ${i===0?'<span class="cal-soon">· als nächstes</span>':''}</div>
+        <div class="s">${TAG[t.dt.getDay()]} · ${String(t.dt.getHours()).padStart(2,'0')}:${String(t.dt.getMinutes()).padStart(2,'0')} Uhr</div>
+      </div>
+      <a class="btn btn-outline" href="${t.meetLink}" target="_blank" rel="noopener">Beitreten</a>
+    </div>`).join("") : `<p class="intro-line" style="margin:0">Aktuell sind keine Termine eingetragen. Schau bald wieder vorbei 💛</p>`;
+
+  // News
+  $("newsList").innerHTML = D.news.map(n=>`
+    <div class="news-item">
+      <div class="news-date">${n.datum}</div>
+      <h3>${n.titel}</h3>
+      <p>${n.text}</p>
+    </div>`).join("");
+
+  // Material (leer = freundlicher Platzhalter)
+  const fileIco = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`;
+  const arr = `<svg class="icn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
+  $("matList").innerHTML = D.material.length
+    ? D.material.map(m=>`
+        <a class="mat" href="${m.link}" target="_blank" rel="noopener">
+          <div class="mat-ico">${fileIco}</div>
+          <div class="mat-txt"><div class="t">${m.titel}</div><div class="s">${m.beschreibung}</div></div>
+          <div class="arr">${arr}</div>
+        </a>`).join("")
+    : `<p class="intro-line" style="margin:0">Hier sammeln sich bald deine Tools, Anleitungen & Workbooks. 💛</p>`;
+
+  // Plattformen & Tools
+  $("platList").innerHTML = (D.plattformen || []).map(p=>`
+    <a class="plat" href="${p.link}" target="_blank" rel="noopener">
+      <div class="plat-tag">${p.platform}</div>
+      <div class="plat-name">${p.name}</div>
+      <div class="plat-desc">${p.beschreibung}</div>
+      <span class="plat-cta">${p.cta} →</span>
+    </a>`).join("");
+}
+
+/* ---------- Countdown ---------- */
+let cdTimer;
+function startCountdown(target){
+  clearInterval(cdTimer);
+  function tick(){
+    const diff = target - new Date();
+    const el = $("countdown");
+    if (diff <= 0){ el.innerHTML = `<div class="cd-box" style="flex:none;width:100%"><div class="cd-num" style="font-size:18px">Läuft gerade – komm dazu! 🎉</div></div>`; clearInterval(cdTimer); return; }
+    const d=Math.floor(diff/86400000), h=Math.floor(diff/3600000)%24, m=Math.floor(diff/60000)%60, s=Math.floor(diff/1000)%60;
+    el.innerHTML = [[d,"Tage"],[h,"Std"],[m,"Min"],[s,"Sek"]].map(([n,l])=>`<div class="cd-box"><div class="cd-num">${String(n).padStart(2,'0')}</div><div class="cd-lbl">${l}</div></div>`).join("");
+  }
+  tick(); cdTimer=setInterval(tick,1000);
+}
+
+/* ---------- Auto-Login bei bestehender Session (am Ende, damit alle Funktionen & Variablen initialisiert sind) ---------- */
+if (sessionStorage.getItem(SKEY)==="1") showApp();
+</script>
+</body>
+</html>
