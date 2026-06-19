@@ -366,7 +366,6 @@ const DASHBOARD = {
         <div class="hero-text">
           <h1 class="serif" id="h-titel"></h1>
           <p id="h-text"></p>
-          <div class="sig" id="h-sig"></div>
         </div>
         <div class="mentor">
           <img class="mentor-img" src="anne-avatar.jpg" alt="Anne Siebenkees" />
@@ -477,7 +476,6 @@ function render(){
   // Greeting
   $("h-titel").textContent = D.begruessung.titel;
   $("h-text").textContent  = D.begruessung.text;
-  $("h-sig").textContent   = "— " + D.begruessung.signatur;
 
   // Kommende Treffen – eine einzige Quelle: die Liste `teamTreffen`.
   // Chronologisch sortiert, vergangene Termine fallen automatisch raus.
