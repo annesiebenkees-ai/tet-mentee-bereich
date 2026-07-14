@@ -6,7 +6,11 @@
       "mcp__Metricool__getBrandSettings",
       "mcp__Metricool__createScheduledPost",
       "mcp__Metricool__updateScheduledPost",
-      "mcp__Metricool__getBestTimeToPostByNetwork"
+      "mcp__Metricool__getBestTimeToPostByNetwork",
+      "mcp__227e92df-490d-4863-ad01-1d547cefaf39",
+      "mcp__227e92df-490d-4863-ad01-1d547cefaf39__getScheduledPosts",
+      "mcp__227e92df-490d-4863-ad01-1d547cefaf39__updateScheduledPost",
+      "mcp__227e92df-490d-4863-ad01-1d547cefaf39__createScheduledPost"
     ]
   }
 }
