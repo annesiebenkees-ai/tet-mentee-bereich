@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Metricool",
+      "mcp__Metricool__getScheduledPosts",
+      "mcp__Metricool__getBrandSettings",
+      "mcp__Metricool__createScheduledPost",
+      "mcp__Metricool__updateScheduledPost",
+      "mcp__Metricool__getBestTimeToPostByNetwork"
+    ]
+  }
+}

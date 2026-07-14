@@ -112,7 +112,7 @@ const DASHBOARD = {
     --navy:   #0d1c32;
     --navy-2: #142844;
     --blue:   #b3dde9;
-    --camel:  #cdb08f;
+    --yellow: #FDDF5B;
     --white:  #ffffff;
     --cream:  #f5f1ea;
     --ink:    #0d1c32;
@@ -152,7 +152,7 @@ const DASHBOARD = {
   }
   .gate-mark {
     font-family:'Jost'; font-weight:600; letter-spacing:.32em;
-    font-size:11px; text-transform:uppercase; color:var(--camel);
+    font-size:11px; text-transform:uppercase; color:var(--yellow);
     margin-bottom: 18px;
   }
   .gate-card h1 { font-size: 27px; font-weight: 600; margin-bottom: 8px; }
@@ -162,7 +162,7 @@ const DASHBOARD = {
     border: 1.5px solid var(--line); border-radius: 14px; outline: none;
     transition: border-color .2s; text-align:center; letter-spacing:.04em;
   }
-  .gate-card input:focus { border-color: var(--camel); }
+  .gate-card input:focus { border-color: var(--yellow); }
   .gate-card button {
     width: 100%; margin-top: 14px; padding: 15px; font-size: 15px; font-weight: 500;
     font-family:'Jost'; color: var(--white); background: var(--navy);
@@ -217,7 +217,7 @@ const DASHBOARD = {
   .card.span { grid-column: 1 / -1; }
   .eyebrow {
     font-size: 11px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase;
-    color: var(--camel); margin-bottom: 14px; display:flex; align-items:center; gap:8px;
+    color: var(--yellow); margin-bottom: 14px; display:flex; align-items:center; gap:8px;
   }
   .card h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
 
@@ -251,7 +251,7 @@ const DASHBOARD = {
   .btn-light { background: var(--white); color: var(--navy); }
   .btn-light:hover { transform: translateY(-2px); }
   .btn-outline { background: transparent; color: var(--navy); border:1.5px solid var(--line); }
-  .btn-outline:hover { border-color: var(--camel); background: var(--cream); }
+  .btn-outline:hover { border-color: var(--yellow); background: var(--cream); }
   .btn-full { width:100%; }
 
   /* Booking cards */
@@ -260,7 +260,7 @@ const DASHBOARD = {
     border: 1.5px solid var(--line); border-radius: 18px; padding: 22px;
     display:flex; flex-direction:column; gap: 6px; transition: border-color .2s, transform .15s;
   }
-  .book:hover { border-color: var(--camel); transform: translateY(-3px); }
+  .book:hover { border-color: var(--yellow); transform: translateY(-3px); }
   .book .dur { font-family:'Playfair Display',serif; font-size: 30px; font-weight: 600; }
   .book .dur span { font-size: 16px; font-weight:500; color: var(--muted); }
   .book .desc { font-size: 14px; color: var(--muted); line-height:1.5; flex:1; margin-bottom: 8px; }
@@ -280,13 +280,13 @@ const DASHBOARD = {
   .cal-info .t { font-weight: 500; font-size: 15.5px; }
   .cal-info .s { font-size: 13.5px; color: var(--muted); margin-top:2px; }
   .cal-item .btn { padding: 9px 18px; font-size: 13.5px; }
-  .cal-soon { font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--camel); }
+  .cal-soon { font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--yellow); }
 
   /* News */
   .news-item { padding: 18px 0; border-bottom: 1px solid var(--line); }
   .news-item:first-child { padding-top: 4px; }
   .news-item:last-child { border-bottom:none; padding-bottom: 0; }
-  .news-date { font-size: 12px; letter-spacing:.08em; text-transform:uppercase; color: var(--camel); font-weight:500; }
+  .news-date { font-size: 12px; letter-spacing:.08em; text-transform:uppercase; color: var(--yellow); font-weight:500; }
   .news-item h3 { font-size: 17px; font-weight: 600; margin: 6px 0; }
   .news-item p { font-size: 14.5px; color: var(--muted); line-height: 1.6; }
 
@@ -296,7 +296,7 @@ const DASHBOARD = {
     display:flex; align-items:center; gap: 16px; text-decoration:none; color:inherit;
     border:1.5px solid var(--line); border-radius: 16px; padding: 16px 18px; transition: border-color .2s, transform .15s, background .2s;
   }
-  .mat:hover { border-color: var(--camel); transform: translateX(4px); background: var(--cream); }
+  .mat:hover { border-color: var(--yellow); transform: translateX(4px); background: var(--cream); }
   .mat-ico {
     flex-shrink:0; width:42px; height:42px; border-radius: 12px; background: var(--navy);
     display:flex; align-items:center; justify-content:center;
@@ -313,8 +313,8 @@ const DASHBOARD = {
     border:1.5px solid var(--line); border-radius:18px; padding:22px;
     transition: border-color .2s, transform .15s, background .2s;
   }
-  .plat:hover { border-color:var(--camel); transform:translateY(-3px); background:var(--cream); }
-  .plat-tag { font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--camel); }
+  .plat:hover { border-color:var(--yellow); transform:translateY(-3px); background:var(--cream); }
+  .plat-tag { font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--yellow); }
   .plat-name { font-weight:600; font-size:18px; }
   .plat-desc { font-size:14px; color:var(--muted); line-height:1.5; flex:1; margin-bottom:4px; }
   .plat-cta { font-weight:500; font-size:14.5px; color:var(--navy); }
