@@ -38,6 +38,20 @@ const DASHBOARD = {
     link30: "https://call-anne-siebenkees-30.youcanbook.me",       // ← 30-Min Strategie Link
   },
 
+  /* --- KPI-Week: monatliches KPI-Tracking ------------------------------- */
+  // `anker` = ein bekanntes KPI-Week-Datum. Das Dashboard rollt es AUTOMATISCH
+  // monatlich weiter und zeigt immer die nächste anstehende KPI-Week + Erinnerung.
+  // Du musst hier also nie wieder das Datum ändern.
+  kpiWeek: {
+    anker: "2026-07-27",   // ← ein KPI-Week-Termin (Tag im Monat zählt), rollt monatlich weiter
+    link: "https://airtable.com/appuUyAbs2BOPJAjK/pagsTOJsMsSM9loEM/form",
+  },
+
+  /* --- Done-4-You (D4Y): Bereiche im Business abgeben ------------------- */
+  d4y: {
+    link: "https://airtable.com/appuUyAbs2BOPJAjK/pagTQnAvJc3TpbEqF/form",
+  },
+
   /* --- Kalender: alle kommenden Team-Treffen ---------------------------- */
   // Neuen Termin = neue Zeile nach dem Muster. Vergangene einfach löschen.
   teamTreffen: [
@@ -53,6 +67,7 @@ const DASHBOARD = {
     { datum: "2026-07-21 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
     { datum: "2026-07-31 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
     { datum: "2026-08-04 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
+    { datum: "2026-08-05 09:00", titel: "☕ Co-Working mit Anne — KI & Social Media", meetLink: "https://zoom.us/j/94289249769", dauer: "Special-Call · Co-Working", beschreibung: "Gemeinsam an deinem KI-Social-Media-Content arbeiten. Per Zoom." },
     { datum: "2026-08-14 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
     { datum: "2026-08-18 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
     { datum: "2026-08-28 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
@@ -399,6 +414,26 @@ const DASHBOARD = {
           </div>
         </div>
 
+        <!-- KPI-Week (monatlich, rollt automatisch weiter) -->
+        <div class="card next">
+          <div class="eyebrow">📊 Einmal im Monat</div>
+          <h2 class="serif">KPI-Week</h2>
+          <div class="when" id="kpi-when"></div>
+          <div class="meta">Trag einmal im Monat deine Zahlen ein – so sehen wir gemeinsam, was wirklich wirkt.</div>
+          <a class="btn btn-primary" id="kpi-link" target="_blank" rel="noopener">
+            <svg class="icn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6m4 6V5m4 14v-9M5 19h14"/></svg>
+            Deine KPIs eintragen
+          </a>
+        </div>
+
+        <!-- Done-4-You Antrag -->
+        <div class="card">
+          <div class="eyebrow">⇢ Aufgaben abgeben</div>
+          <h2 class="serif">Done-4-You Antrag</h2>
+          <p class="intro-line">Du möchtest Bereiche in deinem Business abgeben? Stell hier deinen D4Y-Antrag – wir kümmern uns darum.</p>
+          <a class="btn btn-outline" id="d4y-link" target="_blank" rel="noopener">D4Y-Antrag ausfüllen</a>
+        </div>
+
         <!-- Calendar -->
         <div class="card">
           <div class="eyebrow">🗓 Alle Team-Treffen</div>
@@ -489,6 +524,21 @@ function render(){
   // Booking
   $("bk-15").href = D.buchung.link15;
   $("bk-30").href = D.buchung.link30;
+
+  // KPI-Week (monatlich – rollt automatisch vom Anker-Datum weiter)
+  if (D.kpiWeek) {
+    const anker = parseDate(D.kpiWeek.anker + " 00:00");
+    const today = new Date(); today.setHours(0,0,0,0);
+    let nextKpi = new Date(anker);
+    while (nextKpi < today) { nextKpi.setMonth(nextKpi.getMonth() + 1); }
+    const days = Math.round((nextKpi - today) / 86400000);
+    const rel = days === 0 ? "diese Woche – jetzt dran!" : days === 1 ? "morgen" : `in ${days} Tagen`;
+    $("kpi-when").textContent = `Nächste KPI-Week: ${TAG[nextKpi.getDay()]}, ${nextKpi.getDate()}. ${MONL[nextKpi.getMonth()]} ${nextKpi.getFullYear()} · ${rel}`;
+    $("kpi-link").href = D.kpiWeek.link;
+  }
+
+  // Done-4-You Antrag
+  if (D.d4y) $("d4y-link").href = D.d4y.link;
 
   // Calendar (nutzt dieselbe `upcoming`-Liste von oben)
   $("calList").innerHTML = upcoming.length ? upcoming.map((t,i)=>`
