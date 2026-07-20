@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Begleiter 2.0 · The Escape Theory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0d1c32; --navy-2:#16294a; --camel:#cdb08f; --camel-d:#b8946c;
+    --blue:#b3dde9; --cream:#f4efe7; --card:#ffffff; --line:#e7dece;
+    --ink:#1c2433; --muted:#6b7280;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#e9e2d6}
+  body{font-family:'Jost',sans-serif;-webkit-font-smoothing:antialiased;display:flex;justify-content:center}
+
+  .panel{
+    position:relative; width:1600px; overflow:hidden;
+    background:
+      radial-gradient(1200px 620px at 108% -12%, rgba(205,176,143,.30), transparent 60%),
+      radial-gradient(1000px 560px at -8% 116%, rgba(179,221,233,.30), transparent 58%),
+      var(--cream);
+    padding:56px 60px 44px;
+  }
+  /* dezente Ecken-Shapes (Brand: shapes in the corners) */
+  .panel::before{content:"";position:absolute;top:-90px;left:-90px;width:220px;height:220px;border:2px solid rgba(205,176,143,.4);border-radius:50%}
+  .panel::after{content:"";position:absolute;bottom:-70px;right:38%;width:150px;height:150px;border:2px solid rgba(179,221,233,.5);border-radius:50%}
+
+  .eyebrow{display:flex;align-items:center;gap:12px;color:var(--camel-d);letter-spacing:.32em;text-transform:uppercase;font-size:15px;font-weight:600;margin-bottom:26px}
+  .eyebrow .dot{width:11px;height:11px;border-radius:50%;background:var(--camel)}
+
+  .body{display:grid;grid-template-columns:1fr 500px;gap:48px;position:relative;z-index:2}
+
+  /* LINKS */
+  h1{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:56px;line-height:1.02;margin-bottom:16px;letter-spacing:-.5px}
+  h1 .num{color:var(--camel-d)}
+  .mentor{font-size:19px;color:var(--ink);margin-bottom:20px}
+  .mentor b{font-weight:700}
+  .mentor .role{color:var(--muted)}
+  .desc{font-size:18px;line-height:1.55;color:#3f4859;max-width:760px;margin-bottom:20px}
+  .bul{list-style:none;margin-bottom:20px}
+  .bul li{position:relative;padding-left:30px;font-size:18px;color:var(--ink);margin-bottom:12px;font-weight:500}
+  .bul li::before{content:"";position:absolute;left:0;top:9px;width:10px;height:10px;border-radius:50%;background:var(--camel)}
+  .praxis{font-size:18px;line-height:1.5;color:#3f4859;margin-bottom:28px;max-width:760px}
+  .praxis b{color:var(--navy);font-weight:700}
+
+  .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .chip{display:block;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px 18px;text-decoration:none;box-shadow:0 12px 26px -20px rgba(13,28,50,.4)}
+  .chip .lab{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);margin-bottom:5px}
+  .chip .lab .b{width:8px;height:8px;border-radius:50%;background:var(--camel)}
+  .chip .s{font-size:14.5px;color:var(--muted);line-height:1.35}
+
+  /* RECHTS */
+  .right{display:flex;flex-direction:column;gap:22px}
+  .who{display:flex;align-items:center;gap:18px}
+  .who img{width:104px;height:104px;border-radius:50%;object-fit:cover;border:3px solid var(--camel);box-shadow:0 14px 30px -14px rgba(13,28,50,.5)}
+  .who .n{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--camel-d);font-weight:600}
+  .who .nn{font-family:'Playfair Display',serif;font-size:26px;color:var(--navy);font-weight:700;line-height:1.1}
+  .who .rr{font-size:15px;color:var(--muted);margin-top:2px}
+
+  /* Teambereich-Hero (der Star) */
+  .team{position:relative;display:block;text-decoration:none;border-radius:24px;padding:30px 30px 28px;overflow:hidden;
+    background:linear-gradient(150deg,var(--navy) 0%,var(--navy-2) 100%);
+    box-shadow:0 30px 60px -24px rgba(13,28,50,.6);border:1px solid rgba(255,255,255,.06)}
+  .team::after{content:"";position:absolute;top:-60px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(179,221,233,.22),transparent 70%)}
+  .team .brand{display:flex;align-items:center;gap:9px;color:rgba(255,255,255,.7);font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;margin-bottom:18px}
+  .team .brand .d{width:8px;height:8px;border-radius:50%;background:var(--camel)}
+  .team .ico{width:60px;height:60px;border-radius:16px;background:var(--camel);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+  .team .ico svg{width:30px;height:30px;stroke:var(--navy)}
+  .team .eye{color:var(--blue);font-size:13px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;margin-bottom:6px}
+  .team h2{font-family:'Playfair Display',serif;color:#fff;font-size:38px;font-weight:700;line-height:1;margin-bottom:10px}
+  .team .sub{color:rgba(255,255,255,.72);font-size:15.5px;line-height:1.4;margin-bottom:22px}
+  .team .btn{display:inline-flex;align-items:center;gap:10px;background:var(--blue);color:var(--navy);font-weight:700;font-size:17px;padding:14px 26px;border-radius:30px}
+
+  .callout{display:flex;gap:14px;align-items:flex-start;background:rgba(205,176,143,.16);border:1.5px solid var(--camel);border-radius:16px;padding:18px 20px}
+  .callout .em{font-size:22px;line-height:1}
+  .callout .t{font-size:16px;line-height:1.45;color:#3a3325}
+  .callout .t b{color:var(--navy);font-weight:700}
+
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:34px;padding-top:22px;border-top:1.5px solid var(--line);position:relative;z-index:2}
+  .foot .url{display:flex;align-items:center;gap:11px;font-size:17px;font-weight:600;color:var(--navy)}
+  .foot .url svg{width:19px;height:19px;stroke:var(--camel-d)}
+  .foot .fr{font-size:15px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="eyebrow"><span class="dot"></span> The Escape Theory · Business Begleitung</div>
+
+  <div class="body">
+    <!-- LINKS: Infos -->
+    <div class="left">
+      <h1>Business Begleiter <span class="num">2.0</span></h1>
+      <div class="mentor">Deine Mentorin: <b>Anne Siebenkees</b> · <span class="role">Strategische Mentorin</span></div>
+      <p class="desc">Ich bin deine Ansprechpartnerin rund um die strategische Ausrichtung und Führung deines Business. Ab sofort stehen dir dafür zusätzliche Ressourcen zur Verfügung:</p>
+      <ul class="bul">
+        <li>Wöchentliche Business-Begleiter Team-Calls</li>
+        <li>1:1 Check-in Calls (15 Min) nach Bedarf</li>
+        <li>Monatliches KPI-Tracking</li>
+      </ul>
+      <div class="chips">
+        <a class="chip" href="https://airtable.com/appuUyAbs2BOPJAjK/pagsTOJsMsSM9loEM/form" target="_blank" rel="noopener">
+          <div class="lab"><span class="b"></span> KPI-Tracking</div>
+          <div class="s">Deine Kennzahlen einmal im Monat eintragen.</div>
+        </a>
+        <a class="chip" href="https://call-anne-siebenkees-45.youcanbook.me" target="_blank" rel="noopener">
+          <div class="lab"><span class="b"></span> Call-Booking</div>
+          <div class="s">Deinen 1:1 Expertencall nach Bedarf buchen.</div>
+        </a>
+        <a class="chip" href="https://airtable.com/appuUyAbs2BOPJAjK/pagTQnAvJc3TpbEqF/form" target="_blank" rel="noopener">
+          <div class="lab"><span class="b"></span> Done-4-You</div>
+          <div class="s">Bereiche abgeben? Hier deinen Antrag stellen.</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- RECHTS: Foto + Teambereich-Hero -->
+    <div class="right">
+      <div class="who">
+        <img src="anne-avatar.jpg" alt="Anne Siebenkees">
+        <div>
+          <div class="n">Deine Mentorin</div>
+          <div class="nn">Anne Siebenkees</div>
+          <div class="rr">Strategische Mentorin · The Escape Theory</div>
+        </div>
+      </div>
+
+      <a class="team" href="https://annesiebenkees-ai.github.io/tet-mentee-bereich/" target="_blank" rel="noopener">
+        <div class="brand"><span class="d"></span> The Escape Theory</div>
+        <div class="ico">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+        </div>
+        <div class="eye">Dein Teambereich</div>
+        <h2>Mentee-Bereich</h2>
+        <div class="sub">Termine · Buchungen · KPI-Tracking · deine Tools · Done-4-You — alles an einem Ort.</div>
+        <span class="btn">Jetzt öffnen →</span>
+      </a>
+
+      <div class="callout">
+        <span class="em">👉</span>
+        <div class="t"><b>Arbeite ab jetzt aktiv mit deinem Teambereich.</b> Hier läuft alles für dich zusammen — schau regelmäßig rein und speichere ihn dir als Lesezeichen.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="url">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      annesiebenkees-ai.github.io/tet-mentee-bereich
+    </div>
+    <div class="fr">Dein Mentee-Bereich — jederzeit für dich offen 💛</div>
+  </div>
+</div>
+</body>
+</html>
