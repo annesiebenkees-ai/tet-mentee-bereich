@@ -78,6 +78,13 @@ const DASHBOARD = {
   // Neueste oben. Datum nur als Anzeige-Text.
   news: [
     {
+      datum: "20. Juli 2026",
+      titel: "Neu: Deine Claude-Code-Tools sind da 🛠️",
+      text: "Ich habe dir unter „Material & Ressourcen“ mehrere Claude-Code-Tools bereitgestellt – lad sie dir runter und leg direkt los. Ich würde mich riesig über dein Feedback freuen: Was hilft dir, was fehlt dir noch? Sag's mir in 2 Minuten. 💛",
+      link: "umfrage.html",
+      linkText: "Zur kurzen Umfrage",
+    },
+    {
       datum: "Terminänderung",
       titel: "Nächstes Treffen: Dienstag, 21. Juli um 14:00 Uhr",
       text: "Unser Team-Treffen dieser Woche habe ich von Freitag auf Dienstag, den 21. Juli um 14:00 Uhr vorgezogen. Trag es dir bitte neu ein – ich freue mich auf dich! 🌞",
@@ -551,12 +558,13 @@ function render(){
       <a class="btn btn-outline" href="${t.meetLink}" target="_blank" rel="noopener">Beitreten</a>
     </div>`).join("") : `<p class="intro-line" style="margin:0">Aktuell sind keine Termine eingetragen. Schau bald wieder vorbei 💛</p>`;
 
-  // News
+  // News (optionaler Button pro Eintrag über n.link + n.linkText)
   $("newsList").innerHTML = D.news.map(n=>`
     <div class="news-item">
       <div class="news-date">${n.datum}</div>
       <h3>${n.titel}</h3>
       <p>${n.text}</p>
+      ${n.link ? `<a class="btn btn-primary" href="${n.link}" target="_blank" rel="noopener" style="margin-top:12px">${n.linkText || "Mehr erfahren"}</a>` : ""}
     </div>`).join("");
 
   // Material (leer = freundlicher Platzhalter)
