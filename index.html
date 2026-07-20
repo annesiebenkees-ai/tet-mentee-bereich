@@ -80,9 +80,11 @@ const DASHBOARD = {
     {
       datum: "20. Juli 2026",
       titel: "Neu: Deine Claude-Code-Tools sind da 🛠️",
-      text: "Ich habe dir unter „Material & Ressourcen“ mehrere Claude-Code-Tools bereitgestellt – lad sie dir runter und leg direkt los. Ich würde mich riesig über dein Feedback freuen: Was hilft dir, was fehlt dir noch? Sag's mir in 2 Minuten. 💛",
+      text: "Ich habe dir unter „Material & Ressourcen“ mehrere Claude-Code-Tools bereitgestellt – lad sie dir runter und leg direkt los. Ich würde mich riesig über dein Feedback freuen: Was hilft dir, was fehlt dir noch? Und wenn du dir ein bestimmtes Tool wünschst, sag's mir gern. 💛",
       link: "umfrage.html",
       linkText: "Zur kurzen Umfrage",
+      link2: "wuensche.html",
+      linkText2: "Tool-Wunsch abgeben",
     },
     {
       datum: "Terminänderung",
@@ -558,13 +560,16 @@ function render(){
       <a class="btn btn-outline" href="${t.meetLink}" target="_blank" rel="noopener">Beitreten</a>
     </div>`).join("") : `<p class="intro-line" style="margin:0">Aktuell sind keine Termine eingetragen. Schau bald wieder vorbei 💛</p>`;
 
-  // News (optionaler Button pro Eintrag über n.link + n.linkText)
+  // News (bis zu 2 optionale Buttons pro Eintrag: n.link/n.linkText + n.link2/n.linkText2)
   $("newsList").innerHTML = D.news.map(n=>`
     <div class="news-item">
       <div class="news-date">${n.datum}</div>
       <h3>${n.titel}</h3>
       <p>${n.text}</p>
-      ${n.link ? `<a class="btn btn-primary" href="${n.link}" target="_blank" rel="noopener" style="margin-top:12px">${n.linkText || "Mehr erfahren"}</a>` : ""}
+      ${(n.link || n.link2) ? `<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px">
+        ${n.link ? `<a class="btn btn-primary" href="${n.link}" target="_blank" rel="noopener">${n.linkText || "Mehr erfahren"}</a>` : ""}
+        ${n.link2 ? `<a class="btn btn-outline" href="${n.link2}" target="_blank" rel="noopener">${n.linkText2 || "Mehr"}</a>` : ""}
+      </div>` : ""}
     </div>`).join("");
 
   // Material (leer = freundlicher Platzhalter)

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dein Feedback · The Escape Theory</title>
+<title>Tool-Wunsch · The Escape Theory</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
@@ -44,21 +44,7 @@
     padding:13px 14px; transition:border-color .15s;
   }
   input[type=text]:focus, textarea:focus{outline:none;border-color:var(--camel)}
-  textarea{min-height:92px;resize:vertical}
-  .opts{display:flex;flex-direction:column;gap:10px}
-  .opts.row{flex-direction:row;flex-wrap:wrap;gap:10px}
-  .pick{
-    display:flex;align-items:center;gap:10px; cursor:pointer;
-    border:1.5px solid var(--line); background:var(--cream);
-    border-radius:12px; padding:11px 14px; font-size:14.5px; transition:.15s;
-  }
-  .pick:hover{border-color:var(--camel)}
-  .pick input{accent-color:var(--navy);width:17px;height:17px;flex-shrink:0}
-  .opts.row .pick{padding:11px 16px}
-  .scale{display:flex;gap:8px;flex-wrap:wrap}
-  .scale .pick{flex-direction:column;gap:6px;min-width:58px;justify-content:center;text-align:center}
-  .scale .n{font-weight:700;font-size:18px}
-  .scale .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  textarea{min-height:110px;resize:vertical}
   button{
     width:100%; font-family:inherit; font-weight:600; font-size:16px;
     color:var(--white); background:var(--navy); border:none; border-radius:14px;
@@ -67,7 +53,6 @@
   button:hover{background:var(--navy-2);transform:translateY(-1px)}
   .foot{text-align:center;color:var(--muted);font-size:12.5px;margin-top:18px}
   .hp{position:absolute;left:-9999px}
-  /* Danke-Zustand */
   .thanks{text-align:center;padding:22px 8px}
   .thanks .big{font-size:46px;margin-bottom:10px}
   .thanks h1{margin-bottom:10px}
@@ -81,69 +66,47 @@
 
   <!-- FORMULAR -->
   <div class="card" id="formCard">
-    <h1>Wie waren deine Tools? 💛</h1>
-    <p class="intro">Ich habe dir Claude-Code-Tools in deinem Mentee-Bereich bereitgestellt. Dein ehrliches Feedback hilft mir, sie besser zu machen — 2 Minuten, alles freiwillig.</p>
+    <h1>Dein Tool-Wunsch 🌱</h1>
+    <p class="intro">Welches Claude-Code-Tool würde dir das Leben leichter machen? Sag's mir — deine Wünsche fließen direkt in die nächsten Tools ein.</p>
 
     <form action="https://formsubmit.co/anne.siebenkees@lovelifepassport.com" method="POST">
       <!-- FormSubmit-Steuerung -->
-      <input type="hidden" name="_subject" value="Neues Tool-Feedback aus dem Mentee-Bereich 💛">
+      <input type="hidden" name="_subject" value="Neuer Tool-Wunsch aus dem Mentee-Bereich 🌱">
       <input type="hidden" name="_template" value="table">
       <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_next" value="https://annesiebenkees-ai.github.io/tet-mentee-bereich/umfrage.html?danke=1">
+      <input type="hidden" name="_next" value="https://annesiebenkees-ai.github.io/tet-mentee-bereich/wuensche.html?danke=1">
       <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off">
 
       <div class="field">
-        <label class="q">Welche Tools hast du genutzt? <span class="opt">(Mehrfachauswahl)</span></label>
-        <div class="opts">
-          <label class="pick"><input type="checkbox" name="Genutzte Tools" value="TET Claude-Starter"> TET Claude-Starter</label>
-          <label class="pick"><input type="checkbox" name="Genutzte Tools" value="Instagram-Karussell-System"> Instagram-Karussell-System</label>
-          <label class="pick"><input type="checkbox" name="Genutzte Tools" value="TET Fundament-Modul"> TET Fundament-Modul</label>
-          <label class="pick"><input type="checkbox" name="Genutzte Tools" value="TET Landingpage-Modul"> TET Landingpage-Modul</label>
-        </div>
+        <label class="q">Welches Tool wünschst du dir?</label>
+        <textarea name="Tool-Wunsch" placeholder="z. B. „Ein Tool, das mir aus einem Podcast automatisch Reels-Ideen macht …“" required></textarea>
       </div>
 
       <div class="field">
-        <label class="q">Wie hilfreich war es für dich?</label>
-        <div class="scale">
-          <label class="pick"><input type="radio" name="Hilfreich (1-5)" value="1"><span class="n">1</span><span class="lab">gar nicht</span></label>
-          <label class="pick"><input type="radio" name="Hilfreich (1-5)" value="2"><span class="n">2</span></label>
-          <label class="pick"><input type="radio" name="Hilfreich (1-5)" value="3"><span class="n">3</span></label>
-          <label class="pick"><input type="radio" name="Hilfreich (1-5)" value="4"><span class="n">4</span></label>
-          <label class="pick"><input type="radio" name="Hilfreich (1-5)" value="5"><span class="n">5</span><span class="lab">richtig gut</span></label>
-        </div>
-      </div>
-
-      <div class="field">
-        <label class="q">Was hat dir am meisten geholfen?</label>
-        <textarea name="Was am meisten geholfen hat" placeholder="Erzähl mir, was gut lief …"></textarea>
-      </div>
-
-      <div class="field">
-        <label class="q">Was fehlt dir noch — oder was können wir besser machen?</label>
-        <textarea name="Was noch fehlt / besser gemacht werden kann" placeholder="Ehrlich rein, genau das bringt uns weiter …"></textarea>
+        <label class="q">Wobei würde es dir konkret helfen? <span class="opt">(optional)</span></label>
+        <textarea name="Wobei es helfen würde" placeholder="Welche Aufgabe kostet dich gerade am meisten Zeit oder Nerven?"></textarea>
       </div>
 
       <div class="field">
         <label class="q">Dein Name <span class="opt">(optional)</span></label>
-        <input type="text" name="Name" placeholder="Damit ich mich persönlich bedanken kann">
+        <input type="text" name="Name" placeholder="Damit ich mich bei dir melden kann, wenn's kommt">
       </div>
 
-      <button type="submit">Feedback absenden 💛</button>
-      <div class="foot">Deine Antworten gehen direkt und vertraulich an Anne.</div>
+      <button type="submit">Wunsch abschicken 🌱</button>
+      <div class="foot">Dein Wunsch geht direkt und vertraulich an Anne.</div>
     </form>
   </div>
 
   <!-- DANKE -->
   <div class="card thanks hidden" id="thanksCard">
-    <div class="big">💛</div>
-    <h1>Dankeschön!</h1>
-    <p class="intro">Dein Feedback ist bei mir gelandet — genau sowas hilft mir, die Tools für dich noch besser zu machen. Ich lese jede einzelne Antwort.</p>
+    <div class="big">🌱</div>
+    <h1>Wunsch notiert!</h1>
+    <p class="intro">Danke dir — dein Wunsch ist bei mir gelandet. Genau so entstehen die nächsten Tools: aus dem, was ihr wirklich braucht.</p>
     <a href="https://annesiebenkees-ai.github.io/tet-mentee-bereich/">← Zurück zu deinem Mentee-Bereich</a>
   </div>
 </div>
 
 <script>
-  // Nach dem Absenden leitet FormSubmit auf ?danke=1 zurück → Danke-Zustand zeigen.
   if (new URLSearchParams(location.search).get("danke") === "1") {
     document.getElementById("formCard").classList.add("hidden");
     document.getElementById("thanksCard").classList.remove("hidden");
