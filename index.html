@@ -16,9 +16,6 @@
 <script>
 const DASHBOARD = {
 
-  /* --- Zugang ----------------------------------------------------------- */
-  passwort: "TeamAnne",          // ← Passwort, das du deinen Mentees gibst
-
   /* --- Begrüßung -------------------------------------------------------- */
   begruessung: {
     titel: "Schön, dass du da bist 💛",
@@ -341,26 +338,12 @@ const DASHBOARD = {
 <body>
 
 <!-- ===================== LOGIN ===================== -->
-<div id="gate">
-  <div class="gate-card">
-    <div class="gate-mark">The Escape Theory</div>
-    <h1 class="serif">Mentee-Bereich</h1>
-    <p>Dein geschützter Raum in der Begleitung.<br />Bitte gib dein Zugangswort ein.</p>
-    <form id="gateForm" autocomplete="off">
-      <input id="pw" type="password" placeholder="Zugangswort" aria-label="Zugangswort" />
-      <button type="submit">Eintreten</button>
-      <div class="gate-error" id="err"></div>
-    </form>
-  </div>
-</div>
-
 <!-- ===================== APP ===================== -->
 <div id="app">
   <header>
     <div class="wrap">
       <div class="topbar">
         <div class="brand">The Escape Theory · Mentoring</div>
-        <button class="logout" id="logout">Abmelden</button>
       </div>
       <div class="hero">
         <div class="hero-text">
@@ -459,15 +442,8 @@ const $ = id => document.getElementById(id);
 function parseDate(s){ const [d,t]=s.split(" "); const [y,m,day]=d.split("-").map(Number); const [h,min]=t.split(":").map(Number); return new Date(y,m-1,day,h,min); }
 function fmtLong(dt){ return `${TAG[dt.getDay()]}, ${dt.getDate()}. ${MONL[dt.getMonth()]} ${dt.getFullYear()} · ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')} Uhr`; }
 
-/* ---------- Login ---------- */
-const SKEY = "tet_mentee_auth";
-function showApp(){ $("gate").style.display="none"; $("app").style.display="block"; render(); }
-$("gateForm").addEventListener("submit", e=>{
-  e.preventDefault();
-  if ($("pw").value.trim() === DASHBOARD.passwort){ sessionStorage.setItem(SKEY,"1"); showApp(); }
-  else { $("err").textContent = "Das Zugangswort stimmt leider nicht. Versuch es nochmal."; $("pw").value=""; }
-});
-$("logout").addEventListener("click", ()=>{ sessionStorage.removeItem(SKEY); location.reload(); });
+/* ---------- Anzeige ---------- */
+function showApp(){ $("app").style.display="block"; render(); }
 
 /* ---------- Render ---------- */
 function render(){
@@ -564,8 +540,8 @@ function startCountdown(target){
   tick(); cdTimer=setInterval(tick,1000);
 }
 
-/* ---------- Auto-Login bei bestehender Session (am Ende, damit alle Funktionen & Variablen initialisiert sind) ---------- */
-if (sessionStorage.getItem(SKEY)==="1") showApp();
+/* ---------- Dashboard direkt anzeigen (kein Passwort-Schutz mehr) ---------- */
+showApp();
 </script>
 </body>
 </html>
