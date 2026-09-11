@@ -55,29 +55,24 @@ const DASHBOARD = {
   /* --- Kalender: alle kommenden Team-Treffen ---------------------------- */
   // Neuen Termin = neue Zeile nach dem Muster. Vergangene einfach löschen.
   teamTreffen: [
-    // Treffen ist unregelmäßig (mal Di, mal Fr). Einfach jeden bekannten Termin als Zeile
-    // eintragen – vergangene werden automatisch ausgeblendet, das nächste rückt oben ins
-    // Highlight. ACHTUNG: jeder Termin hat seinen EIGENEN Meet-Link!
-    { datum: "2026-06-26 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
-    // Special-Call (einmalig, per Zoom) – eigener Titel + eigene Texte. Optionale Felder
-    // dauer/beschreibung überschreiben für diesen Termin die Standardtexte aus `treffenInfo`.
-    { datum: "2026-06-29 18:00", titel: "🎉 BUILD-Special: Das Fundament deines Social-Media-Auftritts", meetLink: "https://zoom.us/j/94972862528", dauer: "60 Min · Special-Call für meine Mentees", beschreibung: "Warum dein Auftritt ohne Content-Säulen nicht hält. Per Zoom." },
-    { datum: "2026-06-30 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
-    // 06.–21.07.2026: Sommerpause / Urlaub – keine Sprechstunde
-    { datum: "2026-07-21 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
-    { datum: "2026-07-31 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
-    { datum: "2026-08-05 09:00", titel: "❌ FÄLLT AUS: Co-Working mit Anne — KI & Social Media", meetLink: "https://zoom.us/j/94289249769", dauer: "Fällt aus wegen Krankheit", beschreibung: "Dieses Co-Working muss leider ausfallen (kranke Kinder). Wir holen es nach." },
-    { datum: "2026-08-14 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
-    { datum: "2026-08-18 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
-    // Ersatztermin für das ausgefallene Co-Working vom 05.08. (per Zoom)
-    { datum: "2026-08-21 10:00", titel: "🎉 KI-Special: KI & Social Media mit Anne", meetLink: "https://zoom.us/j/98346484829", dauer: "Special-Call für meine Mentees · per Zoom", beschreibung: "Ersatztermin für das ausgefallene Co-Working — wir arbeiten gemeinsam an deinem KI-Setup für Social Media." },
-    // verschoben von Freitag, 28.08. auf Dienstag, 25.08.
-    { datum: "2026-08-25 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
-    { datum: "2026-09-02 09:00", titel: "🎉 TET Lern-Loop: Wie du die KI richtig nutzt, ohne Opfer von generischem Content zu werden", meetLink: "https://zoom.us/j/94289249769", dauer: "90 Min · Special-Call für meine Mentees · per Zoom", beschreibung: "Wie du der KI dein Wissen beibringst, statt austauschbaren Content zu produzieren." },
-    { datum: "2026-09-11 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
-    { datum: "2026-09-15 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
-    { datum: "2026-09-25 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/shm-uyjb-yqb" },
-    { datum: "2026-09-29 14:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/dpq-ispr-hof" },
+    // NEU ab 18.09.2026: feste wöchentliche Sprechstunde – jeden FREITAG 08:30–09:30 Uhr,
+    // immer mit demselben Google-Meet-Link. Vergangene Termine werden automatisch
+    // ausgeblendet. Zum Verlängern einfach weitere Freitage nach dem Muster anhängen.
+    // Einwahl per Telefon: (DE) +49 30 300195462, PIN: 786 124 469#
+    { datum: "2026-09-18 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-09-25 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-10-02 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-10-09 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-10-16 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-10-23 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-10-30 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-11-06 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-11-13 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-11-20 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-11-27 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-12-04 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-12-11 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-12-18 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
   ],
 
   /* --- News & Updates von dir ------------------------------------------- */
@@ -85,8 +80,8 @@ const DASHBOARD = {
   news: [
     {
       datum: "Neue Termine",
-      titel: "Alle Termine bis Ende September stehen 📅",
-      text: "Der Kalender ist aktualisiert: Am Freitag, 21. August um 10:00 Uhr holen wir das ausgefallene Co-Working als KI-Special „KI & Social Media mit Anne\" nach (per Zoom). Am Mittwoch, 2. September um 9:00 Uhr gibt es den Special-Call „TET Lern-Loop – wie du die KI richtig nutzt, ohne Opfer von generischem Content zu werden\". Die Sprechstunde am Freitag, 4. September entfällt. Weiter geht es am 11., 15., 25. und 29. September. Schau dir am besten gleich die Kalenderübersicht an – jeder Termin hat seinen eigenen Link. 💛",
+      titel: "Neuer Rhythmus: jeden Freitag 08:30 Uhr 📅",
+      text: "Ab dem 18. September findet die Business Begleiter Sprechstunde fest jede Woche statt: immer freitags von 08:30 bis 09:30 Uhr, immer mit demselben Google-Meet-Link. Du musst dir also nur noch einen Termin merken – alle bisherigen Einzeltermine sind damit hinfällig. Schau in die Kalenderübersicht und trag dir die Freitage gleich fest ein. 💛",
     },
     {
       datum: "20. Juli 2026",
