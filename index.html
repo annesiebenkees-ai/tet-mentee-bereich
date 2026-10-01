@@ -38,6 +38,14 @@ const DASHBOARD = {
     link30: "https://call-anne-siebenkees-30.youcanbook.me",       // ← 30-Min Strategie Link
   },
 
+  /* --- Persönlicher Zugang, eigene Termine & Austausch ------------------ */
+  // Adresse deiner Google-Apps-Script-Web-App (siehe SETUP-ANLEITUNG.md).
+  // Solange hier "" steht, ist der Bereich wie bisher OHNE Login sichtbar und
+  // „Deine Termine“ + „Austausch“ sind ausgeblendet.
+  zugang: {
+    apiUrl: "",   // ← z. B. "https://script.google.com/macros/s/XXXX/exec"
+  },
+
   /* --- KPI-Week: monatliches KPI-Tracking ------------------------------- */
   // `anker` = ein bekanntes KPI-Week-Datum. Das Dashboard rollt es AUTOMATISCH
   // monatlich weiter und zeigt immer die nächste anstehende KPI-Week + Erinnerung.
@@ -231,7 +239,8 @@ const DASHBOARD = {
   .mentor-cap strong { display:block; color:var(--blue); font-weight:600; font-size:13.5px; letter-spacing:.02em; text-transform:none; }
 
   /* Content pulled up over header */
-  main { margin-top: -90px; padding-bottom: 70px; }
+  main { margin-top: -90px; padding-bottom: 70px; position: relative; }
+  [hidden] { display: none !important; }
 
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
   .card {
@@ -343,6 +352,72 @@ const DASHBOARD = {
   .plat-desc { font-size:14px; color:var(--muted); line-height:1.5; flex:1; margin-bottom:4px; }
   .plat-cta { font-weight:500; font-size:14.5px; color:var(--navy); }
 
+  /* Login-Info oben */
+  .who { display:flex; align-items:center; gap:12px; font-size:13px; color:rgba(255,255,255,.75); }
+  .who[hidden] { display:none; }
+
+  /* Rote Meldung */
+  .alarm {
+    background: #fdecea; border: 1.5px solid #e2574c; color: #8f1f16;
+    display:flex; gap:18px; align-items:flex-start;
+  }
+  .alarm-ico {
+    flex-shrink:0; width:44px; height:44px; border-radius:50%; background:#e2574c; color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:700;
+  }
+  .alarm h2 { color:#8f1f16; font-size:20px; }
+  .alarm p { font-size:15px; line-height:1.55; margin:6px 0 14px; }
+  .alarm .btn { background:#e2574c; color:#fff; padding:11px 20px; font-size:14px; }
+  .alarm .btn:hover { background:#c9443a; transform: translateY(-2px); }
+  .alarm .btn + .btn { background:transparent; color:#8f1f16; border:1.5px solid rgba(143,31,22,.35); }
+
+  /* Eigene Termine */
+  .my-empty { font-size:14.5px; color:var(--muted); line-height:1.6; }
+  .loading { font-size:14px; color:var(--muted); }
+
+  /* Austausch */
+  .ex-tools { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin:4px 0 20px; }
+  .ex-tools input {
+    flex:1; min-width:200px; padding:12px 16px; font-size:14.5px; font-family:'Jost';
+    border:1.5px solid var(--line); border-radius:100px; outline:none;
+  }
+  .ex-tools input:focus { border-color:var(--camel); }
+  .ex-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px; }
+  .pf { border:1.5px solid var(--line); border-radius:18px; padding:20px; display:flex; flex-direction:column; gap:10px; }
+  .pf.me { border-color: var(--camel); background: #fffcf7; }
+  .pf-head { display:flex; gap:14px; align-items:center; }
+  .pf-ava {
+    flex-shrink:0; width:52px; height:52px; border-radius:50%; background:var(--navy); color:var(--blue);
+    display:flex; align-items:center; justify-content:center; font-weight:600; font-size:18px; overflow:hidden;
+  }
+  .pf-ava img { width:100%; height:100%; object-fit:cover; }
+  .pf-name { font-weight:600; font-size:17px; }
+  .pf-name .you { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--camel); margin-left:6px; }
+  .pf-biz { font-size:13.5px; color:var(--muted); }
+  .pf p { font-size:14px; line-height:1.55; color:var(--ink); white-space:pre-line; }
+  .pf-lbl { font-size:10.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--camel); margin-bottom:-6px; }
+  .pf-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:6px; }
+  .pf-links a { font-size:13px; padding:7px 14px; }
+
+  /* Profil-Formular */
+  dialog {
+    border:none; border-radius:var(--radius); padding:0; width:min(560px, calc(100% - 32px));
+    box-shadow: var(--shadow); color:var(--ink);
+  }
+  dialog::backdrop { background: rgba(13,28,50,.55); }
+  .dlg { padding:28px; max-height:85vh; overflow:auto; }
+  .dlg h2 { font-size:22px; font-weight:600; margin-bottom:4px; }
+  .dlg label { display:block; font-size:13px; font-weight:500; margin:14px 0 6px; }
+  .dlg label small { font-weight:400; color:var(--muted); }
+  .dlg input[type=text], .dlg input[type=url], .dlg textarea {
+    width:100%; padding:11px 14px; font-size:14.5px; font-family:'Jost';
+    border:1.5px solid var(--line); border-radius:12px; outline:none; resize:vertical;
+  }
+  .dlg input:focus, .dlg textarea:focus { border-color:var(--camel); }
+  .dlg .check { display:flex; gap:10px; align-items:center; font-weight:400; }
+  .dlg-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:22px; flex-wrap:wrap; }
+  .dlg-msg { font-size:13.5px; color:#b4452f; margin-top:10px; min-height:18px; }
+
   footer { text-align:center; padding: 30px 0 50px; color: var(--muted); font-size: 13px; }
   footer .brand-f { color: var(--navy); font-weight:600; letter-spacing:.2em; text-transform:uppercase; font-size:11px; }
 
@@ -359,18 +434,34 @@ const DASHBOARD = {
     .book-grid { grid-template-columns: 1fr; }
     .plat-grid { grid-template-columns: 1fr; }
     header { padding-bottom: 110px; }
+    .alarm { flex-direction:column; gap:12px; }
   }
 </style>
 </head>
 <body>
 
 <!-- ===================== LOGIN ===================== -->
+<div id="gate" style="display:none">
+  <form class="gate-card" id="gateForm">
+    <div class="gate-mark">The Escape Theory · Mentoring</div>
+    <h1 class="serif">Dein Mentee-Bereich</h1>
+    <p>Gib deinen persönlichen Zugangscode ein. Du hast ihn von Anne bekommen.</p>
+    <input type="text" id="gateCode" placeholder="Zugangscode" autocomplete="off" autocapitalize="characters" required />
+    <button type="submit" id="gateBtn">Einloggen</button>
+    <div class="gate-error" id="gateErr"></div>
+  </form>
+</div>
+
 <!-- ===================== APP ===================== -->
 <div id="app">
   <header>
     <div class="wrap">
       <div class="topbar">
         <div class="brand">The Escape Theory · Mentoring</div>
+        <div class="who" id="who" hidden>
+          <span id="whoName"></span>
+          <button class="logout" id="logoutBtn" type="button">Abmelden</button>
+        </div>
       </div>
       <div class="hero">
         <div class="hero-text">
@@ -389,6 +480,17 @@ const DASHBOARD = {
     <div class="wrap">
       <div class="grid">
 
+        <!-- Rote Meldung: länger als 14 Tage kein Termin (nur mit Login) -->
+        <div class="card span alarm" id="alarmCard" hidden>
+          <div class="alarm-ico">!</div>
+          <div>
+            <h2 class="serif">Wir haben uns zu lange nicht gesehen</h2>
+            <p id="alarmText"></p>
+            <a class="btn" id="alarm-15" target="_blank" rel="noopener">15-Min Check-in buchen</a>
+            <a class="btn" id="alarm-30" target="_blank" rel="noopener">30-Min Strategie-Call</a>
+          </div>
+        </div>
+
         <!-- Next meeting -->
         <div class="card next span">
           <div class="eyebrow">★ Dein nächstes Treffen</div>
@@ -400,6 +502,14 @@ const DASHBOARD = {
             <svg class="icn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
             Mit Google Meet beitreten
           </a>
+        </div>
+
+        <!-- Eigene 1:1-Termine (nur mit Login) -->
+        <div class="card span" id="myCard" hidden>
+          <div class="eyebrow">👤 Nur für dich</div>
+          <h2 class="serif">Deine nächsten Termine bei mir</h2>
+          <p class="intro-line">Alle 1:1-Termine, die du bei mir gebucht hast.</p>
+          <div id="myList"><div class="loading">Termine werden geladen …</div></div>
         </div>
 
         <!-- Booking -->
@@ -456,6 +566,18 @@ const DASHBOARD = {
           <div id="newsList" style="margin-top:10px"></div>
         </div>
 
+        <!-- Austausch (nur mit Login) -->
+        <div class="card span" id="exCard" hidden>
+          <div class="eyebrow">🤝 Austausch</div>
+          <h2 class="serif">Lern dein Team kennen</h2>
+          <p class="intro-line">Stell dich vor, zeig, wobei du helfen kannst und wonach du suchst, und vernetz dich mit den anderen aus dem Team.</p>
+          <div class="ex-tools">
+            <input type="search" id="exSearch" placeholder="Suchen, z. B. Instagram, Funnel, Coaching …" />
+            <button class="btn btn-primary" id="exEdit" type="button" style="background:var(--navy);color:var(--white)">Mein Profil bearbeiten</button>
+          </div>
+          <div class="ex-grid" id="exList"><div class="loading">Profile werden geladen …</div></div>
+        </div>
+
         <!-- Material -->
         <div class="card span">
           <div class="eyebrow">▣ Für dich</div>
@@ -479,6 +601,36 @@ const DASHBOARD = {
     </footer>
   </main>
 </div>
+
+<!-- ===================== PROFIL-FORMULAR ===================== -->
+<dialog id="pfDialog">
+  <form class="dlg" id="pfForm">
+    <div class="eyebrow">🤝 Austausch</div>
+    <h2 class="serif">Stell dich dem Team vor</h2>
+    <label>Name</label>
+    <input type="text" name="name" maxlength="80" required />
+    <label>Dein Business <small>(in einem Satz)</small></label>
+    <input type="text" name="business" maxlength="150" placeholder="z. B. Business-Coach für Selbstständige Mamas" />
+    <label>Über mich</label>
+    <textarea name="ueber" rows="3" maxlength="600" placeholder="Wer bist du, was treibt dich an?"></textarea>
+    <label>Dabei kann ich helfen</label>
+    <textarea name="biete" rows="2" maxlength="600" placeholder="z. B. Canva, Texte, Reels schneiden …"></textarea>
+    <label>Dazu suche ich Austausch</label>
+    <textarea name="suche" rows="2" maxlength="600" placeholder="z. B. Funnel-Aufbau, Accountability-Partnerin …"></textarea>
+    <label>Instagram <small>(@name oder Link)</small></label>
+    <input type="text" name="instagram" maxlength="150" />
+    <label>Website</label>
+    <input type="text" name="website" maxlength="200" placeholder="https://…" />
+    <label>Foto-Link <small>(optional, z. B. dein Profilbild)</small></label>
+    <input type="text" name="foto" maxlength="300" placeholder="https://…" />
+    <label class="check"><input type="checkbox" name="emailZeigen" /> Meine E-Mail-Adresse für das Team sichtbar machen</label>
+    <div class="dlg-msg" id="pfMsg"></div>
+    <div class="dlg-actions">
+      <button class="btn btn-outline" type="button" id="pfCancel">Abbrechen</button>
+      <button class="btn btn-primary" type="submit" id="pfSave" style="background:var(--navy);color:var(--white)">Speichern</button>
+    </div>
+  </form>
+</dialog>
 
 <script>
 /* ---------- Helpers ---------- */
@@ -606,8 +758,184 @@ function startCountdown(target){
   tick(); cdTimer=setInterval(tick,1000);
 }
 
-/* ---------- Dashboard direkt anzeigen (kein Passwort-Schutz mehr) ---------- */
-showApp();
+/* =====================================================================
+   Persönlicher Zugang, eigene Termine & Austausch
+   ===================================================================== */
+const API = (DASHBOARD.zugang && DASHBOARD.zugang.apiUrl || "").trim();
+const CODE_KEY = "tet-zugangscode";
+let PROFILE = [];
+
+function esc(s){ return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function safeUrl(u){
+  u = String(u || "").trim(); if (!u) return "";
+  if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+  try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : ""; } catch { return ""; }
+}
+function igUrl(v){
+  v = String(v || "").trim(); if (!v) return "";
+  if (/instagram\.com/i.test(v)) return safeUrl(v);
+  return "https://instagram.com/" + encodeURIComponent(v.replace(/^@/, ""));
+}
+function getCode(){ try { return localStorage.getItem(CODE_KEY) || ""; } catch { return ""; } }
+function setCode(c){ try { c ? localStorage.setItem(CODE_KEY, c) : localStorage.removeItem(CODE_KEY); } catch {} }
+
+async function api(payload){
+  const res = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" }, // kein CORS-Preflight
+    body: JSON.stringify({ code: getCode(), ...payload }),
+  });
+  return res.json();
+}
+
+/* ---------- Login ---------- */
+function showGate(msg){
+  $("app").style.display = "none";
+  $("gate").style.display = "flex";
+  $("gateErr").textContent = msg || "";
+  $("gateCode").focus();
+}
+$("gateForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const code = $("gateCode").value.trim().toUpperCase();
+  if (!code) return;
+  $("gateBtn").disabled = true; $("gateBtn").textContent = "Einen Moment …"; $("gateErr").textContent = "";
+  setCode(code);
+  try {
+    const d = await api({});
+    if (!d.ok) { setCode(""); $("gateErr").textContent = d.fehler || "Das hat nicht geklappt."; return; }
+    $("gate").style.display = "none";
+    showApp();
+    renderPersonal(d);
+  } catch {
+    setCode(""); $("gateErr").textContent = "Keine Verbindung. Bitte versuch es gleich noch einmal.";
+  } finally {
+    $("gateBtn").disabled = false; $("gateBtn").textContent = "Einloggen";
+  }
+});
+$("logoutBtn").addEventListener("click", () => { setCode(""); $("gateCode").value = ""; showGate(); });
+
+async function loadPersonal(){
+  try {
+    const d = await api({});
+    if (!d.ok) { setCode(""); showGate(d.fehler); return; }
+    renderPersonal(d);
+  } catch {
+    $("myList").innerHTML = `<div class="my-empty">Deine Termine konnten gerade nicht geladen werden. Lade die Seite gleich noch einmal neu.</div>`;
+    $("exList").innerHTML = `<div class="my-empty">Die Profile konnten gerade nicht geladen werden.</div>`;
+  }
+}
+
+/* ---------- Rendern der persönlichen Bereiche ---------- */
+function renderPersonal(d){
+  const vorname = (d.ich.name || "").split(" ")[0];
+  $("whoName").textContent = "Hallo " + vorname;
+  $("whoName").dataset.full = d.ich.name || "";
+  $("who").hidden = false;
+  ["myCard","exCard"].forEach(id => $(id).hidden = false);
+
+  // Eigene Termine
+  const t = d.termine || { kommend: [] };
+  $("myList").innerHTML = t.kommend.length ? t.kommend.map((x,i) => {
+    const dt = new Date(x.start);
+    return `<div class="cal-item">
+      <div class="cal-date"><div class="d">${dt.getDate()}</div><div class="m">${MON[dt.getMonth()]}</div></div>
+      <div class="cal-info">
+        <div class="t">${esc(x.titel || "Termin mit Anne")} ${i===0?'<span class="cal-soon">· als nächstes</span>':''}</div>
+        <div class="s">${fmtLong(dt)}${x.minuten ? " · " + x.minuten + " Min" : ""}</div>
+      </div>
+    </div>`;
+  }).join("") : `<div class="my-empty">Aktuell hast du keinen Termin bei mir gebucht. Buch dir gleich hier unten deinen nächsten Check-in. 💛</div>`;
+
+  // Rote Meldung
+  if (t.alarm) {
+    $("alarmText").textContent = t.tageSeit === null
+      ? "Du hast noch keinen 1:1-Termin bei mir gebucht. Buch dir jetzt deinen ersten Termin, damit wir gemeinsam am Ball bleiben."
+      : `Dein letzter Termin bei mir ist schon ${t.tageSeit} Tage her, und du hast noch keinen neuen gebucht. Buch dir jetzt deinen nächsten Termin, damit wir gemeinsam am Ball bleiben.`;
+    $("alarm-15").href = DASHBOARD.buchung.link15;
+    $("alarm-30").href = DASHBOARD.buchung.link30;
+    $("alarmCard").hidden = false;
+  } else {
+    $("alarmCard").hidden = true;
+  }
+
+  // Austausch
+  PROFILE = d.profile || [];
+  renderProfiles();
+}
+
+function renderProfiles(){
+  const q = $("exSearch").value.trim().toLowerCase();
+  const list = PROFILE.filter(p => !q || [p.name,p.business,p.ueber,p.biete,p.suche].join(" ").toLowerCase().includes(q));
+  const mine = PROFILE.find(p => p.eigenes);
+  $("exEdit").textContent = mine ? "Mein Profil bearbeiten" : "Jetzt vorstellen";
+  if (!list.length) {
+    $("exList").innerHTML = `<div class="my-empty">${PROFILE.length ? "Keine Treffer für deine Suche." : "Noch hat sich niemand vorgestellt. Mach du den Anfang! 💛"}</div>`;
+    return;
+  }
+  $("exList").innerHTML = list.map(p => {
+    const foto = safeUrl(p.foto);
+    const initials = esc((p.name || "?").split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase());
+    const ig = igUrl(p.instagram), web = safeUrl(p.website);
+    const links = [
+      p.kontakt && !p.eigenes ? `<a class="btn btn-primary" href="mailto:${esc(p.kontakt)}?subject=${encodeURIComponent("Hallo aus dem Escape-Theory-Team 💛")}">✉ Schreib mir</a>` : "",
+      ig ? `<a class="btn btn-outline" href="${esc(ig)}" target="_blank" rel="noopener">Instagram</a>` : "",
+      web ? `<a class="btn btn-outline" href="${esc(web)}" target="_blank" rel="noopener">Website</a>` : "",
+    ].join("");
+    return `<div class="pf${p.eigenes ? " me" : ""}">
+      <div class="pf-head">
+        <div class="pf-ava">${foto ? `<img src="${esc(foto)}" alt="" loading="lazy" referrerpolicy="no-referrer" />` : initials}</div>
+        <div>
+          <div class="pf-name">${esc(p.name)}${p.eigenes ? '<span class="you">Du</span>' : ""}</div>
+          ${p.business ? `<div class="pf-biz">${esc(p.business)}</div>` : ""}
+        </div>
+      </div>
+      ${p.ueber ? `<p>${esc(p.ueber)}</p>` : ""}
+      ${p.biete ? `<div class="pf-lbl">Dabei kann ich helfen</div><p>${esc(p.biete)}</p>` : ""}
+      ${p.suche ? `<div class="pf-lbl">Dazu suche ich Austausch</div><p>${esc(p.suche)}</p>` : ""}
+      ${links ? `<div class="pf-links">${links}</div>` : ""}
+    </div>`;
+  }).join("");
+}
+$("exSearch").addEventListener("input", renderProfiles);
+
+/* ---------- Profil bearbeiten ---------- */
+const pfForm = $("pfForm");
+$("exEdit").addEventListener("click", () => {
+  const p = PROFILE.find(x => x.eigenes) || { name: ($("whoName").dataset.full || "") };
+  ["name","business","ueber","biete","suche","instagram","website","foto"].forEach(k => pfForm.elements[k].value = p[k] || "");
+  pfForm.elements.emailZeigen.checked = !!p.emailZeigen;
+  $("pfMsg").textContent = "";
+  $("pfDialog").showModal();
+});
+$("pfCancel").addEventListener("click", () => $("pfDialog").close());
+pfForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = pfForm.elements;
+  const profil = {};
+  ["name","business","ueber","biete","suche","instagram","website","foto"].forEach(k => profil[k] = f[k].value.trim());
+  profil.emailZeigen = f.emailZeigen.checked;
+  $("pfSave").disabled = true; $("pfSave").textContent = "Speichert …"; $("pfMsg").textContent = "";
+  try {
+    const d = await api({ aktion: "profilSpeichern", profil });
+    if (!d.ok) { $("pfMsg").textContent = d.fehler || "Speichern hat nicht geklappt."; return; }
+    renderPersonal(d);
+    $("pfDialog").close();
+  } catch {
+    $("pfMsg").textContent = "Keine Verbindung. Bitte versuch es gleich noch einmal.";
+  } finally {
+    $("pfSave").disabled = false; $("pfSave").textContent = "Speichern";
+  }
+});
+
+/* ---------- Start ---------- */
+if (!API) {
+  showApp();                      // noch nicht eingerichtet → wie bisher ohne Login
+} else if (getCode()) {
+  showApp(); loadPersonal();      // schon eingeloggt → direkt rein, Daten nachladen
+} else {
+  showGate();
+}
 </script>
 </body>
 </html>
