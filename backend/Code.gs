@@ -43,6 +43,11 @@ const KOPF_MENTEES = ['Name', 'E-Mail', 'Status', 'Laufzeit bis', 'Zugangscode',
                       'Persönlicher Link', 'AM', 'Funnelmapping', 'Letzte Erinnerung'];
 const KOPF_PROFILE = ['E-Mail', 'Name', 'Business', 'Über mich', 'Ich biete', 'Ich suche',
                       'Instagram', 'Website', 'Foto-URL', 'E-Mail zeigen', 'Aktualisiert'];
+const TAB_BEITRAEGE = 'Beiträge';
+const TAB_KOMMENTARE = 'Kommentare';
+const KOPF_BEITRAEGE = ['ID', 'Zeit', 'E-Mail', 'Name', 'Kategorie', 'Text'];
+const KOPF_KOMMENTARE = ['ID', 'Beitrag-ID', 'Zeit', 'E-Mail', 'Name', 'Text'];
+const KATEGORIEN = ['Vorstellung', 'Frage', 'Erfolg', 'Tipp', 'Suche Unterstützung', 'Allgemein'];
 const MAX_LAENGE = 600;
 
 function ss_() {
@@ -67,7 +72,9 @@ function einrichten() {
     if (String(erstes.getRange(1, 1).getValue()).trim() === 'Name') { erstes.setName(TAB_MENTEES); m = erstes; }
     else { m = ss.insertSheet(TAB_MENTEES); }
   }
-  [[m, KOPF_MENTEES], [ss.getSheetByName(TAB_PROFILE) || ss.insertSheet(TAB_PROFILE), KOPF_PROFILE]]
+  [[m, KOPF_MENTEES], [ss.getSheetByName(TAB_PROFILE) || ss.insertSheet(TAB_PROFILE), KOPF_PROFILE],
+   [ss.getSheetByName(TAB_BEITRAEGE) || ss.insertSheet(TAB_BEITRAEGE), KOPF_BEITRAEGE],
+   [ss.getSheetByName(TAB_KOMMENTARE) || ss.insertSheet(TAB_KOMMENTARE), KOPF_KOMMENTARE]]
     .forEach(([sh, kopf]) => {
       const vorhanden = sh.getLastColumn() ? sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String) : [];
       kopf.forEach(k => { if (vorhanden.indexOf(k) < 0) { vorhanden.push(k); sh.getRange(1, vorhanden.length).setValue(k); } });
@@ -175,14 +182,23 @@ function antwort_(p) {
       return json_({ ok: false, fehler: 'Dein persönlicher Link ist nicht (mehr) gültig. Melde dich gern bei Anne.' });
     }
     if (p.aktion === 'profilSpeichern') profilSpeichern_(ich, p.profil || {});
-    const termine = termine_(ich.emails, true);
-    if (!ich.erinnern) termine.alarm = false;
-    // Rote Meldung erscheint gerade → Mails sofort mitschicken (falls heute noch nicht passiert)
-    if (termine.alarm && !ich.letzteErinnerung) {
-      erinnerungSenden_(ich, termine);
-      setzen_(tabelle_(TAB_MENTEES), ich.zeile, 'Letzte Erinnerung', new Date());
+    if (p.aktion === 'beitragSchreiben') beitragSchreiben_(ich, p.beitrag || {});
+    if (p.aktion === 'kommentarSchreiben') kommentarSchreiben_(ich, p.kommentar || {});
+    if (p.aktion === 'loeschen') loeschen_(ich, p.art, p.id);
+
+    const antwort = { ok: true, ich: { name: ich.name }, profile: profile_(ich.emails[0]), beitraege: beitraege_(ich.emails[0]) };
+    // Das Austausch-Portal braucht keine Termine – spart Zeit beim Laden.
+    if (p.bereich !== 'austausch') {
+      const termine = termine_(ich.emails, true);
+      if (!ich.erinnern) termine.alarm = false;
+      // Rote Meldung erscheint gerade → Mails sofort mitschicken (falls noch nicht passiert)
+      if (termine.alarm && !ich.letzteErinnerung) {
+        erinnerungSenden_(ich, termine);
+        setzen_(tabelle_(TAB_MENTEES), ich.zeile, 'Letzte Erinnerung', new Date());
+      }
+      antwort.termine = termine;
     }
-    return json_({ ok: true, ich: { name: ich.name }, termine: termine, profile: profile_(ich.emails[0]) });
+    return json_(antwort);
   } catch (err) {
     return json_({ ok: false, fehler: 'Technischer Fehler: ' + err });
   }
@@ -330,6 +346,107 @@ function profilSpeichern_(ich, p) {
     const i = t.zeilen.findIndex(r => String(wert_(t, r, 'E-Mail')).toLowerCase() === ich.emails[0]);
     if (i >= 0) t.sh.getRange(i + 2, 1, 1, zeile.length).setValues([zeile]);
     else t.sh.appendRow(zeile);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/* ---------- Austausch-Portal: Beiträge & Kommentare ---------- */
+// Beiträge stehen im Blatt „Beiträge“, Kommentare im Blatt „Kommentare“.
+// Zum Moderieren einfach die Zeile in der Tabelle löschen.
+function blatt_(name, kopf) {
+  const ss = ss_();
+  let sh = ss.getSheetByName(name);
+  if (!sh) {
+    sh = ss.insertSheet(name);
+    sh.appendRow(kopf);
+    sh.getRange(1, 1, 1, kopf.length).setFontWeight('bold');
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+
+function beitraege_(meineEmail) {
+  blatt_(TAB_BEITRAEGE, KOPF_BEITRAEGE);
+  blatt_(TAB_KOMMENTARE, KOPF_KOMMENTARE);
+  const aktiv = {};
+  mentees_().forEach(m => { aktiv[m.emails[0]] = m; });
+  const zeit = v => (v instanceof Date ? v.toISOString() : String(v));
+
+  const k = tabelle_(TAB_KOMMENTARE);
+  const kommentare = {};
+  k.zeilen.forEach(r => {
+    const bid = String(wert_(k, r, 'Beitrag-ID'));
+    const email = String(wert_(k, r, 'E-Mail')).toLowerCase();
+    if (!bid) return;
+    (kommentare[bid] = kommentare[bid] || []).push({
+      id: String(wert_(k, r, 'ID')), zeit: zeit(wert_(k, r, 'Zeit')),
+      name: String(wert_(k, r, 'Name')), text: String(wert_(k, r, 'Text')),
+      eigenes: email === meineEmail,
+    });
+  });
+
+  const b = tabelle_(TAB_BEITRAEGE);
+  return b.zeilen
+    .filter(r => String(wert_(b, r, 'ID')))
+    .map(r => {
+      const id = String(wert_(b, r, 'ID'));
+      const email = String(wert_(b, r, 'E-Mail')).toLowerCase();
+      return {
+        id: id, zeit: zeit(wert_(b, r, 'Zeit')),
+        name: String(wert_(b, r, 'Name')), kategorie: String(wert_(b, r, 'Kategorie')),
+        text: String(wert_(b, r, 'Text')), eigenes: email === meineEmail,
+        kommentare: (kommentare[id] || []).sort((x, y) => x.zeit.localeCompare(y.zeit)),
+      };
+    })
+    .sort((x, y) => y.zeit.localeCompare(x.zeit))
+    .slice(0, 100);
+}
+
+function beitragSchreiben_(ich, p) {
+  const text = String(p.text || '').trim().slice(0, 2000);
+  if (!text) return;
+  const kat = KATEGORIEN.indexOf(p.kategorie) >= 0 ? p.kategorie : 'Allgemein';
+  const sh = blatt_(TAB_BEITRAEGE, KOPF_BEITRAEGE);
+  sh.appendRow([Utilities.getUuid().slice(0, 8), new Date(), ich.emails[0], anzeigeName_(ich), kat, text]);
+}
+
+function kommentarSchreiben_(ich, p) {
+  const text = String(p.text || '').trim().slice(0, 1000);
+  const bid = String(p.beitragId || '').trim();
+  if (!text || !bid) return;
+  const sh = blatt_(TAB_KOMMENTARE, KOPF_KOMMENTARE);
+  sh.appendRow([Utilities.getUuid().slice(0, 8), bid, new Date(), ich.emails[0], anzeigeName_(ich), text]);
+}
+
+// Name aus dem Vorstellungsprofil, sonst aus der Mentee-Liste
+function anzeigeName_(ich) {
+  const p = profile_(ich.emails[0]).find(x => x.eigenes);
+  return (p && p.name) || ich.name;
+}
+
+// Eigene Beiträge/Kommentare löschen (ein Beitrag nimmt seine Kommentare mit)
+function loeschen_(ich, art, id) {
+  id = String(id || '');
+  if (!id) return;
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const name = art === 'beitrag' ? TAB_BEITRAEGE : TAB_KOMMENTARE;
+    const t = tabelle_(name);
+    for (let i = t.zeilen.length - 1; i >= 0; i--) {
+      const r = t.zeilen[i];
+      if (String(wert_(t, r, 'ID')) === id && String(wert_(t, r, 'E-Mail')).toLowerCase() === ich.emails[0]) {
+        t.sh.deleteRow(i + 2);
+        if (art === 'beitrag') {
+          const k = tabelle_(TAB_KOMMENTARE);
+          for (let j = k.zeilen.length - 1; j >= 0; j--) {
+            if (String(wert_(k, k.zeilen[j], 'Beitrag-ID')) === id) k.sh.deleteRow(j + 2);
+          }
+        }
+        break;
+      }
+    }
   } finally {
     lock.releaseLock();
   }
