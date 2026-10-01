@@ -40,8 +40,9 @@ const DASHBOARD = {
 
   /* --- Persönlicher Zugang, eigene Termine & Austausch ------------------ */
   // Adresse deiner Google-Apps-Script-Web-App (siehe SETUP-ANLEITUNG.md).
-  // Solange hier "" steht, ist der Bereich wie bisher OHNE Login sichtbar und
-  // „Deine Termine“ + „Austausch“ sind ausgeblendet.
+  // Jeder Mentee öffnet den Bereich über seinen persönlichen Link (…/?z=CODE),
+  // den du in sein Miro legst. Solange hier "" steht, sind „Deine Termine“
+  // und „Austausch“ ausgeblendet – der Rest funktioniert wie bisher.
   zugang: {
     apiUrl: "",   // ← z. B. "https://script.google.com/macros/s/XXXX/exec"
   },
@@ -164,46 +165,6 @@ const DASHBOARD = {
   }
   .serif { font-family: 'Playfair Display', serif; letter-spacing: 0; }
 
-  /* ---------- LOGIN GATE ---------- */
-  #gate {
-    position: fixed; inset: 0; z-index: 1000;
-    display: flex; align-items: center; justify-content: center;
-    background:
-      radial-gradient(120% 90% at 80% -10%, rgba(179,221,233,.18), transparent 55%),
-      radial-gradient(110% 80% at 0% 110%, rgba(205,176,143,.20), transparent 55%),
-      var(--navy);
-    padding: 24px;
-  }
-  .gate-card {
-    width: 100%; max-width: 420px;
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 44px 38px 38px;
-    box-shadow: var(--shadow);
-    text-align: center;
-  }
-  .gate-mark {
-    font-family:'Jost'; font-weight:600; letter-spacing:.32em;
-    font-size:11px; text-transform:uppercase; color:var(--camel);
-    margin-bottom: 18px;
-  }
-  .gate-card h1 { font-size: 27px; font-weight: 600; margin-bottom: 8px; }
-  .gate-card p  { color: var(--muted); font-size: 15px; margin-bottom: 26px; }
-  .gate-card input {
-    width: 100%; padding: 15px 18px; font-size: 15px; font-family:'Jost';
-    border: 1.5px solid var(--line); border-radius: 14px; outline: none;
-    transition: border-color .2s; text-align:center; letter-spacing:.04em;
-  }
-  .gate-card input:focus { border-color: var(--camel); }
-  .gate-card button {
-    width: 100%; margin-top: 14px; padding: 15px; font-size: 15px; font-weight: 500;
-    font-family:'Jost'; color: var(--white); background: var(--navy);
-    border: none; border-radius: 14px; cursor: pointer; transition: transform .12s, background .2s;
-    letter-spacing:.02em;
-  }
-  .gate-card button:hover { background: var(--navy-2); transform: translateY(-1px); }
-  .gate-error { color: #b4452f; font-size: 13.5px; margin-top: 14px; min-height: 18px; }
-
   /* ---------- APP ---------- */
   #app { display: none; }
   .wrap { max-width: 1060px; margin: 0 auto; padding: 0 22px; }
@@ -219,12 +180,6 @@ const DASHBOARD = {
   }
   .topbar { display:flex; align-items:center; justify-content:space-between; }
   .brand { font-weight:600; letter-spacing:.3em; font-size:11px; text-transform:uppercase; color: var(--blue); }
-  .logout {
-    background: rgba(255,255,255,.08); color: var(--white); border:1px solid rgba(255,255,255,.18);
-    font-family:'Jost'; font-size:12.5px; padding:8px 16px; border-radius: 100px; cursor:pointer;
-    transition: background .2s;
-  }
-  .logout:hover { background: rgba(255,255,255,.16); }
   .hero { margin-top: 40px; display:flex; align-items:flex-start; justify-content:space-between; gap:28px; }
   .hero-text { max-width: 640px; }
   .hero h1 { font-size: 40px; font-weight: 600; line-height: 1.12; margin-bottom: 16px; }
@@ -440,18 +395,6 @@ const DASHBOARD = {
 </head>
 <body>
 
-<!-- ===================== LOGIN ===================== -->
-<div id="gate" style="display:none">
-  <form class="gate-card" id="gateForm">
-    <div class="gate-mark">The Escape Theory · Mentoring</div>
-    <h1 class="serif">Dein Mentee-Bereich</h1>
-    <p>Gib deinen persönlichen Zugangscode ein. Du hast ihn von Anne bekommen.</p>
-    <input type="text" id="gateCode" placeholder="Zugangscode" autocomplete="off" autocapitalize="characters" required />
-    <button type="submit" id="gateBtn">Einloggen</button>
-    <div class="gate-error" id="gateErr"></div>
-  </form>
-</div>
-
 <!-- ===================== APP ===================== -->
 <div id="app">
   <header>
@@ -460,7 +403,6 @@ const DASHBOARD = {
         <div class="brand">The Escape Theory · Mentoring</div>
         <div class="who" id="who" hidden>
           <span id="whoName"></span>
-          <button class="logout" id="logoutBtn" type="button">Abmelden</button>
         </div>
       </div>
       <div class="hero">
@@ -489,6 +431,12 @@ const DASHBOARD = {
             <a class="btn" id="alarm-15" target="_blank" rel="noopener">15-Min Check-in buchen</a>
             <a class="btn" id="alarm-30" target="_blank" rel="noopener">30-Min Strategie-Call</a>
           </div>
+        </div>
+
+        <!-- Hinweis: ohne persönlichen Link -->
+        <div class="card span" id="hintCard" hidden>
+          <div class="eyebrow">🔑 Dein persönlicher Zugang</div>
+          <p class="intro-line" id="hintText" style="margin:0"></p>
         </div>
 
         <!-- Next meeting -->
@@ -788,37 +736,19 @@ async function api(payload){
   return res.json();
 }
 
-/* ---------- Login ---------- */
-function showGate(msg){
-  $("app").style.display = "none";
-  $("gate").style.display = "flex";
-  $("gateErr").textContent = msg || "";
-  $("gateCode").focus();
-}
-$("gateForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  const code = $("gateCode").value.trim().toUpperCase();
-  if (!code) return;
-  $("gateBtn").disabled = true; $("gateBtn").textContent = "Einen Moment …"; $("gateErr").textContent = "";
-  setCode(code);
-  try {
-    const d = await api({});
-    if (!d.ok) { setCode(""); $("gateErr").textContent = d.fehler || "Das hat nicht geklappt."; return; }
-    $("gate").style.display = "none";
-    showApp();
-    renderPersonal(d);
-  } catch {
-    setCode(""); $("gateErr").textContent = "Keine Verbindung. Bitte versuch es gleich noch einmal.";
-  } finally {
-    $("gateBtn").disabled = false; $("gateBtn").textContent = "Einloggen";
-  }
-});
-$("logoutBtn").addEventListener("click", () => { setCode(""); $("gateCode").value = ""; showGate(); });
+/* ---------- Persönlicher Link (?z=CODE) ---------- */
+// Jeder Mentee hat seinen eigenen Link (liegt in seinem Miro). Beim ersten Öffnen
+// merkt sich der Browser den Code, danach reicht auch die normale Adresse.
+(function(){
+  const z = new URLSearchParams(location.search).get("z");
+  if (z) { setCode(z.trim().toUpperCase()); history.replaceState(null, "", location.pathname + location.hash); }
+})();
+function showHint(msg){ $("hintText").textContent = msg; $("hintCard").hidden = false; }
 
 async function loadPersonal(){
   try {
     const d = await api({});
-    if (!d.ok) { setCode(""); showGate(d.fehler); return; }
+    if (!d.ok) { setCode(""); ["myCard","exCard","who"].forEach(id => $(id).hidden = true); showHint(d.fehler); return; }
     renderPersonal(d);
   } catch {
     $("myList").innerHTML = `<div class="my-empty">Deine Termine konnten gerade nicht geladen werden. Lade die Seite gleich noch einmal neu.</div>`;
@@ -932,9 +862,10 @@ pfForm.addEventListener("submit", async e => {
 if (!API) {
   showApp();                      // noch nicht eingerichtet → wie bisher ohne Login
 } else if (getCode()) {
-  showApp(); loadPersonal();      // schon eingeloggt → direkt rein, Daten nachladen
+  showApp(); loadPersonal();      // persönlicher Link bekannt → Termine & Austausch laden
 } else {
-  showGate();
+  showApp();                      // ohne persönlichen Link: allgemeiner Bereich + Hinweis
+  showHint("Deine persönlichen Termine und den Austausch mit dem Team siehst du, wenn du den Mentee-Bereich über deinen persönlichen Link aus deinem Miro öffnest.");
 }
 </script>
 </body>

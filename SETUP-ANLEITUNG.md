@@ -1,80 +1,95 @@
-# Einrichtung: Persönlicher Zugang, eigene Termine & Austausch
+# Einrichtung: Persönlicher Zugang, eigene Termine, Erinnerungen & Austausch
 
-Damit jeder Mentee einen eigenen Zugang hat, seine bei dir gebuchten Termine sieht
-und sich im Austauschbereich vorstellen kann, braucht der Mentee-Bereich eine kleine
-„Datenablage“. Dafür nutzen wir eine **Google-Tabelle mit einem Google Apps Script**.
-Kostenlos, kein Programmieren nötig, einmalig ca. 15 Minuten.
+Die Tabelle **„TET Mentee-Bereich“** liegt schon in deinem Google Drive
+(Konto *annesiebenkees@gmail.com*). Alle 17 Mentees sind eingetragen, und jeder hat
+einen persönlichen Link. Du musst nur noch das Script einbauen und einschalten.
+Dauer: ca. 10 Minuten.
 
-> Solange du das nicht eingerichtet hast, funktioniert der Mentee-Bereich wie bisher
-> (ohne Login). Die neuen Bereiche erscheinen erst, wenn Schritt 5 erledigt ist.
-
-**Voraussetzung:** YouCanBook.me trägt die Buchungen in deinen **Google Kalender** ein
-(Standard, wenn YCBM mit Google verbunden ist). Erledige alle Schritte mit **dem
-Google-Konto, zu dem dieser Kalender gehört**.
+> **Wichtig:** Die Termine werden aus dem Google Kalender des Kontos gelesen, in dem das
+> Script läuft. Das sollte der Kalender sein, in den YouCanBook.me deine Buchungen einträgt.
 
 ---
 
-## 1. Google-Tabelle anlegen
-1. Öffne <https://sheets.new> und nenne die Tabelle z. B. **„Mentee-Bereich“**.
-2. Menü **Erweiterungen → Apps Script**.
-3. Lösche den vorhandenen Text komplett und füge den gesamten Inhalt der Datei
-   [`backend/Code.gs`](backend/Code.gs) ein. Klicke auf **Speichern** (Disketten-Symbol).
+## Schritt 1: Tabelle öffnen und Script einfügen
+1. Öffne in Google Drive die Tabelle **„TET Mentee-Bereich“**.
+2. Menü oben: **Erweiterungen → Apps Script**. Ein neuer Tab öffnet sich.
+3. Dort steht schon etwas Code (`function myFunction() …`). **Alles markieren und löschen.**
+4. Öffne die Datei [`backend/Code.gs`](backend/Code.gs), kopiere den **gesamten** Inhalt
+   und füge ihn ein.
+5. Oben auf das **Disketten-Symbol (Speichern)** klicken.
 
-## 2. Tabelle einrichten
-1. Wähle oben im Apps-Script-Fenster die Funktion **`einrichten`** aus und klicke auf **Ausführen**.
-2. Google fragt nach Berechtigungen (Tabelle & Kalender). Klicke auf
-   **Berechtigungen prüfen → dein Konto → Erweitert → „… öffnen (unsicher)“ → Zulassen**.
-   (Die Warnung erscheint, weil das Script von dir selbst stammt und nicht von Google geprüft wurde.)
-3. In deiner Tabelle gibt es jetzt die Blätter **„Mentees“** und **„Profile“**.
+## Schritt 2: Einrichten (einmalig)
+1. Wähle oben in der Leiste neben „Ausführen“ die Funktion **`einrichten`** aus.
+2. Klicke auf **▶ Ausführen**.
+3. Google fragt nach Berechtigungen. Klicke dich durch:
+   **Berechtigungen prüfen → dein Konto wählen → „Erweitert“ → „TET Mentee-Bereich öffnen (unsicher)“ → Zulassen.**
+   Die Warnung kommt nur, weil das Script von dir selbst ist und nicht von Google geprüft wurde.
+4. Unten erscheint „Ausführung abgeschlossen“. Ab jetzt:
+   - heißt das erste Blatt **„Mentees“**, und es gibt ein zweites Blatt **„Profile“** für den Austausch,
+   - wird **jeden Morgen gegen 8 Uhr** automatisch geprüft, wer eine Erinnerung braucht.
 
-## 3. Mentees eintragen
-Im Blatt **„Mentees“** pro Person eine Zeile:
-
-| Name | E-Mail | Zugangscode | Aktiv (ja/nein) |
-|---|---|---|---|
-| Maria Muster | maria@beispiel.de | *(leer lassen)* | ja |
-
-- **E-Mail** = die Adresse, mit der die Person bei YouCanBook.me bucht.
-  Darüber werden ihr ihre Termine zugeordnet.
-- Lade die Tabelle neu. Oben erscheint das Menü **„Mentee-Bereich“**.
-  Klicke auf **„2 · Fehlende Zugangscodes erzeugen“**. Jede Person bekommt einen
-  eigenen 8-stelligen Code, den du ihr schickst.
-- Wer nicht mehr dabei ist: bei „Aktiv“ **nein** eintragen. Ab dann ist der Zugang
-  gesperrt, und das Profil verschwindet aus dem Austausch.
-
-## 4. Als Web-App veröffentlichen
-1. Im Apps-Script-Fenster oben rechts **Bereitstellen → Neue Bereitstellung**.
-2. Zahnrad bei „Typ auswählen“ → **Web-App**.
-3. **Ausführen als:** *Ich* · **Zugriff:** *Jeder*.
+## Schritt 3: Als Web-App veröffentlichen
+1. Oben rechts: **Bereitstellen → Neue Bereitstellung**.
+2. Beim Zahnrad neben „Typ auswählen“ **Web-App** wählen.
+3. Einstellungen:
+   - **Ausführen als:** Ich
+   - **Wer hat Zugriff:** Jeder
 4. **Bereitstellen** klicken und die **Web-App-URL** kopieren
-   (sieht aus wie `https://script.google.com/macros/s/…/exec`).
+   (`https://script.google.com/macros/s/…/exec`).
 
-> „Jeder“ heißt nur, dass die Seite das Script erreichen kann. Ohne gültigen
-> Zugangscode gibt es keine Daten.
+> „Jeder“ bedeutet nur, dass die Website das Script erreichen kann. Daten gibt es
+> ausschließlich mit einem gültigen persönlichen Link.
 
-## 5. URL in den Mentee-Bereich eintragen
-In `index.html` ganz oben im Pflegebereich:
+## Schritt 4: URL an Claude schicken (oder selbst eintragen)
+Schick mir die URL, dann trage ich sie ein und mache die Seite live.
+Selbst eintragen geht so: In `index.html` ganz oben bei
+`zugang: { apiUrl: "HIER EINFÜGEN" }`.
 
-```js
-zugang: {
-  apiUrl: "https://script.google.com/macros/s/…/exec",
-},
-```
-
-Speichern und hochladen. Ab jetzt sehen deine Mentees die Login-Seite.
+## Schritt 5: Links ins Miro legen
+In der Tabelle steht in Spalte **„Persönlicher Link“** für jeden Mentee sein eigener Link.
+Leg ihn in das jeweilige Miro-Board, zum Beispiel als Button „Mein Mentee-Bereich“.
+Fertig! 🎉
 
 ---
 
-## Gut zu wissen
-- **Welche Termine werden angezeigt?** Alle Termine in deinem Kalender, bei denen die
-  E-Mail des Mentees als Gast oder in der Beschreibung steht (so trägt YCBM die
-  Buchungen ein). Termine mit „Sprechstunde“ oder „Team Treffen“ im Titel zählen nicht.
-  Die Liste kannst du oben in `Code.gs` unter `IGNORIEREN` anpassen.
-- **Rote Meldung:** erscheint, wenn der letzte Termin mehr als **14 Tage** her ist **und**
-  noch kein neuer gebucht ist (oder es noch nie einen gab). Die Zahl änderst du in
-  `Code.gs` bei `ALARM_TAGE`.
-- Neue Buchungen erscheinen nach spätestens **5 Minuten** im Mentee-Bereich.
-- **Änderungen am Script** werden erst aktiv, wenn du unter **Bereitstellen →
-  Bereitstellungen verwalten → Bearbeiten (Stift) → Version: Neue Version →
-  Bereitstellen** eine neue Version anlegst. Die URL bleibt dabei gleich.
-- **Profile** stehen im Blatt „Profile“. Dort kannst du auch etwas korrigieren oder löschen.
+## So funktioniert es im Alltag
+
+**Neuer Mentee:** Neue Zeile mit Name, E-Mail und Status ausfüllen. Dann im Menü
+**Mentee-Bereich → Fehlende Codes & Links erzeugen** klicken, und Code und Link
+erscheinen automatisch. *(Das Menü erscheint, nachdem du die Tabelle einmal neu geladen hast.)*
+
+**Status** (Spalte C):
+| Status | Zugang | Rote Meldung + Erinnerungs-Mail |
+|---|---|---|
+| Aktiv | ✅ | ✅ |
+| Pausiert / Pausiert Lang / New Deal | ✅ | – |
+| Beendet | ❌ | – |
+
+**Laufzeit bis** (Spalte D): Ab dem Tag danach ist der Zugang automatisch gesperrt.
+Leer = unbegrenzt.
+⚠️ Die eingetragenen Daten sind aus „noch ~X Mon.“ **geschätzt** (Monatsende).
+Bitte einmal prüfen und die echten Enddaten eintragen.
+
+**Mehrere E-Mails** (wie bei Sonya): einfach mit Komma getrennt in eine Zelle schreiben.
+
+**Erinnerungen:** Hatte ein *aktiver* Mentee seit über 14 Tagen keinen Termin und hat
+auch keinen neuen gebucht, dann
+- sieht er die **rote Meldung** im Mentee-Bereich,
+- bekommt **er** eine Mail mit dem Link zum 15-Min-Check-in,
+- bekommst **du** eine Mail an *anne.siebenkees@lovelifepassport.com*.
+
+Die Mails gehen sofort raus, wenn der Mentee die Seite öffnet, sonst spätestens
+am nächsten Morgen. Pro Pause gibt es genau **eine** Erinnerung (Datum in Spalte
+„Letzte Erinnerung“). Sobald der Mentee wieder bucht, wird das zurückgesetzt.
+
+**Welche Termine zählen?** Alle Termine in deinem Kalender, bei denen die E-Mail des
+Mentees als Gast oder in der Beschreibung steht. So trägt YouCanBook.me die Buchungen ein.
+Termine mit „Sprechstunde“ oder „Team Treffen“ im Titel zählen nicht.
+
+**Anpassen** (oben in `Code.gs` unter `EINSTELLUNGEN`): Anzahl der Tage, deine
+E-Mail-Adresse, Check-in-Link, Uhrzeit der täglichen Prüfung, welche Status erinnert werden.
+Nach einer Änderung am Script: **Bereitstellen → Bereitstellungen verwalten → ✏️ →
+Version: „Neue Version“ → Bereitstellen** (die URL bleibt gleich).
+
+**Austausch:** Die Profile stehen im Blatt „Profile“. Dort kannst du auch etwas
+korrigieren oder eine Zeile löschen.
