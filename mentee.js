@@ -59,6 +59,11 @@ function withCode(href){
   const u = new URL(href, location.href); u.searchParams.set("z", c); return u.pathname.split("/").pop() + u.search + u.hash;
 }
 
+// Letzten Stand im Browser merken → beim nächsten Öffnen sofort anzeigen,
+// während im Hintergrund frisch geladen wird.
+function merken(bereich, d){ try { localStorage.setItem(`tet-stand-${bereich}-${getCode()}`, JSON.stringify(d)); } catch {} }
+function gemerkt(bereich){ try { return JSON.parse(localStorage.getItem(`tet-stand-${bereich}-${getCode()}`) || "null"); } catch { return null; } }
+
 async function api(payload){
   const res = await fetch(API_URL, {
     method: "POST",

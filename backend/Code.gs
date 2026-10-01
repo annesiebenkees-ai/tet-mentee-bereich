@@ -137,12 +137,15 @@ function datum_(v) {
 }
 
 /* ---------- Mentees ---------- */
+// Pro Aufruf wird die Mentee-Liste nur einmal gelesen (spart Zeit).
+let MENTEES_MEMO = null;
 function mentees_() {
+  if (MENTEES_MEMO) return MENTEES_MEMO;
   const t = tabelle_(TAB_MENTEES);
   const heute = new Date(); heute.setHours(0, 0, 0, 0);
   const ohne = EINSTELLUNGEN.KEIN_ZUGANG_STATUS.map(s => s.toLowerCase());
   const erinnern = EINSTELLUNGEN.ERINNERUNG_STATUS.map(s => s.toLowerCase());
-  return t.zeilen.map((r, i) => {
+  const liste = t.zeilen.map((r, i) => {
     const status = String(wert_(t, r, 'Status'));
     const bis = datum_(wert_(t, r, 'Laufzeit bis'));
     const abgelaufen = bis !== null && bis < heute;
@@ -158,6 +161,8 @@ function mentees_() {
       letzteErinnerung: wert_(t, r, 'Letzte Erinnerung'),
     };
   }).filter(m => m.name && m.emails.length && m.zugang);
+  MENTEES_MEMO = liste;
+  return liste;
 }
 
 function menteeFinden_(code) {
@@ -228,27 +233,47 @@ function kalenderEvents_() {
    }));
 }
 
+// Termine eines Mentees. Der Kalender wird nur einmal für ALLE Mentees durchsucht
+// und das Ergebnis 15 Minuten gemerkt – so lädt die Seite für alle schnell.
+const TERMIN_CACHE_SEK = 900;
 function termine_(emails, mitCache, events) {
-  const cache = CacheService.getScriptCache();
   const key = 't_' + emails.join(',');
-  if (mitCache) { const hit = cache.get(key); if (hit) return JSON.parse(hit); }
+  if (mitCache) {
+    const cache = CacheService.getScriptCache();
+    const hit = cache.get(key);
+    if (hit) return JSON.parse(hit);
+    const alle = alleTermine_();
+    if (alle[key]) return alle[key];
+  }
+  return termineBerechnen_(emails, events || kalenderEvents_());
+}
 
+function alleTermine_() {
+  const events = kalenderEvents_();
+  const ergebnis = {}, zumCache = {};
+  mentees_().forEach(m => {
+    const key = 't_' + m.emails.join(',');
+    ergebnis[key] = termineBerechnen_(m.emails, events);
+    zumCache[key] = JSON.stringify(ergebnis[key]);
+  });
+  CacheService.getScriptCache().putAll(zumCache, TERMIN_CACHE_SEK);
+  return ergebnis;
+}
+
+function termineBerechnen_(emails, events) {
   const jetzt = new Date();
-  const passend = (events || kalenderEvents_()).filter(ev => emails.some(e => ev.suchtext.includes(e)));
+  const passend = events.filter(ev => emails.some(e => ev.suchtext.includes(e)));
   const kommend = passend.filter(ev => ev.ende >= jetzt).sort((a, b) => a.start - b.start)
     .map(ev => ({ titel: ev.titel, start: ev.start.toISOString(), minuten: Math.round((ev.ende - ev.start) / 60000) }));
   const letzter = passend.filter(ev => ev.ende < jetzt).map(ev => ev.start).sort((a, b) => b - a)[0] || null;
   const tageSeit = letzter ? Math.floor((jetzt - letzter) / 86400000) : null;
-
-  const ergebnis = {
+  return {
     kommend: kommend,
     letzter: letzter ? letzter.toISOString() : null,
     tageSeit: tageSeit,
     alarmTage: EINSTELLUNGEN.ALARM_TAGE,
     alarm: kommend.length === 0 && (tageSeit === null || tageSeit > EINSTELLUNGEN.ALARM_TAGE),
   };
-  cache.put(key, JSON.stringify(ergebnis), 300); // 5 Min zwischenspeichern
-  return ergebnis;
 }
 
 /* ---------- Tägliche Erinnerungs-Mails ---------- */

@@ -544,11 +544,15 @@ function startCountdown(target){
 function showHint(msg){ $("hintText").textContent = msg; $("hintCard").hidden = false; }
 
 async function loadPersonal(){
+  const alt = gemerkt("dashboard");
+  if (alt) renderPersonal(alt);            // sofort den letzten Stand zeigen
   try {
     const d = await api({});
-    if (!d.ok) { setCode(""); ["myCard","exCard","who","topEx"].forEach(id => $(id).hidden = true); showHint(d.fehler); return; }
+    if (!d.ok) { setCode(""); ["myCard","exCard","who","topEx","alarmCard"].forEach(id => $(id).hidden = true); showHint(d.fehler); return; }
+    merken("dashboard", d);
     renderPersonal(d);
   } catch {
+    if (alt) return;                       // alter Stand bleibt stehen
     $("myList").innerHTML = `<p class="muted">Deine Termine konnten gerade nicht geladen werden. Lade die Seite gleich noch einmal neu.</p>`;
     $("teaser").innerHTML = `<p class="muted">Die Beiträge konnten gerade nicht geladen werden.</p>`;
   }
