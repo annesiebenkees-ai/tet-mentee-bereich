@@ -14,7 +14,7 @@
 
 /* --- HIER KANNST DU ANPASSEN ------------------------------------------------ */
 const EINSTELLUNGEN = {
-  KALENDER_ID: 'primary',   // 'primary' = dein Hauptkalender. Sonst die Kalender-ID eintragen.
+  KALENDER_ID: 'anne.siebenkees@lovelifepassport.com',   // Kalender, in den YouCanBook.me bucht ('primary' = Hauptkalender)
   ALARM_TAGE: 14,           // Rote Meldung + Mail, wenn so viele Tage kein Termin war & keiner gebucht ist
   RUECKBLICK_TAGE: 180,     // So weit wird nach vergangenen Terminen gesucht
   VORSCHAU_TAGE: 120,       // So weit in die Zukunft werden Termine angezeigt
