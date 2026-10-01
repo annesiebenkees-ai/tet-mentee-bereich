@@ -42,8 +42,7 @@ Dauer: ca. 10 Minuten.
 
 ## Schritt 4: URL an Claude schicken (oder selbst eintragen)
 Schick mir die URL, dann trage ich sie ein und mache die Seite live.
-Selbst eintragen geht so: In `index.html` ganz oben bei
-`zugang: { apiUrl: "HIER EINFÜGEN" }`.
+Selbst eintragen geht so: In `mentee.js` ganz oben bei `const API_URL = "HIER EINFÜGEN";`.
 
 ## Schritt 5: Links ins Miro legen
 In der Tabelle steht in Spalte **„Persönlicher Link“** für jeden Mentee sein eigener Link.
@@ -93,3 +92,29 @@ Version: „Neue Version“ → Bereitstellen** (die URL bleibt gleich).
 
 **Austausch:** Die Profile stehen im Blatt „Profile“. Dort kannst du auch etwas
 korrigieren oder eine Zeile löschen.
+
+---
+
+## Austausch-Portal (`austausch.html`)
+
+Hier schreiben deine Mentees Beiträge (Vorstellung, Frage, Erfolg, Tipp, Suche
+Unterstützung, Allgemein) und kommentieren sie. Im Reiter „Team“ stehen alle
+Vorstellungsprofile. Das Dashboard zeigt die 3 neuesten Beiträge als Vorschau.
+
+- Beiträge stehen im Blatt **„Beiträge“**, Kommentare im Blatt **„Kommentare“**.
+  Beide Blätter legt das Script von selbst an.
+- **Moderieren:** Eine unpassende Zeile löschst du einfach in der Tabelle.
+- Jeder kann nur seine eigenen Beiträge und Kommentare löschen.
+
+## Als App aufs Handy
+
+Der Mentee-Bereich lässt sich wie eine App installieren. Die Karte „Hol dir den
+Mentee-Bereich als App aufs Handy“ auf dem Dashboard erklärt das für iPhone und
+Android. Auf Android gibt es auch einen Direkt-Button. Der persönliche Link steckt
+in der Adresse, deshalb öffnet die App direkt den eigenen Bereich.
+
+## Design & Dateien
+
+- `escape-os.css`: Escape-OS-Design (gleiche Werte wie Reel-Tool & Social-Media-Studio)
+- `mentee.js`: gemeinsame Logik und die **Adresse der Web-App** (`API_URL`)
+- `manifest.webmanifest`, `sw.js`, `icons/`: App-Installation

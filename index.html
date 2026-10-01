@@ -2,15 +2,22 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>The Escape Theory · Mentee-Bereich</title>
+<meta name="theme-color" content="#FAFCFD" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" type="image/png" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="TET Mentees" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
 
 <!-- =========================================================================
      ❶  HIER PFLEGST DU ALLES — kein Code-Wissen nötig.
-        Texte, Termine, Links & das Passwort einfach zwischen den
+        Texte, Termine & Links einfach zwischen den
         Anführungszeichen ändern. Danach Datei speichern & neu hochladen.
      ========================================================================= -->
 <script>
@@ -36,15 +43,6 @@ const DASHBOARD = {
   buchung: {
     link15: "https://businessbegleitung-checkin.youcanbook.me/",   // ← 15-Min Check-in Link
     link30: "https://call-anne-siebenkees-30.youcanbook.me",       // ← 30-Min Strategie Link
-  },
-
-  /* --- Persönlicher Zugang, eigene Termine & Austausch ------------------ */
-  // Adresse deiner Google-Apps-Script-Web-App (siehe SETUP-ANLEITUNG.md).
-  // Jeder Mentee öffnet den Bereich über seinen persönlichen Link (…/?z=CODE),
-  // den du in sein Miro legst. Solange hier "" steht, sind „Deine Termine“
-  // und „Austausch“ ausgeblendet – der Rest funktioniert wie bisher.
-  zugang: {
-    apiUrl: "https://script.google.com/macros/s/AKfycbyXyMPS_TaaBA6s7XjQR4d8v_R8O1ezR27FNddf-8Yv_HlY_t87kK1DSVLuCTezubIK/exec",
   },
 
   /* --- KPI-Week: monatliches KPI-Tracking ------------------------------- */
@@ -138,644 +136,398 @@ const DASHBOARD = {
 </script>
 <!-- =========================================================================
      ❷  AB HIER NICHTS MEHR ÄNDERN — das ist Design & Technik.
+        Design: escape-os („Boarding Pass“) → escape-os.css
+        Gemeinsame Logik (Zugang, Script-Adresse, App) → mentee.js
      ========================================================================= -->
-
+<link rel="stylesheet" href="escape-os.css" />
 <style>
-  :root {
-    --navy:   #0d1c32;
-    --navy-2: #142844;
-    --blue:   #b3dde9;
-    --camel:  #cdb08f;
-    --white:  #ffffff;
-    --cream:  #f5f1ea;
-    --ink:    #0d1c32;
-    --muted:  rgba(13,28,50,.62);
-    --line:   rgba(13,28,50,.10);
-    --shadow: 0 18px 50px -20px rgba(13,28,50,.35);
-    --radius: 22px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: 'Jost', sans-serif;
-    letter-spacing: -.01em;
-    color: var(--ink);
-    background: var(--cream);
-    -webkit-font-smoothing: antialiased;
-  }
-  .serif { font-family: 'Playfair Display', serif; letter-spacing: 0; }
+  /* Countdown */
+  .countdown{ display:grid; grid-template-columns:repeat(4,1fr); gap:var(--s2); margin:var(--s4) 0 var(--s5); max-width:460px; }
+  .cd{ background:var(--tint); border:1px solid var(--hair); border-radius:var(--r-md); padding:.625rem 0; text-align:center; }
+  .cd b{ display:block; font-family:var(--serif); font-weight:600; font-size:1.625rem; line-height:1.1; color:var(--ink); }
+  .cd span{ font-family:var(--mono); font-size:.5625rem; letter-spacing:.16em; text-transform:uppercase; color:var(--slate); }
+  .cd.live{ grid-column:1 / -1; background:var(--accent-soft); border-color:var(--accent-tint); }
+  .cd.live b{ font-size:1.125rem; color:var(--accent-deep); }
+  .when{ font-size:var(--t-lg); color:var(--ink); font-weight:500; margin-top:var(--s2); }
+  .meta{ font-size:var(--t-sm); color:var(--slate); }
 
-  /* ---------- APP ---------- */
-  #app { display: none; }
-  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 22px; }
-
-  /* Header */
-  header {
-    background:
-      radial-gradient(130% 120% at 90% -20%, rgba(179,221,233,.20), transparent 55%),
-      var(--navy);
-    color: var(--white);
-    padding: 30px 0 130px;
-    position: relative;
-  }
-  .topbar { display:flex; align-items:center; justify-content:space-between; }
-  .brand { font-weight:600; letter-spacing:.3em; font-size:11px; text-transform:uppercase; color: var(--blue); }
-  .hero { margin-top: 40px; display:flex; align-items:flex-start; justify-content:space-between; gap:28px; }
-  .hero-text { max-width: 640px; }
-  .hero h1 { font-size: 40px; font-weight: 600; line-height: 1.12; margin-bottom: 16px; }
-  .hero p  { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,.78); }
-  .hero .sig { margin-top: 16px; font-style: italic; color: var(--blue); font-size: 16px; }
-  .mentor { flex-shrink:0; text-align:center; }
-  .mentor-img {
-    width:84px; height:84px; border-radius:50%; object-fit:cover; display:block;
-    border:2px solid rgba(179,221,233,.45); box-shadow:0 8px 24px -8px rgba(0,0,0,.45);
-  }
-  .mentor-cap { margin-top:9px; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:rgba(255,255,255,.65); line-height:1.4; }
-  .mentor-cap strong { display:block; color:var(--blue); font-weight:600; font-size:13.5px; letter-spacing:.02em; text-transform:none; }
-
-  /* Content pulled up over header */
-  main { margin-top: -90px; padding-bottom: 70px; position: relative; }
-  [hidden] { display: none !important; }
-
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-  .card {
-    background: var(--white); border-radius: var(--radius); padding: 28px;
-    box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.6);
-  }
-  .card.span { grid-column: 1 / -1; }
-  .eyebrow {
-    font-size: 11px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase;
-    color: var(--camel); margin-bottom: 14px; display:flex; align-items:center; gap:8px;
-  }
-  .card h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
-
-  /* Next meeting highlight */
-  .next {
-    background:
-      linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
-    color: var(--white); position: relative; overflow:hidden;
-  }
-  .next::after {
-    content:""; position:absolute; right:-60px; top:-60px; width:200px; height:200px;
-    background: radial-gradient(circle, rgba(179,221,233,.22), transparent 70%);
-  }
-  .next .eyebrow { color: var(--blue); }
-  .next h2 { color: var(--white); font-size: 24px; }
-  .next .when { font-size: 16px; color: rgba(255,255,255,.8); margin: 10px 0 4px; }
-  .next .meta { font-size: 14px; color: rgba(255,255,255,.6); margin-bottom: 18px; }
-  .countdown { display:flex; gap: 14px; margin: 18px 0 22px; }
-  .cd-box { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius: 14px; padding: 12px 0; flex:1; text-align:center; }
-  .cd-num { font-size: 26px; font-weight: 600; font-family:'Playfair Display',serif; }
-  .cd-lbl { font-size: 10.5px; letter-spacing:.14em; text-transform:uppercase; color: rgba(255,255,255,.6); margin-top: 2px; }
-
-  .btn {
-    display:inline-flex; align-items:center; gap:9px; justify-content:center;
-    font-family:'Jost'; font-weight:500; font-size:15px; text-decoration:none;
-    padding: 14px 24px; border-radius: 100px; cursor:pointer; transition: transform .12s, box-shadow .2s, background .2s;
-    border: none;
-  }
-  .btn-primary { background: var(--blue); color: var(--navy); }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 26px -10px rgba(179,221,233,.6); }
-  .btn-light { background: var(--white); color: var(--navy); }
-  .btn-light:hover { transform: translateY(-2px); }
-  .btn-outline { background: transparent; color: var(--navy); border:1.5px solid var(--line); }
-  .btn-outline:hover { border-color: var(--camel); background: var(--cream); }
-  .btn-full { width:100%; }
-
-  /* Booking cards */
-  .book-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 6px; }
-  .book {
-    border: 1.5px solid var(--line); border-radius: 18px; padding: 22px;
-    display:flex; flex-direction:column; gap: 6px; transition: border-color .2s, transform .15s;
-  }
-  .book:hover { border-color: var(--camel); transform: translateY(-3px); }
-  .book .dur { font-family:'Playfair Display',serif; font-size: 30px; font-weight: 600; }
-  .book .dur span { font-size: 16px; font-weight:500; color: var(--muted); }
-  .book .desc { font-size: 14px; color: var(--muted); line-height:1.5; flex:1; margin-bottom: 8px; }
-  .intro-line { font-size:15px; color:var(--muted); line-height:1.6; margin-bottom:18px; }
-
-  /* Calendar list */
-  .cal-item {
-    display:flex; align-items:center; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line);
-  }
-  .cal-item:last-child { border-bottom: none; }
-  .cal-date {
-    flex-shrink:0; width: 62px; text-align:center; background: var(--cream); border-radius: 14px; padding: 8px 0;
-  }
-  .cal-date .d { font-size: 22px; font-weight: 600; font-family:'Playfair Display',serif; line-height:1; }
-  .cal-date .m { font-size: 10.5px; letter-spacing:.12em; text-transform:uppercase; color: var(--muted); margin-top:3px; }
-  .cal-info { flex:1; }
-  .cal-info .t { font-weight: 500; font-size: 15.5px; }
-  .cal-info .s { font-size: 13.5px; color: var(--muted); margin-top:2px; }
-  .cal-item .btn { padding: 9px 18px; font-size: 13.5px; }
-  .cal-soon { font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--camel); }
+  /* Buchung */
+  .book-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s4); }
+  .book{ display:flex; flex-direction:column; gap:var(--s2); border:1px solid var(--hair); border-radius:var(--r-lg); padding:var(--s5); background:var(--paper); transition:box-shadow var(--med) var(--ease), border-color var(--med) var(--ease), transform var(--med) var(--ease); }
+  .book:hover{ box-shadow:var(--sh-2); border-color:#CBDCE8; transform:translateY(-2px); }
+  .book .dur{ font-family:var(--serif); font-weight:600; font-size:2rem; color:var(--ink); line-height:1; }
+  .book .dur small{ font-family:var(--mono); font-size:.6875rem; letter-spacing:.16em; text-transform:uppercase; color:var(--slate); margin-left:.25rem; }
+  .book p{ font-size:var(--t-sm); color:var(--slate); flex:1; }
+  @media (max-width:640px){ .book-grid{ grid-template-columns:1fr; } }
 
   /* News */
-  .news-item { padding: 18px 0; border-bottom: 1px solid var(--line); }
-  .news-item:first-child { padding-top: 4px; }
-  .news-item:last-child { border-bottom:none; padding-bottom: 0; }
-  .news-date { font-size: 12px; letter-spacing:.08em; text-transform:uppercase; color: var(--camel); font-weight:500; }
-  .news-item h3 { font-size: 17px; font-weight: 600; margin: 6px 0; }
-  .news-item p { font-size: 14.5px; color: var(--muted); line-height: 1.6; }
+  .news{ padding:var(--s4) 0; border-bottom:1px solid var(--hair2); }
+  .news:first-of-type{ padding-top:var(--s2); }
+  .news:last-child{ border-bottom:0; padding-bottom:0; }
+  .news .nd{ font-family:var(--mono); font-size:.625rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-deep); }
+  .news h3{ font-family:var(--serif); font-weight:600; font-size:1.0625rem; color:var(--ink); margin:.25rem 0; }
+  .news p{ font-size:var(--t-sm); color:var(--body); }
+  .news .acts{ display:flex; flex-wrap:wrap; gap:var(--s2); margin-top:var(--s3); }
 
-  /* Material */
-  .mat-list { display:flex; flex-direction:column; gap: 12px; }
-  .mat {
-    display:flex; align-items:center; gap: 16px; text-decoration:none; color:inherit;
-    border:1.5px solid var(--line); border-radius: 16px; padding: 16px 18px; transition: border-color .2s, transform .15s, background .2s;
-  }
-  .mat:hover { border-color: var(--camel); transform: translateX(4px); background: var(--cream); }
-  .mat-ico {
-    flex-shrink:0; width:42px; height:42px; border-radius: 12px; background: var(--navy);
-    display:flex; align-items:center; justify-content:center;
-  }
-  .mat-ico svg { width:20px; height:20px; stroke: var(--blue); }
-  .mat-txt .t { font-weight: 500; font-size: 15px; }
-  .mat-txt .s { font-size: 13px; color: var(--muted); margin-top:1px; }
-  .mat .arr { margin-left:auto; color: var(--muted); }
+  /* Material & Plattformen */
+  .link-list{ display:flex; flex-direction:column; gap:var(--s3); }
+  .link-row{ display:flex; align-items:center; gap:var(--s4); text-decoration:none; color:inherit; border:1px solid var(--hair); border-radius:var(--r-md); padding:var(--s4); background:var(--paper); transition:all var(--med) var(--ease); }
+  .link-row:hover{ border-color:var(--deep); background:var(--white); box-shadow:var(--sh-2); transform:translateY(-1px); }
+  .link-row .lic{ flex:none; width:40px; height:40px; border-radius:var(--r-md); background:var(--tint); border:1px solid var(--hair); display:flex; align-items:center; justify-content:center; color:var(--accent-deep); }
+  .link-row .lic svg{ width:18px; height:18px; }
+  .link-row .t{ font-weight:600; color:var(--ink); }
+  .link-row .s{ font-size:var(--t-sm); color:var(--slate); }
+  .link-row .arr{ margin-left:auto; color:var(--slate); flex:none; }
+  .plat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s4); }
+  .plat{ display:flex; flex-direction:column; gap:.25rem; text-decoration:none; color:inherit; border:1px solid var(--hair); border-radius:var(--r-lg); padding:var(--s5); background:var(--paper); transition:all var(--med) var(--ease); }
+  .plat:hover{ border-color:#CBDCE8; background:var(--white); box-shadow:var(--sh-2); transform:translateY(-2px); }
+  .plat .pn{ font-family:var(--serif); font-weight:600; font-size:var(--t-lg); color:var(--ink); }
+  .plat p{ font-size:var(--t-sm); color:var(--slate); flex:1; }
+  .plat .cta{ font-weight:600; font-size:var(--t-sm); color:var(--accent-deep); margin-top:var(--s2); }
+  @media (max-width:640px){ .plat-grid{ grid-template-columns:1fr; } }
 
-  /* Plattformen */
-  .plat-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:6px; }
-  .plat {
-    display:flex; flex-direction:column; gap:6px; text-decoration:none; color:inherit;
-    border:1.5px solid var(--line); border-radius:18px; padding:22px;
-    transition: border-color .2s, transform .15s, background .2s;
-  }
-  .plat:hover { border-color:var(--camel); transform:translateY(-3px); background:var(--cream); }
-  .plat-tag { font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--camel); }
-  .plat-name { font-weight:600; font-size:18px; }
-  .plat-desc { font-size:14px; color:var(--muted); line-height:1.5; flex:1; margin-bottom:4px; }
-  .plat-cta { font-weight:500; font-size:14.5px; color:var(--navy); }
+  /* Austausch-Vorschau */
+  .teaser{ display:flex; flex-direction:column; gap:var(--s3); margin-bottom:var(--s5); }
+  .teaser a{ display:flex; gap:var(--s3); align-items:flex-start; text-decoration:none; color:inherit; padding:var(--s3) var(--s4); border:1px solid var(--hair); border-radius:var(--r-md); background:var(--paper); transition:all var(--med) var(--ease); }
+  .teaser a:hover{ border-color:var(--deep); background:var(--white); box-shadow:var(--sh-1); }
+  .teaser .tx{ min-width:0; flex:1; }
+  .teaser .tm{ font-size:.75rem; color:var(--slate); }
+  .teaser .tm b{ color:var(--ink); font-weight:600; }
+  .teaser .tt{ font-size:var(--t-sm); color:var(--body); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .teaser .tc{ flex:none; font-family:var(--mono); font-size:.625rem; color:var(--slate); white-space:nowrap; align-self:center; }
 
-  /* Login-Info oben */
-  .who { display:flex; align-items:center; gap:12px; font-size:13px; color:rgba(255,255,255,.75); }
-  .who[hidden] { display:none; }
-
-  /* Rote Meldung */
-  .alarm {
-    background: #fdecea; border: 1.5px solid #e2574c; color: #8f1f16;
-    display:flex; gap:18px; align-items:flex-start;
-  }
-  .alarm-ico {
-    flex-shrink:0; width:44px; height:44px; border-radius:50%; background:#e2574c; color:#fff;
-    display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:700;
-  }
-  .alarm h2 { color:#8f1f16; font-size:20px; }
-  .alarm p { font-size:15px; line-height:1.55; margin:6px 0 14px; }
-  .alarm .btn { background:#e2574c; color:#fff; padding:11px 20px; font-size:14px; }
-  .alarm .btn:hover { background:#c9443a; transform: translateY(-2px); }
-  .alarm .btn + .btn { background:transparent; color:#8f1f16; border:1.5px solid rgba(143,31,22,.35); }
-
-  /* Eigene Termine */
-  .my-empty { font-size:14.5px; color:var(--muted); line-height:1.6; }
-  .loading { font-size:14px; color:var(--muted); }
-
-  /* Austausch */
-  .ex-tools { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin:4px 0 20px; }
-  .ex-tools input {
-    flex:1; min-width:200px; padding:12px 16px; font-size:14.5px; font-family:'Jost';
-    border:1.5px solid var(--line); border-radius:100px; outline:none;
-  }
-  .ex-tools input:focus { border-color:var(--camel); }
-  .ex-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px; }
-  .pf { border:1.5px solid var(--line); border-radius:18px; padding:20px; display:flex; flex-direction:column; gap:10px; }
-  .pf.me { border-color: var(--camel); background: #fffcf7; }
-  .pf-head { display:flex; gap:14px; align-items:center; }
-  .pf-ava {
-    flex-shrink:0; width:52px; height:52px; border-radius:50%; background:var(--navy); color:var(--blue);
-    display:flex; align-items:center; justify-content:center; font-weight:600; font-size:18px; overflow:hidden;
-  }
-  .pf-ava img { width:100%; height:100%; object-fit:cover; }
-  .pf-name { font-weight:600; font-size:17px; }
-  .pf-name .you { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--camel); margin-left:6px; }
-  .pf-biz { font-size:13.5px; color:var(--muted); }
-  .pf p { font-size:14px; line-height:1.55; color:var(--ink); white-space:pre-line; }
-  .pf-lbl { font-size:10.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--camel); margin-bottom:-6px; }
-  .pf-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:6px; }
-  .pf-links a { font-size:13px; padding:7px 14px; }
-
-  /* Profil-Formular */
-  dialog {
-    border:none; border-radius:var(--radius); padding:0; width:min(560px, calc(100% - 32px));
-    box-shadow: var(--shadow); color:var(--ink);
-  }
-  dialog::backdrop { background: rgba(13,28,50,.55); }
-  .dlg { padding:28px; max-height:85vh; overflow:auto; }
-  .dlg h2 { font-size:22px; font-weight:600; margin-bottom:4px; }
-  .dlg label { display:block; font-size:13px; font-weight:500; margin:14px 0 6px; }
-  .dlg label small { font-weight:400; color:var(--muted); }
-  .dlg input[type=text], .dlg input[type=url], .dlg textarea {
-    width:100%; padding:11px 14px; font-size:14.5px; font-family:'Jost';
-    border:1.5px solid var(--line); border-radius:12px; outline:none; resize:vertical;
-  }
-  .dlg input:focus, .dlg textarea:focus { border-color:var(--camel); }
-  .dlg .check { display:flex; gap:10px; align-items:center; font-weight:400; }
-  .dlg-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:22px; flex-wrap:wrap; }
-  .dlg-msg { font-size:13.5px; color:#b4452f; margin-top:10px; min-height:18px; }
-
-  footer { text-align:center; padding: 30px 0 50px; color: var(--muted); font-size: 13px; }
-  footer .brand-f { color: var(--navy); font-weight:600; letter-spacing:.2em; text-transform:uppercase; font-size:11px; }
-
-  .icn { width:15px; height:15px; stroke-width:2; }
-
-  /* Responsive */
-  @media (max-width: 820px) {
-    .grid { grid-template-columns: 1fr; }
-    .hero h1 { font-size: 32px; }
-    .hero { gap:16px; }
-    .mentor-img { width:62px; height:62px; }
-    .mentor-cap { font-size:10px; }
-    .mentor-cap strong { font-size:12px; }
-    .book-grid { grid-template-columns: 1fr; }
-    .plat-grid { grid-template-columns: 1fr; }
-    header { padding-bottom: 110px; }
-    .alarm { flex-direction:column; gap:12px; }
-  }
+  /* App installieren */
+  .app-card{ display:grid; grid-template-columns:auto 1fr; gap:var(--s6); align-items:center; }
+  .phone{ width:96px; height:170px; border-radius:22px; background:linear-gradient(176deg,#FBFDFE,#E6F0F8); border:2px solid var(--ink); position:relative; overflow:hidden; box-shadow:var(--sh-2); }
+  .phone::before{ content:""; position:absolute; top:8px; left:50%; transform:translateX(-50%); width:30px; height:5px; border-radius:3px; background:var(--ink); }
+  .phone::after{ content:""; position:absolute; inset:auto 0 0 0; height:60px; background:var(--wave); background-size:100% 100%; }
+  .phone .appicon{ position:absolute; top:44px; left:50%; transform:translateX(-50%); width:44px; height:44px; border-radius:11px; background:var(--white) url("icons/icon-192.png") center/cover; box-shadow:var(--sh-2); }
+  .phone .applbl{ position:absolute; top:92px; width:100%; text-align:center; font-size:.5625rem; font-weight:600; color:var(--ink); }
+  .steps{ list-style:none; margin:var(--s3) 0 0; padding:0; counter-reset:st; display:flex; flex-direction:column; gap:var(--s2); }
+  .steps li{ counter-increment:st; position:relative; padding-left:34px; min-height:24px; font-size:var(--t-sm); color:var(--body); }
+  .steps li::before{ content:counter(st); position:absolute; left:0; top:0; width:22px; height:22px; border-radius:50%; background:var(--accent-soft); color:var(--accent-deep); border:1px solid var(--accent-tint); font-family:var(--mono); font-size:.6875rem; display:flex; align-items:center; justify-content:center; }
+  .steps .ico{ display:inline-flex; vertical-align:-3px; width:16px; height:16px; color:var(--focus); }
+  .app-tabs{ display:flex; gap:.375rem; margin:var(--s3) 0 0; }
+  @media (max-width:640px){ .app-card{ grid-template-columns:1fr; } .phone{ display:none; } .row .t{ font-size:var(--t-sm); } }
 </style>
 </head>
 <body>
 
-<!-- ===================== APP ===================== -->
-<div id="app">
-  <header>
-    <div class="wrap">
-      <div class="topbar">
-        <div class="brand">The Escape Theory · Mentoring</div>
-        <div class="who" id="who" hidden>
-          <span id="whoName"></span>
-        </div>
-      </div>
-      <div class="hero">
-        <div class="hero-text">
-          <h1 class="serif" id="h-titel"></h1>
-          <p id="h-text"></p>
-        </div>
-        <div class="mentor">
-          <img class="mentor-img" src="anne-avatar.jpg" alt="Anne Siebenkees" />
-          <div class="mentor-cap">Deine Mentorin<strong>Anne</strong></div>
-        </div>
-      </div>
+<div class="topbar">
+  <a class="brand" href="#" onclick="scrollTo(0,0);return false"><span class="mark"></span><span class="wm">The Escape <em>Theory</em></span></a>
+  <span class="sep"></span><span class="ctx">Mentee-Bereich</span>
+  <span class="spacer"></span>
+  <span class="who" id="who" hidden>Hallo <b id="whoName"></b></span>
+  <a class="btn btn-secondary btn-sm" id="topEx" href="austausch.html" hidden>Austausch</a>
+</div>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Mentoring · Business Begleitung</div>
+      <h1 id="h-titel"></h1>
+      <p class="lead" id="h-text"></p>
+      <p class="sig" id="h-sig"></p>
     </div>
-  </header>
+    <div class="mentor">
+      <img src="anne-avatar.jpg" alt="Anne Siebenkees" />
+      <div class="cap">Deine Mentorin<b>Anne</b></div>
+    </div>
+  </div>
+</section>
 
-  <main>
-    <div class="wrap">
-      <div class="grid">
+<main>
+  <div class="wrap">
+    <div class="grid">
 
-        <!-- Rote Meldung: länger als 14 Tage kein Termin (nur mit Login) -->
-        <div class="card span alarm" id="alarmCard" hidden>
-          <div class="alarm-ico">!</div>
-          <div>
-            <h2 class="serif">Wir haben uns zu lange nicht gesehen</h2>
-            <p id="alarmText"></p>
-            <a class="btn" id="alarm-15" target="_blank" rel="noopener">15-Min Check-in buchen</a>
-            <a class="btn" id="alarm-30" target="_blank" rel="noopener">30-Min Strategie-Call</a>
+      <!-- Rote Meldung: länger als 14 Tage kein Termin -->
+      <div class="alert span" id="alarmCard" hidden>
+        <div class="ic">!</div>
+        <div>
+          <h2>Wir haben uns zu lange nicht gesehen</h2>
+          <p id="alarmText"></p>
+          <div class="acts">
+            <a class="btn btn-primary" id="alarm-15" target="_blank" rel="noopener">15-Min Check-in buchen</a>
+            <a class="btn btn-danger" id="alarm-30" target="_blank" rel="noopener">30-Min Strategie-Call</a>
           </div>
         </div>
+      </div>
 
-        <!-- Hinweis: ohne persönlichen Link -->
-        <div class="card span" id="hintCard" hidden>
-          <div class="eyebrow">🔑 Dein persönlicher Zugang</div>
-          <p class="intro-line" id="hintText" style="margin:0"></p>
-        </div>
+      <!-- Hinweis ohne persönlichen Link -->
+      <div class="card span" id="hintCard" hidden>
+        <div class="eyebrow">Dein persönlicher Zugang</div>
+        <p class="muted" id="hintText"></p>
+      </div>
 
-        <!-- Next meeting -->
-        <div class="card next span">
-          <div class="eyebrow">★ Dein nächstes Treffen</div>
-          <h2 class="serif" id="nx-titel"></h2>
+      <!-- Nächstes Team-Treffen (Boarding Pass) -->
+      <div class="ticket span">
+        <div class="body">
+          <div class="eyebrow">Dein nächstes Treffen</div>
+          <h2 class="serif" style="font-family:var(--serif);font-weight:600;font-size:var(--t-h2);color:var(--ink);line-height:1.15" id="nx-titel"></h2>
           <div class="when" id="nx-when"></div>
           <div class="meta" id="nx-meta"></div>
           <div class="countdown" id="countdown"></div>
-          <a class="btn btn-primary" id="nx-link" target="_blank" rel="noopener">
-            <svg class="icn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-            Mit Google Meet beitreten
-          </a>
+          <a class="btn btn-primary btn-lg" id="nx-link" target="_blank" rel="noopener"></a>
         </div>
-
-        <!-- Eigene 1:1-Termine (nur mit Login) -->
-        <div class="card span" id="myCard" hidden>
-          <div class="eyebrow">👤 Nur für dich</div>
-          <h2 class="serif">Deine nächsten Termine bei mir</h2>
-          <p class="intro-line">Alle 1:1-Termine, die du bei mir gebucht hast.</p>
-          <div id="myList"><div class="loading">Termine werden geladen …</div></div>
-        </div>
-
-        <!-- Booking -->
-        <div class="card span">
-          <div class="eyebrow">⏱ Termin bei mir buchen</div>
-          <h2 class="serif">Freier Zugriff auf meinen Kalender</h2>
-          <p class="intro-line">Bucht euch eure Termine selbst – ganz wie ihr sie braucht.</p>
-          <div class="book-grid">
-            <div class="book">
-              <div class="dur">15 <span>Min</span></div>
-              <div class="desc">Check-in für die schnellen Dinge und zum Am-Ball-Bleiben.</div>
-              <a class="btn btn-outline btn-full" id="bk-15" target="_blank" rel="noopener">Check-in buchen</a>
-            </div>
-            <div class="book">
-              <div class="dur">30 <span>Min</span></div>
-              <div class="desc">Strategie, Funnel & Tiefenarbeit – wenn's um die großen Schritte geht.</div>
-              <a class="btn btn-light btn-full" id="bk-30" target="_blank" rel="noopener" style="border:1.5px solid var(--line)">Strategie-Call buchen</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- KPI-Week (monatlich, rollt automatisch weiter) -->
-        <div class="card next">
-          <div class="eyebrow">📊 Einmal im Monat</div>
-          <h2 class="serif">KPI-Week</h2>
-          <div class="when" id="kpi-when"></div>
-          <div class="meta">Trag einmal im Monat deine Zahlen ein – so sehen wir gemeinsam, was wirklich wirkt.</div>
-          <a class="btn btn-primary" id="kpi-link" target="_blank" rel="noopener">
-            <svg class="icn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6m4 6V5m4 14v-9M5 19h14"/></svg>
-            Deine KPIs eintragen
-          </a>
-        </div>
-
-        <!-- Done-4-You Antrag -->
-        <div class="card">
-          <div class="eyebrow">⇢ Aufgaben abgeben</div>
-          <h2 class="serif">Done-4-You Antrag</h2>
-          <p class="intro-line">Du möchtest Bereiche in deinem Business abgeben? Stell hier deinen D4Y-Antrag – wir kümmern uns darum.</p>
-          <a class="btn btn-outline" id="d4y-link" target="_blank" rel="noopener">D4Y-Antrag ausfüllen</a>
-        </div>
-
-        <!-- Calendar -->
-        <div class="card">
-          <div class="eyebrow">🗓 Alle Team-Treffen</div>
-          <h2 class="serif">Kalender</h2>
-          <p class="intro-line">Eure Team-Treffen & Calls auf einen Blick. Teilnahme freiwillig.</p>
-          <div id="calList"></div>
-        </div>
-
-        <!-- News -->
-        <div class="card">
-          <div class="eyebrow">✦ Neues von mir</div>
-          <h2 class="serif">Updates</h2>
-          <div id="newsList" style="margin-top:10px"></div>
-        </div>
-
-        <!-- Austausch (nur mit Login) -->
-        <div class="card span" id="exCard" hidden>
-          <div class="eyebrow">🤝 Austausch</div>
-          <h2 class="serif">Lern dein Team kennen</h2>
-          <p class="intro-line">Stell dich vor, zeig, wobei du helfen kannst und wonach du suchst, und vernetz dich mit den anderen aus dem Team.</p>
-          <div class="ex-tools">
-            <input type="search" id="exSearch" placeholder="Suchen, z. B. Instagram, Funnel, Coaching …" />
-            <button class="btn btn-primary" id="exEdit" type="button" style="background:var(--navy);color:var(--white)">Mein Profil bearbeiten</button>
-          </div>
-          <div class="ex-grid" id="exList"><div class="loading">Profile werden geladen …</div></div>
-        </div>
-
-        <!-- Material -->
-        <div class="card span">
-          <div class="eyebrow">▣ Für dich</div>
-          <h2 class="serif" style="margin-bottom:16px">Material & Ressourcen</h2>
-          <div class="mat-list" id="matList"></div>
-        </div>
-
-        <!-- Plattformen -->
-        <div class="card span">
-          <div class="eyebrow">▢ Plattformen & Tools</div>
-          <h2 class="serif">Eure Arbeits-Plattformen</h2>
-          <p class="intro-line">Hier arbeiten wir gemeinsam – einfach einloggen und loslegen.</p>
-          <div class="plat-grid" id="platList"></div>
-        </div>
-
+        <div class="stub">Boarding · Team Call</div>
       </div>
-    </div>
-    <footer>
-      <div class="brand-f">The Escape Theory</div>
-      <div style="margin-top:6px">Dein geschützter Mentee-Bereich · Mit 💛 für dich gebaut</div>
-    </footer>
-  </main>
-</div>
 
-<!-- ===================== PROFIL-FORMULAR ===================== -->
-<dialog id="pfDialog">
-  <form class="dlg" id="pfForm">
-    <div class="eyebrow">🤝 Austausch</div>
-    <h2 class="serif">Stell dich dem Team vor</h2>
-    <label>Name</label>
-    <input type="text" name="name" maxlength="80" required />
-    <label>Dein Business <small>(in einem Satz)</small></label>
-    <input type="text" name="business" maxlength="150" placeholder="z. B. Business-Coach für Selbstständige Mamas" />
-    <label>Über mich</label>
-    <textarea name="ueber" rows="3" maxlength="600" placeholder="Wer bist du, was treibt dich an?"></textarea>
-    <label>Dabei kann ich helfen</label>
-    <textarea name="biete" rows="2" maxlength="600" placeholder="z. B. Canva, Texte, Reels schneiden …"></textarea>
-    <label>Dazu suche ich Austausch</label>
-    <textarea name="suche" rows="2" maxlength="600" placeholder="z. B. Funnel-Aufbau, Accountability-Partnerin …"></textarea>
-    <label>Instagram <small>(@name oder Link)</small></label>
-    <input type="text" name="instagram" maxlength="150" />
-    <label>Website</label>
-    <input type="text" name="website" maxlength="200" placeholder="https://…" />
-    <label>Foto-Link <small>(optional, z. B. dein Profilbild)</small></label>
-    <input type="text" name="foto" maxlength="300" placeholder="https://…" />
-    <label class="check"><input type="checkbox" name="emailZeigen" /> Meine E-Mail-Adresse für das Team sichtbar machen</label>
-    <div class="dlg-msg" id="pfMsg"></div>
-    <div class="dlg-actions">
-      <button class="btn btn-outline" type="button" id="pfCancel">Abbrechen</button>
-      <button class="btn btn-primary" type="submit" id="pfSave" style="background:var(--navy);color:var(--white)">Speichern</button>
-    </div>
-  </form>
-</dialog>
+      <!-- Eigene 1:1-Termine -->
+      <div class="card span" id="myCard" hidden>
+        <div class="eyebrow">Nur für dich</div>
+        <h2>Deine nächsten Termine <em>bei mir</em></h2>
+        <p class="intro">Alle 1:1-Termine, die du bei mir gebucht hast.</p>
+        <div id="myList"><p class="muted">Termine werden geladen …</p></div>
+      </div>
 
+      <!-- Termin buchen -->
+      <div class="card span">
+        <div class="eyebrow">Termin bei mir buchen</div>
+        <h2>Freier Zugriff auf <em>meinen Kalender</em></h2>
+        <p class="intro">Bucht euch eure Termine selbst – ganz wie ihr sie braucht.</p>
+        <div class="book-grid">
+          <div class="book">
+            <div class="dur">15<small>Min</small></div>
+            <p>Check-in für die schnellen Dinge und zum Am-Ball-Bleiben.</p>
+            <a class="btn btn-secondary btn-full" id="bk-15" target="_blank" rel="noopener">Check-in buchen</a>
+          </div>
+          <div class="book">
+            <div class="dur">30<small>Min</small></div>
+            <p>Strategie, Funnel &amp; Tiefenarbeit – wenn's um die großen Schritte geht.</p>
+            <a class="btn btn-primary btn-full" id="bk-30" target="_blank" rel="noopener">Strategie-Call buchen</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI-Week -->
+      <div class="card">
+        <div class="eyebrow">Einmal im Monat</div>
+        <h2>KPI-<em>Week</em></h2>
+        <div class="when" id="kpi-when" style="font-size:var(--t-body)"></div>
+        <p class="intro" style="margin-top:.25rem">Trag einmal im Monat deine Zahlen ein – so sehen wir gemeinsam, was wirklich wirkt.</p>
+        <a class="btn btn-primary" id="kpi-link" target="_blank" rel="noopener">Deine KPIs eintragen</a>
+      </div>
+
+      <!-- Done-4-You -->
+      <div class="card">
+        <div class="eyebrow">Aufgaben abgeben</div>
+        <h2>Done-4-You <em>Antrag</em></h2>
+        <p class="intro">Du möchtest Bereiche in deinem Business abgeben? Stell hier deinen D4Y-Antrag – wir kümmern uns darum.</p>
+        <a class="btn btn-secondary" id="d4y-link" target="_blank" rel="noopener">D4Y-Antrag ausfüllen</a>
+      </div>
+
+      <!-- Austausch-Vorschau -->
+      <div class="card span" id="exCard" hidden>
+        <div class="eyebrow">Austausch-Portal</div>
+        <h2>Was im Team <em>gerade los ist</em></h2>
+        <p class="intro">Stell Fragen, teile Erfolge, gib Tipps und vernetz dich mit den anderen aus dem Team.</p>
+        <div class="teaser" id="teaser"><p class="muted">Wird geladen …</p></div>
+        <a class="btn btn-primary btn-lg" id="exLink" href="austausch.html">Zum Austausch-Portal →</a>
+      </div>
+
+      <!-- Kalender -->
+      <div class="card">
+        <div class="eyebrow">Alle Team-Treffen</div>
+        <h2>Kalender</h2>
+        <p class="intro">Eure Team-Treffen &amp; Calls auf einen Blick. Teilnahme freiwillig.</p>
+        <div id="calList"></div>
+      </div>
+
+      <!-- News -->
+      <div class="card">
+        <div class="eyebrow">Neues von mir</div>
+        <h2>Updates</h2>
+        <div id="newsList"></div>
+      </div>
+
+      <!-- Als App aufs Handy -->
+      <div class="card span" id="appCard" hidden>
+        <div class="app-card">
+          <div class="phone"><div class="appicon"></div><div class="applbl">TET Mentees</div></div>
+          <div>
+            <div class="eyebrow">Immer dabei</div>
+            <h2>Hol dir den Mentee-Bereich <em>als App</em> aufs Handy</h2>
+            <p class="intro" style="margin-bottom:0">Ein Tipp aufs Icon – und du bist direkt in deinem Bereich, ohne Link suchen.</p>
+            <div class="app-tabs" id="appTabs">
+              <button class="chip" data-os="ios" type="button">iPhone</button>
+              <button class="chip" data-os="android" type="button">Android</button>
+            </div>
+            <ol class="steps" id="steps-ios" hidden>
+              <li>Öffne diese Seite in <b>Safari</b> (über deinen persönlichen Link).</li>
+              <li>Tippe unten auf <b>Teilen</b> <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg></span>.</li>
+              <li>Scrolle runter und wähle <b>„Zum Home-Bildschirm“</b>.</li>
+              <li>Tippe oben rechts auf <b>„Hinzufügen“</b> – fertig! 💛</li>
+            </ol>
+            <ol class="steps" id="steps-android" hidden>
+              <li>Öffne diese Seite in <b>Chrome</b> (über deinen persönlichen Link).</li>
+              <li>Tippe oben rechts auf die <b>drei Punkte ⋮</b>.</li>
+              <li>Wähle <b>„App installieren“</b> oder <b>„Zum Startbildschirm hinzufügen“</b>.</li>
+              <li>Bestätige mit <b>„Installieren“</b> – fertig! 💛</li>
+            </ol>
+            <div style="display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s4)">
+              <button class="btn btn-primary" id="installBtn" type="button" hidden>Jetzt als App installieren</button>
+              <button class="btn btn-ghost btn-sm" id="appDone" type="button">Hab ich schon ✓</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Material -->
+      <div class="card span">
+        <div class="eyebrow">Für dich</div>
+        <h2 style="margin-bottom:var(--s4)">Material &amp; <em>Ressourcen</em></h2>
+        <div class="link-list" id="matList"></div>
+      </div>
+
+      <!-- Plattformen -->
+      <div class="card span">
+        <div class="eyebrow">Plattformen &amp; Tools</div>
+        <h2>Eure Arbeits-<em>Plattformen</em></h2>
+        <p class="intro">Hier arbeiten wir gemeinsam – einfach einloggen und loslegen.</p>
+        <div class="plat-grid" id="platList"></div>
+      </div>
+
+    </div>
+  </div>
+  <footer>
+    <div class="f-brand">The Escape Theory</div>
+    <div style="margin-top:.375rem">Dein geschützter Mentee-Bereich · Mit 💛 für dich gebaut</div>
+  </footer>
+</main>
+
+<script src="mentee.js"></script>
 <script>
-/* ---------- Helpers ---------- */
-const MON = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
-const MONL = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-const TAG = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
-const $ = id => document.getElementById(id);
+const meetIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
+const arrIcon  = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
+const fileIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>';
 function parseDate(s){ const [d,t]=s.split(" "); const [y,m,day]=d.split("-").map(Number); const [h,min]=t.split(":").map(Number); return new Date(y,m-1,day,h,min); }
-function fmtLong(dt){ return `${TAG[dt.getDay()]}, ${dt.getDate()}. ${MONL[dt.getMonth()]} ${dt.getFullYear()} · ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')} Uhr`; }
 
-/* ---------- Anzeige ---------- */
-function showApp(){ $("app").style.display="block"; render(); }
-
-/* ---------- Render ---------- */
+/* ---------- Allgemeiner Bereich (aus dem Pflegebereich oben) ---------- */
 function render(){
   const D = DASHBOARD;
-
-  // Greeting
   $("h-titel").textContent = D.begruessung.titel;
   $("h-text").textContent  = D.begruessung.text;
+  $("h-sig").textContent   = D.begruessung.signatur || "";
 
-  // Kommende Treffen – eine einzige Quelle: die Liste `teamTreffen`.
-  // Chronologisch sortiert, vergangene Termine fallen automatisch raus.
+  // Kommende Team-Treffen: chronologisch, vergangene fallen automatisch raus
   const now = new Date();
   const upcoming = D.teamTreffen
     .map(t => ({ ...t, dt: parseDate(t.datum) }))
     .filter(t => t.dt >= new Date(now.getTime() - 3600*1000))
     .sort((a, b) => a.dt - b.dt);
 
-  // Nächstes Treffen (großes Highlight) = das erste kommende aus der Liste.
-  // Pro-Termin-Felder (titel/dauer/beschreibung) haben Vorrang vor den Standardtexten.
   const info = D.treffenInfo, nx = upcoming[0];
-  const meetIcon = '<svg class="icn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
   if (nx) {
     $("nx-titel").textContent = nx.titel || info.titel;
     $("nx-when").textContent  = fmtLong(nx.dt);
     $("nx-meta").textContent  = [nx.dauer || info.dauer, nx.beschreibung || info.beschreibung].filter(Boolean).join(" · ");
     $("nx-link").href = nx.meetLink;
-    $("nx-link").innerHTML = meetIcon + " " + ((nx.meetLink || "").includes("zoom") ? "Per Zoom beitreten" : "Mit Google Meet beitreten");
-    $("nx-link").style.display = "";
+    $("nx-link").innerHTML = meetIcon + ((nx.meetLink || "").includes("zoom") ? "Per Zoom beitreten" : "Mit Google Meet beitreten");
     startCountdown(nx.dt);
   } else {
     $("nx-titel").textContent = info.titel;
     $("nx-when").textContent  = "Aktuell ist kein Termin geplant.";
     $("nx-meta").textContent  = "Neue Termine folgen in Kürze 💛";
-    $("nx-link").style.display = "none";
-    $("countdown").innerHTML  = "";
+    $("nx-link").hidden = true;
   }
 
-  // Booking
   $("bk-15").href = D.buchung.link15;
   $("bk-30").href = D.buchung.link30;
 
-  // KPI-Week (monatlich – rollt automatisch vom Anker-Datum weiter)
+  // KPI-Week rollt automatisch monatlich vom Anker-Datum weiter
   if (D.kpiWeek) {
-    const anker = parseDate(D.kpiWeek.anker + " 00:00");
     const today = new Date(); today.setHours(0,0,0,0);
-    let nextKpi = new Date(anker);
-    while (nextKpi < today) { nextKpi.setMonth(nextKpi.getMonth() + 1); }
-    const days = Math.round((nextKpi - today) / 86400000);
+    let k = parseDate(D.kpiWeek.anker + " 00:00");
+    while (k < today) k.setMonth(k.getMonth() + 1);
+    const days = Math.round((k - today) / 86400000);
     const rel = days === 0 ? "diese Woche – jetzt dran!" : days === 1 ? "morgen" : `in ${days} Tagen`;
-    $("kpi-when").textContent = `Nächste KPI-Week: ${TAG[nextKpi.getDay()]}, ${nextKpi.getDate()}. ${MONL[nextKpi.getMonth()]} ${nextKpi.getFullYear()} · ${rel}`;
+    $("kpi-when").textContent = `Nächste: ${TAG[k.getDay()]}, ${k.getDate()}. ${MONL[k.getMonth()]} · ${rel}`;
     $("kpi-link").href = D.kpiWeek.link;
   }
-
-  // Done-4-You Antrag
   if (D.d4y) $("d4y-link").href = D.d4y.link;
 
-  // Calendar (nutzt dieselbe `upcoming`-Liste von oben)
-  $("calList").innerHTML = upcoming.length ? upcoming.map((t,i)=>`
-    <div class="cal-item">
-      <div class="cal-date"><div class="d">${t.dt.getDate()}</div><div class="m">${MON[t.dt.getMonth()]}</div></div>
-      <div class="cal-info">
-        <div class="t">${t.titel} ${i===0?'<span class="cal-soon">· als nächstes</span>':''}</div>
-        <div class="s">${TAG[t.dt.getDay()]} · ${String(t.dt.getHours()).padStart(2,'0')}:${String(t.dt.getMinutes()).padStart(2,'0')} Uhr</div>
+  $("calList").innerHTML = upcoming.length ? upcoming.map((t,i) => `
+    <div class="row">
+      <div class="date"><div class="d">${t.dt.getDate()}</div><div class="m">${MON[t.dt.getMonth()]}</div></div>
+      <div class="info">
+        <div class="t">${t.titel}${i===0 ? '<span class="soon">als nächstes</span>' : ''}</div>
+        <div class="s">${TAG[t.dt.getDay()]} · ${pad(t.dt.getHours())}:${pad(t.dt.getMinutes())} Uhr</div>
       </div>
-      <a class="btn btn-outline" href="${t.meetLink}" target="_blank" rel="noopener">Beitreten</a>
-    </div>`).join("") : `<p class="intro-line" style="margin:0">Aktuell sind keine Termine eingetragen. Schau bald wieder vorbei 💛</p>`;
+      <a class="btn btn-secondary btn-sm" href="${t.meetLink}" target="_blank" rel="noopener">Beitreten</a>
+    </div>`).join("") : `<p class="muted">Aktuell sind keine Termine eingetragen. Schau bald wieder vorbei 💛</p>`;
 
-  // News (bis zu 2 optionale Buttons pro Eintrag: n.link/n.linkText + n.link2/n.linkText2)
-  $("newsList").innerHTML = D.news.map(n=>`
-    <div class="news-item">
-      <div class="news-date">${n.datum}</div>
+  $("newsList").innerHTML = D.news.map(n => `
+    <div class="news">
+      <div class="nd">${n.datum}</div>
       <h3>${n.titel}</h3>
       <p>${n.text}</p>
-      ${(n.link || n.link2) ? `<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px">
-        ${n.link ? `<a class="btn btn-primary" href="${n.link}" target="_blank" rel="noopener">${n.linkText || "Mehr erfahren"}</a>` : ""}
-        ${n.link2 ? `<a class="btn btn-outline" href="${n.link2}" target="_blank" rel="noopener">${n.linkText2 || "Mehr"}</a>` : ""}
+      ${(n.link || n.link2) ? `<div class="acts">
+        ${n.link ? `<a class="btn btn-primary btn-sm" href="${n.link}" target="_blank" rel="noopener">${n.linkText || "Mehr erfahren"}</a>` : ""}
+        ${n.link2 ? `<a class="btn btn-secondary btn-sm" href="${n.link2}" target="_blank" rel="noopener">${n.linkText2 || "Mehr"}</a>` : ""}
       </div>` : ""}
     </div>`).join("");
 
-  // Material (leer = freundlicher Platzhalter)
-  const fileIco = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`;
-  const arr = `<svg class="icn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
-  $("matList").innerHTML = D.material.length
-    ? D.material.map(m=>`
-        <a class="mat" href="${m.link}" target="_blank" rel="noopener">
-          <div class="mat-ico">${fileIco}</div>
-          <div class="mat-txt"><div class="t">${m.titel}</div><div class="s">${m.beschreibung}</div></div>
-          <div class="arr">${arr}</div>
-        </a>`).join("")
-    : `<p class="intro-line" style="margin:0">Hier sammeln sich bald deine Tools, Anleitungen & Workbooks. 💛</p>`;
+  $("matList").innerHTML = D.material.length ? D.material.map(m => `
+    <a class="link-row" href="${m.link}" target="_blank" rel="noopener">
+      <div class="lic">${fileIcon}</div>
+      <div><div class="t">${m.titel}</div><div class="s">${m.beschreibung}</div></div>
+      <div class="arr">${arrIcon}</div>
+    </a>`).join("") : `<p class="muted">Hier sammeln sich bald deine Tools, Anleitungen &amp; Workbooks. 💛</p>`;
 
-  // Plattformen & Tools
-  $("platList").innerHTML = (D.plattformen || []).map(p=>`
+  $("platList").innerHTML = (D.plattformen || []).map(p => `
     <a class="plat" href="${p.link}" target="_blank" rel="noopener">
-      <div class="plat-tag">${p.platform}</div>
-      <div class="plat-name">${p.name}</div>
-      <div class="plat-desc">${p.beschreibung}</div>
-      <span class="plat-cta">${p.cta} →</span>
+      <span class="tag cool" style="align-self:flex-start">${p.platform}</span>
+      <div class="pn">${p.name}</div>
+      <p>${p.beschreibung}</p>
+      <span class="cta">${p.cta} →</span>
     </a>`).join("");
 }
 
-/* ---------- Countdown ---------- */
 let cdTimer;
 function startCountdown(target){
   clearInterval(cdTimer);
+  const el = $("countdown");
   function tick(){
     const diff = target - new Date();
-    const el = $("countdown");
-    if (diff <= 0){ el.innerHTML = `<div class="cd-box" style="flex:none;width:100%"><div class="cd-num" style="font-size:18px">Läuft gerade – komm dazu! 🎉</div></div>`; clearInterval(cdTimer); return; }
+    if (diff <= 0){ el.innerHTML = `<div class="cd live"><b>Läuft gerade – komm dazu! 🎉</b></div>`; clearInterval(cdTimer); return; }
     const d=Math.floor(diff/86400000), h=Math.floor(diff/3600000)%24, m=Math.floor(diff/60000)%60, s=Math.floor(diff/1000)%60;
-    el.innerHTML = [[d,"Tage"],[h,"Std"],[m,"Min"],[s,"Sek"]].map(([n,l])=>`<div class="cd-box"><div class="cd-num">${String(n).padStart(2,'0')}</div><div class="cd-lbl">${l}</div></div>`).join("");
+    el.innerHTML = [[d,"Tage"],[h,"Std"],[m,"Min"],[s,"Sek"]].map(([n,l]) => `<div class="cd"><b>${pad(n)}</b><span>${l}</span></div>`).join("");
   }
-  tick(); cdTimer=setInterval(tick,1000);
+  tick(); cdTimer = setInterval(tick, 1000);
 }
 
-/* =====================================================================
-   Persönlicher Zugang, eigene Termine & Austausch
-   ===================================================================== */
-const API = (DASHBOARD.zugang && DASHBOARD.zugang.apiUrl || "").trim();
-const CODE_KEY = "tet-zugangscode";
-let PROFILE = [];
-
-function esc(s){ return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-function safeUrl(u){
-  u = String(u || "").trim(); if (!u) return "";
-  if (!/^https?:\/\//i.test(u)) u = "https://" + u;
-  try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : ""; } catch { return ""; }
-}
-function igUrl(v){
-  v = String(v || "").trim(); if (!v) return "";
-  if (/instagram\.com/i.test(v)) return safeUrl(v);
-  return "https://instagram.com/" + encodeURIComponent(v.replace(/^@/, ""));
-}
-function getCode(){ try { return localStorage.getItem(CODE_KEY) || ""; } catch { return ""; } }
-function setCode(c){ try { c ? localStorage.setItem(CODE_KEY, c) : localStorage.removeItem(CODE_KEY); } catch {} }
-
-async function api(payload){
-  const res = await fetch(API, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" }, // kein CORS-Preflight
-    body: JSON.stringify({ code: getCode(), ...payload }),
-  });
-  return res.json();
-}
-
-/* ---------- Persönlicher Link (?z=CODE) ---------- */
-// Jeder Mentee hat seinen eigenen Link (liegt in seinem Miro). Beim ersten Öffnen
-// merkt sich der Browser den Code, danach reicht auch die normale Adresse.
-(function(){
-  const z = new URLSearchParams(location.search).get("z");
-  if (z) { setCode(z.trim().toUpperCase()); history.replaceState(null, "", location.pathname + location.hash); }
-})();
+/* ---------- Persönlicher Bereich ---------- */
 function showHint(msg){ $("hintText").textContent = msg; $("hintCard").hidden = false; }
 
 async function loadPersonal(){
   try {
     const d = await api({});
-    if (!d.ok) { setCode(""); ["myCard","exCard","who"].forEach(id => $(id).hidden = true); showHint(d.fehler); return; }
+    if (!d.ok) { setCode(""); ["myCard","exCard","who","topEx"].forEach(id => $(id).hidden = true); showHint(d.fehler); return; }
     renderPersonal(d);
   } catch {
-    $("myList").innerHTML = `<div class="my-empty">Deine Termine konnten gerade nicht geladen werden. Lade die Seite gleich noch einmal neu.</div>`;
-    $("exList").innerHTML = `<div class="my-empty">Die Profile konnten gerade nicht geladen werden.</div>`;
+    $("myList").innerHTML = `<p class="muted">Deine Termine konnten gerade nicht geladen werden. Lade die Seite gleich noch einmal neu.</p>`;
+    $("teaser").innerHTML = `<p class="muted">Die Beiträge konnten gerade nicht geladen werden.</p>`;
   }
 }
 
-/* ---------- Rendern der persönlichen Bereiche ---------- */
 function renderPersonal(d){
-  const vorname = (d.ich.name || "").split(" ")[0];
-  $("whoName").textContent = "Hallo " + vorname;
-  $("whoName").dataset.full = d.ich.name || "";
-  $("who").hidden = false;
-  ["myCard","exCard"].forEach(id => $(id).hidden = false);
+  $("whoName").textContent = (d.ich.name || "").split(" ")[0];
+  ["who","topEx","myCard","exCard"].forEach(id => $(id).hidden = false);
+  $("topEx").href = withCode("austausch.html");
+  $("exLink").href = withCode("austausch.html");
 
   // Eigene Termine
   const t = d.termine || { kommend: [] };
   $("myList").innerHTML = t.kommend.length ? t.kommend.map((x,i) => {
     const dt = new Date(x.start);
-    return `<div class="cal-item">
-      <div class="cal-date"><div class="d">${dt.getDate()}</div><div class="m">${MON[dt.getMonth()]}</div></div>
-      <div class="cal-info">
-        <div class="t">${esc(x.titel || "Termin mit Anne")} ${i===0?'<span class="cal-soon">· als nächstes</span>':''}</div>
+    return `<div class="row">
+      <div class="date"><div class="d">${dt.getDate()}</div><div class="m">${MON[dt.getMonth()]}</div></div>
+      <div class="info">
+        <div class="t">${esc(x.titel || "Termin mit Anne")}${i===0 ? '<span class="soon">als nächstes</span>' : ''}</div>
         <div class="s">${fmtLong(dt)}${x.minuten ? " · " + x.minuten + " Min" : ""}</div>
       </div>
     </div>`;
-  }).join("") : `<div class="my-empty">Aktuell hast du keinen Termin bei mir gebucht. Buch dir gleich hier unten deinen nächsten Check-in. 💛</div>`;
+  }).join("") : `<p class="muted">Aktuell hast du keinen Termin bei mir gebucht. Buch dir gleich hier unten deinen nächsten Check-in. 💛</p>`;
 
   // Rote Meldung
   if (t.alarm) {
@@ -789,84 +541,41 @@ function renderPersonal(d){
     $("alarmCard").hidden = true;
   }
 
-  // Austausch
-  PROFILE = d.profile || [];
-  renderProfiles();
-}
-
-function renderProfiles(){
-  const q = $("exSearch").value.trim().toLowerCase();
-  const list = PROFILE.filter(p => !q || [p.name,p.business,p.ueber,p.biete,p.suche].join(" ").toLowerCase().includes(q));
-  const mine = PROFILE.find(p => p.eigenes);
-  $("exEdit").textContent = mine ? "Mein Profil bearbeiten" : "Jetzt vorstellen";
-  if (!list.length) {
-    $("exList").innerHTML = `<div class="my-empty">${PROFILE.length ? "Keine Treffer für deine Suche." : "Noch hat sich niemand vorgestellt. Mach du den Anfang! 💛"}</div>`;
-    return;
-  }
-  $("exList").innerHTML = list.map(p => {
-    const foto = safeUrl(p.foto);
-    const initials = esc((p.name || "?").split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase());
-    const ig = igUrl(p.instagram), web = safeUrl(p.website);
-    const links = [
-      p.kontakt && !p.eigenes ? `<a class="btn btn-primary" href="mailto:${esc(p.kontakt)}?subject=${encodeURIComponent("Hallo aus dem Escape-Theory-Team 💛")}">✉ Schreib mir</a>` : "",
-      ig ? `<a class="btn btn-outline" href="${esc(ig)}" target="_blank" rel="noopener">Instagram</a>` : "",
-      web ? `<a class="btn btn-outline" href="${esc(web)}" target="_blank" rel="noopener">Website</a>` : "",
-    ].join("");
-    return `<div class="pf${p.eigenes ? " me" : ""}">
-      <div class="pf-head">
-        <div class="pf-ava">${foto ? `<img src="${esc(foto)}" alt="" loading="lazy" referrerpolicy="no-referrer" />` : initials}</div>
-        <div>
-          <div class="pf-name">${esc(p.name)}${p.eigenes ? '<span class="you">Du</span>' : ""}</div>
-          ${p.business ? `<div class="pf-biz">${esc(p.business)}</div>` : ""}
-        </div>
+  // Austausch-Vorschau: die 3 neuesten Beiträge
+  const b = (d.beitraege || []).slice(0, 3);
+  $("teaser").innerHTML = b.length ? b.map(x => `
+    <a href="${withCode("austausch.html")}#b-${esc(x.id)}">
+      ${avatar(x.name, "", "sm")}
+      <div class="tx">
+        <div class="tm"><b>${esc(x.name)}</b> · ${KAT_ICON[x.kategorie] || "💬"} ${esc(x.kategorie)} · ${fmtRel(x.zeit)}</div>
+        <div class="tt">${esc(x.text)}</div>
       </div>
-      ${p.ueber ? `<p>${esc(p.ueber)}</p>` : ""}
-      ${p.biete ? `<div class="pf-lbl">Dabei kann ich helfen</div><p>${esc(p.biete)}</p>` : ""}
-      ${p.suche ? `<div class="pf-lbl">Dazu suche ich Austausch</div><p>${esc(p.suche)}</p>` : ""}
-      ${links ? `<div class="pf-links">${links}</div>` : ""}
-    </div>`;
-  }).join("");
+      <div class="tc">💬 ${x.kommentare.length}</div>
+    </a>`).join("") : `<p class="muted">Noch ist es ruhig hier. Stell dich vor oder stell die erste Frage! 💛</p>`;
 }
-$("exSearch").addEventListener("input", renderProfiles);
 
-/* ---------- Profil bearbeiten ---------- */
-const pfForm = $("pfForm");
-$("exEdit").addEventListener("click", () => {
-  const p = PROFILE.find(x => x.eigenes) || { name: ($("whoName").dataset.full || "") };
-  ["name","business","ueber","biete","suche","instagram","website","foto"].forEach(k => pfForm.elements[k].value = p[k] || "");
-  pfForm.elements.emailZeigen.checked = !!p.emailZeigen;
-  $("pfMsg").textContent = "";
-  $("pfDialog").showModal();
-});
-$("pfCancel").addEventListener("click", () => $("pfDialog").close());
-pfForm.addEventListener("submit", async e => {
-  e.preventDefault();
-  const f = pfForm.elements;
-  const profil = {};
-  ["name","business","ueber","biete","suche","instagram","website","foto"].forEach(k => profil[k] = f[k].value.trim());
-  profil.emailZeigen = f.emailZeigen.checked;
-  $("pfSave").disabled = true; $("pfSave").textContent = "Speichert …"; $("pfMsg").textContent = "";
-  try {
-    const d = await api({ aktion: "profilSpeichern", profil });
-    if (!d.ok) { $("pfMsg").textContent = d.fehler || "Speichern hat nicht geklappt."; return; }
-    renderPersonal(d);
-    $("pfDialog").close();
-  } catch {
-    $("pfMsg").textContent = "Keine Verbindung. Bitte versuch es gleich noch einmal.";
-  } finally {
-    $("pfSave").disabled = false; $("pfSave").textContent = "Speichern";
-  }
-});
+/* ---------- Als App aufs Handy ---------- */
+function setupApp(){
+  let erledigt = false; try { erledigt = localStorage.getItem("tet-app-ok") === "1"; } catch {}
+  if (isStandalone() || erledigt) return;
+  $("appCard").hidden = false;
+  const zeige = os => {
+    document.querySelectorAll("#appTabs .chip").forEach(c => c.classList.toggle("is-on", c.dataset.os === os));
+    $("steps-ios").hidden = os !== "ios"; $("steps-android").hidden = os !== "android";
+  };
+  const os = plattform(); zeige(os === "desktop" ? "ios" : os);
+  document.querySelectorAll("#appTabs .chip").forEach(c => c.addEventListener("click", () => zeige(c.dataset.os)));
+  const btn = () => { $("installBtn").hidden = !installPrompt; };
+  btn(); document.addEventListener("tet-installbar", btn);
+  $("installBtn").addEventListener("click", async () => { if (!installPrompt) return; installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; btn(); });
+  $("appDone").addEventListener("click", () => { try { localStorage.setItem("tet-app-ok", "1"); } catch {} $("appCard").hidden = true; });
+}
 
 /* ---------- Start ---------- */
-if (!API) {
-  showApp();                      // noch nicht eingerichtet → wie bisher ohne Login
-} else if (getCode()) {
-  showApp(); loadPersonal();      // persönlicher Link bekannt → Termine & Austausch laden
-} else {
-  showApp();                      // ohne persönlichen Link: allgemeiner Bereich + Hinweis
-  showHint("Deine persönlichen Termine und den Austausch mit dem Team siehst du, wenn du den Mentee-Bereich über deinen persönlichen Link aus deinem Miro öffnest.");
-}
+render();
+setupApp();
+if (API_URL && getCode()) loadPersonal();
+else if (API_URL) showHint("Deine persönlichen Termine und das Austausch-Portal siehst du, wenn du den Mentee-Bereich über deinen persönlichen Link aus deinem Miro öffnest.");
 </script>
 </body>
 </html>

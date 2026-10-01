@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>The Escape Theory · Austausch-Portal</title>
+<meta name="theme-color" content="#FAFCFD" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" type="image/png" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="TET Mentees" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="escape-os.css" />
+<style>
+  .hero{ padding:var(--s8) 0 calc(var(--s12) + 30px); }
+  .layout{ display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:var(--s5); align-items:start; }
+  .side{ position:sticky; top:76px; display:flex; flex-direction:column; gap:var(--s4); }
+  @media (max-width:900px){ .layout{ grid-template-columns:1fr; } .side{ display:none; } }
+
+  .seg{ display:inline-flex; background:var(--white); border:1px solid var(--hair); border-radius:var(--r-pill); padding:3px; box-shadow:var(--sh-1); margin-bottom:var(--s5); }
+  .seg button{ border:0; background:none; cursor:pointer; padding:.5rem 1.125rem; border-radius:var(--r-pill); font-weight:600; font-size:var(--t-sm); color:var(--slate); transition:all var(--fast) var(--ease); }
+  .seg button.is-on{ background:var(--tint); color:var(--ink); box-shadow:inset 0 0 0 1px var(--deep); }
+
+  /* Composer */
+  .composer .top{ display:flex; gap:var(--s3); align-items:flex-start; }
+  .composer textarea{ min-height:96px; }
+  .composer .bar{ display:flex; flex-wrap:wrap; gap:var(--s3); align-items:center; justify-content:space-between; margin-top:var(--s3); }
+  .composer .lbl{ font-family:var(--mono); font-size:.625rem; letter-spacing:.16em; text-transform:uppercase; color:var(--slate); margin:var(--s3) 0 var(--s2); }
+
+  /* Feed */
+  .filters{ display:flex; flex-wrap:wrap; gap:.5rem; margin:var(--s5) 0 var(--s4); }
+  .feed{ display:flex; flex-direction:column; gap:var(--s4); }
+  .post{ scroll-margin-top:80px; }
+  .post.flash{ box-shadow:0 0 0 3px var(--accent-tint), var(--sh-2); }
+  .post .head{ display:flex; gap:var(--s3); align-items:center; margin-bottom:var(--s3); }
+  .post .nm{ font-weight:600; color:var(--ink); }
+  .post .tm{ font-size:.75rem; color:var(--slate); }
+  .post .head .tag{ margin-left:auto; }
+  .post .txt{ color:var(--body); white-space:pre-line; word-wrap:break-word; }
+  .post .txt a{ color:var(--focus); }
+  .post .foot{ display:flex; align-items:center; gap:var(--s2); margin-top:var(--s4); padding-top:var(--s3); border-top:1px solid var(--hair2); }
+  .post .foot .spacer{ flex:1; }
+  .comments{ margin-top:var(--s3); display:flex; flex-direction:column; gap:var(--s3); }
+  .cmt{ display:flex; gap:var(--s3); align-items:flex-start; }
+  .cmt .bubble{ flex:1; min-width:0; background:var(--tint); border:1px solid var(--hair); border-radius:var(--r-md); padding:.5rem .75rem; }
+  .cmt .bubble .nm{ font-size:var(--t-sm); }
+  .cmt .bubble .tm{ font-size:.6875rem; }
+  .cmt .bubble p{ font-size:var(--t-sm); white-space:pre-line; word-wrap:break-word; }
+  .cmt .del{ border:0; background:none; cursor:pointer; color:var(--slate); font-size:.6875rem; padding:0 .25rem; }
+  .cmt .del:hover{ color:var(--danger); }
+  .reply{ display:flex; gap:var(--s2); align-items:flex-end; margin-top:var(--s3); }
+  .reply textarea{ min-height:42px; height:42px; }
+
+  /* Team */
+  .team-tools{ display:flex; flex-wrap:wrap; gap:var(--s3); margin-bottom:var(--s4); }
+  .team-tools .input{ flex:1; min-width:200px; }
+  .team{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:var(--s4); }
+  .pf{ display:flex; flex-direction:column; gap:var(--s2); }
+  .pf.me{ border-color:var(--accent-tint); background:linear-gradient(180deg,var(--accent-soft),var(--white) 40%); }
+  .pf .head{ display:flex; gap:var(--s3); align-items:center; margin-bottom:var(--s2); }
+  .pf .nm{ font-family:var(--serif); font-weight:600; font-size:var(--t-lg); color:var(--ink); line-height:1.2; }
+  .pf .biz{ font-size:var(--t-sm); color:var(--slate); }
+  .pf .lbl{ font-family:var(--mono); font-size:.5625rem; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-deep); margin-top:var(--s2); }
+  .pf p{ font-size:var(--t-sm); white-space:pre-line; }
+  .pf .links{ display:flex; flex-wrap:wrap; gap:var(--s2); margin-top:auto; padding-top:var(--s3); }
+
+  .side .card{ padding:var(--s5); }
+  .side h3{ font-family:var(--serif); font-weight:600; font-size:var(--t-lg); color:var(--ink); margin-bottom:var(--s2); }
+  .side ul{ margin:0; padding-left:1.1rem; font-size:var(--t-sm); color:var(--body); }
+  .side li{ margin-bottom:.25rem; }
+  .empty{ text-align:center; padding:var(--s10) var(--s5); }
+  .empty .big{ font-size:2rem; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" id="homeLink" href="index.html"><span class="mark"></span><span class="wm">The Escape <em>Theory</em></span></a>
+  <span class="sep"></span><span class="ctx">Austausch</span>
+  <span class="spacer"></span>
+  <span class="who" id="who" hidden>Hallo <b id="whoName"></b></span>
+  <a class="btn btn-secondary btn-sm" id="backLink" href="index.html">← Dashboard</a>
+</div>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Austausch-Portal</div>
+      <h1>Lern dein Team <em>kennen</em></h1>
+      <p class="lead">Stell Fragen, teile Erfolge, gib Tipps – und vernetz dich mit den anderen aus dem Team. Hier sind nur wir. 💛</p>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+
+    <div class="card" id="hintCard" hidden>
+      <div class="eyebrow">Dein persönlicher Zugang</div>
+      <p class="muted" id="hintText">Das Austausch-Portal siehst du, wenn du den Mentee-Bereich über deinen persönlichen Link aus deinem Miro öffnest.</p>
+    </div>
+
+    <div class="layout" id="portal" hidden>
+      <div>
+        <div class="seg" role="tablist">
+          <button type="button" class="is-on" data-tab="feed">Beiträge</button>
+          <button type="button" data-tab="team">Team</button>
+        </div>
+
+        <!-- Beiträge -->
+        <section id="tab-feed">
+          <form class="card composer" id="composer">
+            <div class="top">
+              <div id="meAva"></div>
+              <textarea class="input" name="text" maxlength="2000" placeholder="Was möchtest du mit dem Team teilen?" required></textarea>
+            </div>
+            <div class="lbl">Worum geht's?</div>
+            <div class="chips" id="katPick"></div>
+            <div class="bar">
+              <span class="muted" id="postMsg"></span>
+              <button class="btn btn-primary" type="submit" id="postBtn">Posten</button>
+            </div>
+          </form>
+
+          <div class="filters" id="filters"></div>
+          <div class="feed" id="feed"><p class="muted">Beiträge werden geladen …</p></div>
+        </section>
+
+        <!-- Team -->
+        <section id="tab-team" hidden>
+          <div class="team-tools">
+            <input class="input" type="search" id="teamSearch" placeholder="Suchen, z. B. Instagram, Funnel, Coaching …" />
+            <button class="btn btn-primary" type="button" id="pfEditBtn">Jetzt vorstellen</button>
+          </div>
+          <div class="team" id="team"></div>
+        </section>
+      </div>
+
+      <aside class="side">
+        <div class="card">
+          <div class="eyebrow">Dein Profil</div>
+          <div style="display:flex;gap:var(--s3);align-items:center;margin-bottom:var(--s3)">
+            <div id="sideAva"></div>
+            <div><div style="font-weight:600;color:var(--ink)" id="sideName"></div><div class="muted" id="sideBiz"></div></div>
+          </div>
+          <button class="btn btn-secondary btn-sm btn-full" type="button" id="pfEditBtn2">Profil bearbeiten</button>
+        </div>
+        <div class="card">
+          <h3>So funktioniert's</h3>
+          <ul>
+            <li>Teile Fragen, Erfolge &amp; Tipps als Beitrag.</li>
+            <li>Kommentiere bei den anderen – jede Antwort hilft.</li>
+            <li>Im Reiter <b>Team</b> findest du alle Vorstellungen.</li>
+            <li>Deine eigenen Beiträge kannst du jederzeit löschen.</li>
+          </ul>
+        </div>
+        <button class="btn btn-ghost btn-sm" type="button" id="refresh">↻ Aktualisieren</button>
+      </aside>
+    </div>
+
+  </div>
+  <footer>
+    <div class="f-brand">The Escape Theory</div>
+    <div style="margin-top:.375rem">Austausch-Portal · Nur für unser Team</div>
+  </footer>
+</main>
+
+<!-- Profil-Formular -->
+<dialog id="pfDialog">
+  <form class="dlg" id="pfForm">
+    <div class="eyebrow">Austausch</div>
+    <h2>Stell dich dem <em>Team</em> vor</h2>
+    <div class="field"><label>Name</label><input class="input" name="name" maxlength="80" required /></div>
+    <div class="field"><label>Dein Business <span class="hint">(in einem Satz)</span></label><input class="input" name="business" maxlength="150" placeholder="z. B. Business-Coach für Selbstständige Mamas" /></div>
+    <div class="field"><label>Über mich</label><textarea class="input" name="ueber" rows="3" maxlength="600" placeholder="Wer bist du, was treibt dich an?"></textarea></div>
+    <div class="field"><label>Dabei kann ich helfen</label><textarea class="input" name="biete" rows="2" maxlength="600" placeholder="z. B. Canva, Texte, Reels schneiden …"></textarea></div>
+    <div class="field"><label>Dazu suche ich Austausch</label><textarea class="input" name="suche" rows="2" maxlength="600" placeholder="z. B. Funnel-Aufbau, Accountability-Partnerin …"></textarea></div>
+    <div class="field"><label>Instagram <span class="hint">(@name oder Link)</span></label><input class="input" name="instagram" maxlength="150" /></div>
+    <div class="field"><label>Website</label><input class="input" name="website" maxlength="200" placeholder="https://…" /></div>
+    <div class="field"><label>Foto-Link <span class="hint">(optional, z. B. dein Profilbild)</span></label><input class="input" name="foto" maxlength="300" placeholder="https://…" /></div>
+    <label class="check"><input type="checkbox" name="emailZeigen" /> Meine E-Mail-Adresse für das Team sichtbar machen</label>
+    <div class="dlg-msg" id="pfMsg"></div>
+    <div class="dlg-acts">
+      <button class="btn btn-ghost" type="button" id="pfCancel">Abbrechen</button>
+      <button class="btn btn-primary" type="submit" id="pfSave">Speichern</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="mentee.js"></script>
+<script>
+let DATA = { beitraege: [], profile: [], ich: {} };
+let filterKat = "", neuKat = "Allgemein";
+const offen = new Set();   // Beiträge mit aufgeklappten Kommentaren
+
+["homeLink","backLink"].forEach(id => $(id).href = withCode("index.html"));
+
+/* ---------- Laden & Speichern ---------- */
+async function laden(payload){
+  const d = await api({ bereich: "austausch", ...(payload || {}) });
+  if (!d.ok) { setCode(""); $("portal").hidden = true; $("who").hidden = true; $("hintText").textContent = d.fehler; $("hintCard").hidden = false; return null; }
+  d.beitraege = d.beitraege || []; d.profile = d.profile || []; DATA = d; renderAll(); return d;
+}
+
+function renderAll(){
+  $("portal").hidden = false; $("who").hidden = false;
+  $("whoName").textContent = (DATA.ich.name || "").split(" ")[0];
+  const me = (DATA.profile || []).find(p => p.eigenes) || { name: DATA.ich.name };
+  $("meAva").innerHTML = avatar(me.name, me.foto);
+  $("sideAva").innerHTML = avatar(me.name, me.foto);
+  $("sideName").textContent = me.name || DATA.ich.name;
+  $("sideBiz").textContent = me.business || "Noch nicht vorgestellt";
+  $("pfEditBtn").textContent = me.business || me.ueber ? "Mein Profil bearbeiten" : "Jetzt vorstellen";
+  renderFilters(); renderFeed(); renderTeam();
+}
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".seg button").forEach(x => x.classList.toggle("is-on", x === b));
+  $("tab-feed").hidden = b.dataset.tab !== "feed"; $("tab-team").hidden = b.dataset.tab !== "team";
+}));
+
+/* ---------- Kategorien ---------- */
+$("katPick").innerHTML = KATEGORIEN.map(k => `<button type="button" class="chip${k === neuKat ? " is-on" : ""}" data-k="${k}">${KAT_ICON[k]} ${k}</button>`).join("");
+$("katPick").addEventListener("click", e => {
+  const c = e.target.closest(".chip"); if (!c) return;
+  neuKat = c.dataset.k; $("katPick").querySelectorAll(".chip").forEach(x => x.classList.toggle("is-on", x === c));
+});
+function renderFilters(){
+  const da = new Set(DATA.beitraege.map(b => b.kategorie));
+  $("filters").innerHTML = [`<button type="button" class="chip${!filterKat ? " is-on" : ""}" data-k="">Alle</button>`]
+    .concat(KATEGORIEN.filter(k => da.has(k)).map(k => `<button type="button" class="chip${filterKat === k ? " is-on" : ""}" data-k="${k}">${KAT_ICON[k]} ${k}</button>`)).join("");
+}
+$("filters").addEventListener("click", e => { const c = e.target.closest(".chip"); if (!c) return; filterKat = c.dataset.k; renderFilters(); renderFeed(); });
+
+/* ---------- Feed ---------- */
+function renderFeed(){
+  const list = DATA.beitraege.filter(b => !filterKat || b.kategorie === filterKat);
+  if (!list.length) {
+    $("feed").innerHTML = `<div class="card empty"><div class="big">💬</div><p class="muted">${DATA.beitraege.length ? "In dieser Kategorie gibt es noch nichts." : "Noch ist es ruhig hier. Stell dich vor oder stell die erste Frage!"}</p></div>`;
+    return;
+  }
+  $("feed").innerHTML = list.map(b => {
+    const auf = offen.has(b.id), n = b.kommentare.length;
+    return `<article class="card post" id="b-${esc(b.id)}">
+      <div class="head">
+        ${avatar(b.name, (DATA.profile.find(p => p.name === b.name) || {}).foto)}
+        <div><div class="nm">${esc(b.name)}</div><div class="tm">${fmtRel(b.zeit)}</div></div>
+        <span class="tag">${KAT_ICON[b.kategorie] || "💬"} ${esc(b.kategorie)}</span>
+      </div>
+      <div class="txt">${richText(b.text)}</div>
+      <div class="foot">
+        <button type="button" class="btn btn-ghost btn-sm" data-toggle="${esc(b.id)}">💬 ${n ? n + (n === 1 ? " Kommentar" : " Kommentare") : "Kommentieren"}</button>
+        <span class="spacer"></span>
+        ${b.eigenes ? `<button type="button" class="btn btn-ghost btn-sm" data-del-b="${esc(b.id)}">Löschen</button>` : ""}
+      </div>
+      ${auf ? `<div class="comments">
+        ${b.kommentare.map(k => `<div class="cmt">
+          ${avatar(k.name, (DATA.profile.find(p => p.name === k.name) || {}).foto, "sm")}
+          <div class="bubble"><span class="nm">${esc(k.name)}</span> <span class="tm">· ${fmtRel(k.zeit)}</span>${k.eigenes ? ` <button type="button" class="del" data-del-k="${esc(k.id)}">löschen</button>` : ""}<p>${richText(k.text)}</p></div>
+        </div>`).join("")}
+        <form class="reply" data-reply="${esc(b.id)}">
+          <textarea class="input" name="text" maxlength="1000" placeholder="Schreib einen Kommentar …" required></textarea>
+          <button class="btn btn-primary" type="submit">Senden</button>
+        </form>
+      </div>` : ""}
+    </article>`;
+  }).join("");
+}
+
+$("feed").addEventListener("click", async e => {
+  const t = e.target.closest("[data-toggle]");
+  if (t) { const id = t.dataset.toggle; offen.has(id) ? offen.delete(id) : offen.add(id); renderFeed(); const f = document.querySelector(`[data-reply="${CSS.escape(id)}"] textarea`); if (f) f.focus(); return; }
+  const db = e.target.closest("[data-del-b]");
+  if (db && confirm("Diesen Beitrag wirklich löschen? Die Kommentare verschwinden mit.")) { db.disabled = true; await laden({ aktion: "loeschen", art: "beitrag", id: db.dataset.delB }); return; }
+  const dk = e.target.closest("[data-del-k]");
+  if (dk && confirm("Diesen Kommentar löschen?")) { dk.disabled = true; await laden({ aktion: "loeschen", art: "kommentar", id: dk.dataset.delK }); }
+});
+$("feed").addEventListener("submit", async e => {
+  const f = e.target.closest("[data-reply]"); if (!f) return;
+  e.preventDefault();
+  const text = f.elements.text.value.trim(); if (!text) return;
+  const btn = f.querySelector("button"); btn.disabled = true; btn.textContent = "…";
+  try { await laden({ aktion: "kommentarSchreiben", kommentar: { beitragId: f.dataset.reply, text } }); }
+  catch { btn.disabled = false; btn.textContent = "Senden"; alert("Keine Verbindung. Bitte versuch es gleich noch einmal."); }
+});
+// Strg/Cmd + Enter sendet
+document.addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && e.target.form) e.target.form.requestSubmit(); });
+
+/* ---------- Neuer Beitrag ---------- */
+$("composer").addEventListener("submit", async e => {
+  e.preventDefault();
+  const ta = $("composer").elements.text, text = ta.value.trim(); if (!text) return;
+  $("postBtn").disabled = true; $("postBtn").textContent = "Wird gepostet …"; $("postMsg").textContent = "";
+  try {
+    const d = await laden({ aktion: "beitragSchreiben", beitrag: { text, kategorie: neuKat } });
+    if (d) { ta.value = ""; filterKat = ""; renderFilters(); renderFeed(); $("postMsg").textContent = "Gepostet 💛"; setTimeout(() => $("postMsg").textContent = "", 3000); }
+  } catch { $("postMsg").textContent = "Keine Verbindung. Bitte versuch es gleich noch einmal."; }
+  finally { $("postBtn").disabled = false; $("postBtn").textContent = "Posten"; }
+});
+
+/* ---------- Team ---------- */
+function renderTeam(){
+  const q = $("teamSearch").value.trim().toLowerCase();
+  const list = DATA.profile.filter(p => !q || [p.name,p.business,p.ueber,p.biete,p.suche].join(" ").toLowerCase().includes(q));
+  if (!list.length) { $("team").innerHTML = `<div class="card empty" style="grid-column:1/-1"><div class="big">👋</div><p class="muted">${DATA.profile.length ? "Keine Treffer für deine Suche." : "Noch hat sich niemand vorgestellt. Mach du den Anfang!"}</p></div>`; return; }
+  $("team").innerHTML = list.map(p => {
+    const ig = igUrl(p.instagram), web = safeUrl(p.website);
+    const links = [
+      p.kontakt && !p.eigenes ? `<a class="btn btn-primary btn-sm" href="mailto:${esc(p.kontakt)}?subject=${encodeURIComponent("Hallo aus dem Escape-Theory-Team 💛")}">✉ Schreib mir</a>` : "",
+      ig ? `<a class="btn btn-secondary btn-sm" href="${esc(ig)}" target="_blank" rel="noopener">Instagram</a>` : "",
+      web ? `<a class="btn btn-secondary btn-sm" href="${esc(web)}" target="_blank" rel="noopener">Website</a>` : "",
+    ].join("");
+    return `<div class="card pf${p.eigenes ? " me" : ""}">
+      <div class="head">${avatar(p.name, p.foto)}<div><div class="nm">${esc(p.name)}${p.eigenes ? ' <span class="tag" style="vertical-align:2px">Du</span>' : ""}</div>${p.business ? `<div class="biz">${esc(p.business)}</div>` : ""}</div></div>
+      ${p.ueber ? `<p>${esc(p.ueber)}</p>` : ""}
+      ${p.biete ? `<div class="lbl">Dabei kann ich helfen</div><p>${esc(p.biete)}</p>` : ""}
+      ${p.suche ? `<div class="lbl">Dazu suche ich Austausch</div><p>${esc(p.suche)}</p>` : ""}
+      ${links ? `<div class="links">${links}</div>` : ""}
+    </div>`;
+  }).join("");
+}
+$("teamSearch").addEventListener("input", renderTeam);
+
+/* ---------- Profil bearbeiten ---------- */
+const pfForm = $("pfForm");
+function profilOeffnen(){
+  const p = DATA.profile.find(x => x.eigenes) || { name: DATA.ich.name };
+  ["name","business","ueber","biete","suche","instagram","website","foto"].forEach(k => pfForm.elements[k].value = p[k] || "");
+  pfForm.elements.emailZeigen.checked = !!p.emailZeigen;
+  $("pfMsg").textContent = ""; $("pfDialog").showModal();
+}
+["pfEditBtn","pfEditBtn2"].forEach(id => $(id).addEventListener("click", profilOeffnen));
+$("pfCancel").addEventListener("click", () => $("pfDialog").close());
+pfForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = pfForm.elements, profil = {};
+  ["name","business","ueber","biete","suche","instagram","website","foto"].forEach(k => profil[k] = f[k].value.trim());
+  profil.emailZeigen = f.emailZeigen.checked;
+  $("pfSave").disabled = true; $("pfSave").textContent = "Speichert …"; $("pfMsg").textContent = "";
+  try { const d = await laden({ aktion: "profilSpeichern", profil }); if (d) $("pfDialog").close(); }
+  catch { $("pfMsg").textContent = "Keine Verbindung. Bitte versuch es gleich noch einmal."; }
+  finally { $("pfSave").disabled = false; $("pfSave").textContent = "Speichern"; }
+});
+
+/* ---------- Start ---------- */
+$("refresh").addEventListener("click", () => laden().catch(() => {}));
+document.addEventListener("visibilitychange", () => { if (!document.hidden && !$("portal").hidden) laden().catch(() => {}); });
+
+if (API_URL && getCode()) {
+  laden().then(() => {
+    // Sprung aus der Dashboard-Vorschau direkt zum Beitrag
+    const ziel = location.hash && document.querySelector(location.hash);
+    if (ziel) { ziel.scrollIntoView({ block: "start" }); ziel.classList.add("flash"); setTimeout(() => ziel.classList.remove("flash"), 1800); }
+  }).catch(() => { $("feed").innerHTML = `<p class="muted">Die Beiträge konnten gerade nicht geladen werden. Lade die Seite gleich noch einmal neu.</p>`; $("portal").hidden = false; });
+} else {
+  $("hintCard").hidden = false;
+}
+</script>
+</body>
+</html>

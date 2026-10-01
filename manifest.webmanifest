@@ -1,0 +1,15 @@
+{
+  "name": "The Escape Theory · Mentee-Bereich",
+  "short_name": "TET Mentees",
+  "description": "Dein Mentee-Bereich: Termine, Team-Treffen, Austausch & Material.",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ECF3F8",
+  "theme_color": "#FAFCFD",
+  "lang": "de",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
