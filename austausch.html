@@ -202,7 +202,7 @@ const offen = new Set();   // Beiträge mit aufgeklappten Kommentaren
 async function laden(payload){
   const d = await api({ bereich: "austausch", ...(payload || {}) });
   if (!d.ok) { setCode(""); $("portal").hidden = true; $("who").hidden = true; $("hintText").textContent = d.fehler; $("hintCard").hidden = false; return null; }
-  d.beitraege = d.beitraege || []; d.profile = d.profile || []; DATA = d; renderAll(); return d;
+  d.beitraege = d.beitraege || []; d.profile = d.profile || []; DATA = d; merken("austausch", d); renderAll(); return d;
 }
 
 function renderAll(){
@@ -351,6 +351,8 @@ $("refresh").addEventListener("click", () => laden().catch(() => {}));
 document.addEventListener("visibilitychange", () => { if (!document.hidden && !$("portal").hidden) laden().catch(() => {}); });
 
 if (API_URL && getCode()) {
+  const alt = gemerkt("austausch");
+  if (alt) { DATA = alt; renderAll(); }   // sofort den letzten Stand zeigen
   laden().then(() => {
     // „Jetzt vorstellen“ vom Dashboard: Team-Reiter + Profil-Formular öffnen
     if (location.hash === "#team") {
@@ -362,7 +364,7 @@ if (API_URL && getCode()) {
     // Sprung aus der Dashboard-Vorschau direkt zum Beitrag
     const ziel = location.hash && document.querySelector(location.hash);
     if (ziel) { ziel.scrollIntoView({ block: "start" }); ziel.classList.add("flash"); setTimeout(() => ziel.classList.remove("flash"), 1800); }
-  }).catch(() => { $("feed").innerHTML = `<p class="muted">Die Beiträge konnten gerade nicht geladen werden. Lade die Seite gleich noch einmal neu.</p>`; $("portal").hidden = false; });
+  }).catch(() => { if (alt) return; $("feed").innerHTML = `<p class="muted">Die Beiträge konnten gerade nicht geladen werden. Lade die Seite gleich noch einmal neu.</p>`; $("portal").hidden = false; });
 } else {
   $("hintCard").hidden = false;
 }
