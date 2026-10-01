@@ -31,6 +31,9 @@ const EINSTELLUNGEN = {
   CHECKIN_LINK: 'https://businessbegleitung-checkin.youcanbook.me/',
   BEREICH_LINK: 'https://annesiebenkees-ai.github.io/tet-mentee-bereich/',
   MAIL_UHRZEIT: 8,          // tägliche Prüfung gegen 8 Uhr morgens
+  // ID der Tabelle „TET Mentee-Bereich“ (aus ihrer Adresse). Nötig, wenn das Script
+  // als eigene Datei läuft; ist es direkt in der Tabelle eingebaut, wird diese genutzt.
+  TABELLEN_ID: '1Y20RZgmugoX2ulqJSHY83ldEgvPJn_BUnGXTkZur9qI',
 };
 /* --------------------------------------------------------------------------- */
 
@@ -41,6 +44,10 @@ const KOPF_MENTEES = ['Name', 'E-Mail', 'Status', 'Laufzeit bis', 'Zugangscode',
 const KOPF_PROFILE = ['E-Mail', 'Name', 'Business', 'Über mich', 'Ich biete', 'Ich suche',
                       'Instagram', 'Website', 'Foto-URL', 'E-Mail zeigen', 'Aktualisiert'];
 const MAX_LAENGE = 600;
+
+function ss_() {
+  return SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(EINSTELLUNGEN.TABELLEN_ID);
+}
 
 /* ---------- Menü in der Tabelle ---------- */
 function onOpen() {
@@ -53,7 +60,7 @@ function onOpen() {
 
 /* Einmalig ausführen: Blätter anlegen, Codes erzeugen, tägliche Prüfung starten. */
 function einrichten() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = ss_();
   let m = ss.getSheetByName(TAB_MENTEES);
   if (!m) {
     const erstes = ss.getSheets()[0];
@@ -96,7 +103,7 @@ function codesErzeugen() {
 
 /* ---------- Tabellen-Helfer (Spalten werden über die Überschrift gefunden) ---------- */
 function tabelle_(name) {
-  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
+  const sh = ss_().getSheetByName(name);
   if (!sh || sh.getLastRow() < 1) return { sh: sh, kopf: [], zeilen: [] };
   const alle = sh.getRange(1, 1, sh.getLastRow(), Math.max(sh.getLastColumn(), 1)).getValues();
   return { sh: sh, kopf: alle[0].map(k => String(k).trim()), zeilen: alle.slice(1) };
