@@ -352,6 +352,13 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden && !$
 
 if (API_URL && getCode()) {
   laden().then(() => {
+    // „Jetzt vorstellen“ vom Dashboard: Team-Reiter + Profil-Formular öffnen
+    if (location.hash === "#team") {
+      document.querySelector('.seg [data-tab="team"]').click();
+      const me = DATA.profile.find(p => p.eigenes);
+      if (!me || !(me.business || me.ueber)) profilOeffnen();
+      return;
+    }
     // Sprung aus der Dashboard-Vorschau direkt zum Beitrag
     const ziel = location.hash && document.querySelector(location.hash);
     if (ziel) { ziel.scrollIntoView({ block: "start" }); ziel.classList.add("flash"); setTimeout(() => ziel.classList.remove("flash"), 1800); }

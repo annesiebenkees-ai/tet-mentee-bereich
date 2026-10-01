@@ -186,10 +186,36 @@ const DASHBOARD = {
   .plat .cta{ font-weight:600; font-size:var(--t-sm); color:var(--accent-deep); margin-top:var(--s2); }
   @media (max-width:640px){ .plat-grid{ grid-template-columns:1fr; } }
 
-  /* Austausch-Vorschau */
-  .teaser{ display:flex; flex-direction:column; gap:var(--s3); margin-bottom:var(--s5); }
-  .teaser a{ display:flex; gap:var(--s3); align-items:flex-start; text-decoration:none; color:inherit; padding:var(--s3) var(--s4); border:1px solid var(--hair); border-radius:var(--r-md); background:var(--paper); transition:all var(--med) var(--ease); }
-  .teaser a:hover{ border-color:var(--deep); background:var(--white); box-shadow:var(--sh-1); }
+  /* Austausch-Portal */
+  .ex-hero{ position:relative; overflow:hidden; border-color:var(--accent-tint); background:linear-gradient(135deg,var(--white) 0%,var(--white) 55%,var(--accent-soft) 100%); box-shadow:var(--sh-2); padding:var(--s8); }
+  .ex-hero::after{ content:""; position:absolute; inset:auto 0 0 0; height:90px; background:var(--wave); background-size:100% 100%; opacity:.55; pointer-events:none; }
+  .ex-grid{ position:relative; z-index:1; display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:var(--s8); align-items:center; }
+  .ex-h{ font-size:var(--t-h2) !important; line-height:1.15; margin-bottom:var(--s2) !important; }
+  .ex-stats{ display:flex; flex-wrap:wrap; gap:var(--s2); margin-bottom:var(--s4); }
+  .ex-stats span{ font-family:var(--mono); font-size:.625rem; letter-spacing:.12em; text-transform:uppercase; padding:.3rem .625rem; border-radius:var(--r-pill); background:var(--white); border:1px solid var(--hair); color:var(--slate); }
+  .ex-stats b{ color:var(--accent-deep); font-weight:500; }
+  .ex-acts{ display:flex; flex-wrap:wrap; gap:var(--s2); }
+  .ex-art{ position:relative; display:flex; flex-direction:column; align-items:center; gap:var(--s4); }
+  .ex-window{ width:100%; max-width:340px; background:var(--white); border:1px solid var(--hair); border-radius:var(--r-xl); box-shadow:var(--sh-3); padding:var(--s4); display:flex; flex-direction:column; gap:var(--s3); transform:rotate(-1.5deg); }
+  .ex-bar{ display:flex; gap:5px; margin-bottom:var(--s1); }
+  .ex-bar i{ width:8px; height:8px; border-radius:50%; background:var(--hair); }
+  .ex-bar i:first-child{ background:var(--accent); }
+  .ex-msg{ display:flex; align-items:flex-end; gap:.5rem; }
+  .ex-msg.r{ justify-content:flex-end; }
+  .ex-msg .a{ flex:none; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-weight:600; font-size:.6875rem; color:var(--ink); box-shadow:inset 0 0 0 1.5px #fff, 0 0 0 1.5px var(--deep); }
+  .ex-msg .a1{ background:linear-gradient(135deg,#FCE7DD,#F7C5AE); } .ex-msg .a2{ background:linear-gradient(135deg,#CFE2EE,#9CC0DB); }
+  .ex-msg .a3{ background:linear-gradient(135deg,#E3F1E9,#B9DCC8); } .ex-msg .a4{ background:linear-gradient(135deg,#ECF3F8,#BFD7E8); }
+  .ex-msg .b{ font-size:.75rem; line-height:1.4; padding:.5rem .75rem; border-radius:14px; max-width:78%; }
+  .ex-msg.l .b{ background:var(--tint); color:var(--body); border-bottom-left-radius:4px; }
+  .ex-msg.r .b{ background:linear-gradient(135deg,#F2602F,var(--accent-deep)); color:#fff; border-bottom-right-radius:4px; }
+  .ex-ava{ display:flex; align-items:center; }
+  .ex-ava .ava{ width:36px; height:36px; font-size:.75rem; margin-left:-8px; }
+  .ex-ava .ava:first-child{ margin-left:0; }
+  .ex-ava .more{ margin-left:var(--s2); font-size:var(--t-sm); color:var(--slate); }
+  @media (max-width:820px){ .ex-grid{ grid-template-columns:1fr; } .ex-art{ order:-1; } .ex-hero{ padding:var(--s6); } .ex-window{ max-width:300px; } }
+  .teaser{ display:flex; flex-direction:column; gap:var(--s2); margin-bottom:var(--s5); }
+  .teaser a{ display:flex; gap:var(--s3); align-items:flex-start; text-decoration:none; color:inherit; padding:var(--s3) var(--s4); border:1px solid var(--hair); border-radius:var(--r-md); background:var(--white); transition:all var(--med) var(--ease); }
+  .teaser a:hover{ border-color:var(--deep); box-shadow:var(--sh-1); }
   .teaser .tx{ min-width:0; flex:1; }
   .teaser .tm{ font-size:.75rem; color:var(--slate); }
   .teaser .tm b{ color:var(--ink); font-weight:600; }
@@ -280,6 +306,33 @@ const DASHBOARD = {
         <div id="myList"><p class="muted">Termine werden geladen …</p></div>
       </div>
 
+      <!-- Austausch-Portal (prominent, mit Illustration) -->
+      <div class="card span ex-hero" id="exCard" hidden>
+        <div class="ex-grid">
+          <div class="ex-text">
+            <div class="eyebrow">Neu · Austausch-Portal</div>
+            <h2 class="ex-h">Dein Team. <em>Dein Austausch.</em></h2>
+            <p class="intro">Stell Fragen, feiere Erfolge, teile Tipps und vernetz dich mit den anderen aus dem Team – an einem geschützten Ort nur für uns.</p>
+            <div class="ex-stats" id="exStats"></div>
+            <div class="teaser" id="teaser"><p class="muted">Wird geladen …</p></div>
+            <div class="ex-acts">
+              <a class="btn btn-primary btn-lg" id="exLink" href="austausch.html">Zum Austausch-Portal →</a>
+              <a class="btn btn-secondary btn-lg" id="exIntro" href="austausch.html">👋 Jetzt vorstellen</a>
+            </div>
+          </div>
+          <div class="ex-art" aria-hidden="true">
+            <div class="ex-window">
+              <div class="ex-bar"><i></i><i></i><i></i></div>
+              <div class="ex-msg l"><span class="a a1">JV</span><span class="b">Mein erstes Reel hat 10k Aufrufe! 🎉</span></div>
+              <div class="ex-msg r"><span class="b">Wow, Glückwunsch! 💛</span><span class="a a2">RO</span></div>
+              <div class="ex-msg l"><span class="a a3">EB</span><span class="b">Welches Newsletter-Tool nutzt ihr? ❓</span></div>
+              <div class="ex-msg r"><span class="b">Brevo – zeig ich dir! 💡</span><span class="a a4">SV</span></div>
+            </div>
+            <div class="ex-ava" id="exAva"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Termin buchen -->
       <div class="card span">
         <div class="eyebrow">Termin bei mir buchen</div>
@@ -314,15 +367,6 @@ const DASHBOARD = {
         <h2>Done-4-You <em>Antrag</em></h2>
         <p class="intro">Du möchtest Bereiche in deinem Business abgeben? Stell hier deinen D4Y-Antrag – wir kümmern uns darum.</p>
         <a class="btn btn-secondary" id="d4y-link" target="_blank" rel="noopener">D4Y-Antrag ausfüllen</a>
-      </div>
-
-      <!-- Austausch-Vorschau -->
-      <div class="card span" id="exCard" hidden>
-        <div class="eyebrow">Austausch-Portal</div>
-        <h2>Was im Team <em>gerade los ist</em></h2>
-        <p class="intro">Stell Fragen, teile Erfolge, gib Tipps und vernetz dich mit den anderen aus dem Team.</p>
-        <div class="teaser" id="teaser"><p class="muted">Wird geladen …</p></div>
-        <a class="btn btn-primary btn-lg" id="exLink" href="austausch.html">Zum Austausch-Portal →</a>
       </div>
 
       <!-- Kalender -->
@@ -541,8 +585,15 @@ function renderPersonal(d){
     $("alarmCard").hidden = true;
   }
 
-  // Austausch-Vorschau: die 3 neuesten Beiträge
-  const b = (d.beitraege || []).slice(0, 3);
+  // Austausch-Portal: Zahlen, Team-Gesichter und die 2 neuesten Beiträge
+  const alle = d.beitraege || [], prof = d.profile || [];
+  const ichVorgestellt = prof.some(p => p.eigenes && (p.business || p.ueber));
+  $("exIntro").href = withCode("austausch.html") + "#team";
+  $("exIntro").hidden = ichVorgestellt;
+  $("exStats").hidden = !prof.length && !alle.length;
+  $("exStats").innerHTML = `<span><b>${prof.length}</b> vorgestellt</span><span><b>${alle.length}</b> Beiträge</span><span><b>${alle.reduce((n, x) => n + x.kommentare.length, 0)}</b> Kommentare</span>`;
+  $("exAva").innerHTML = prof.slice(0, 6).map(p => avatar(p.name, p.foto)).join("") + (prof.length > 6 ? `<span class="more">+${prof.length - 6}</span>` : "");
+  const b = alle.slice(0, 2);
   $("teaser").innerHTML = b.length ? b.map(x => `
     <a href="${withCode("austausch.html")}#b-${esc(x.id)}">
       ${avatar(x.name, "", "sm")}
@@ -551,7 +602,7 @@ function renderPersonal(d){
         <div class="tt">${esc(x.text)}</div>
       </div>
       <div class="tc">💬 ${x.kommentare.length}</div>
-    </a>`).join("") : `<p class="muted">Noch ist es ruhig hier. Stell dich vor oder stell die erste Frage! 💛</p>`;
+    </a>`).join("") : "";
 }
 
 /* ---------- Als App aufs Handy ---------- */
