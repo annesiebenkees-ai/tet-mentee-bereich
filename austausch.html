@@ -202,7 +202,7 @@ const offen = new Set();   // Beiträge mit aufgeklappten Kommentaren
 async function laden(payload){
   const d = await api({ bereich: "austausch", ...(payload || {}) });
   if (!d.ok) { setCode(""); $("portal").hidden = true; $("who").hidden = true; $("hintText").textContent = d.fehler; $("hintCard").hidden = false; return null; }
-  DATA = d; renderAll(); return d;
+  d.beitraege = d.beitraege || []; d.profile = d.profile || []; DATA = d; renderAll(); return d;
 }
 
 function renderAll(){
