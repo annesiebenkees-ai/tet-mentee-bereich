@@ -131,6 +131,13 @@ const DASHBOARD = {
       link: "https://miro.com/login/",
       cta: "Zu Miro",
     },
+    {
+      platform: "TET-Portal",
+      name: "The Escape Theory Portal",
+      beschreibung: "Dein Login ins TET-Portal.",
+      link: "https://portal.theescapetheory.de/login",
+      cta: "Zum Portal",
+    },
   ],
 };
 </script>
@@ -178,7 +185,7 @@ const DASHBOARD = {
   .link-row .t{ font-weight:600; color:var(--ink); }
   .link-row .s{ font-size:var(--t-sm); color:var(--slate); }
   .link-row .arr{ margin-left:auto; color:var(--slate); flex:none; }
-  .plat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s4); }
+  .plat-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:var(--s4); }
   .plat{ display:flex; flex-direction:column; gap:.25rem; text-decoration:none; color:inherit; border:1px solid var(--hair); border-radius:var(--r-lg); padding:var(--s5); background:var(--paper); transition:all var(--med) var(--ease); }
   .plat:hover{ border-color:#CBDCE8; background:var(--white); box-shadow:var(--sh-2); transform:translateY(-2px); }
   .plat .pn{ font-family:var(--serif); font-weight:600; font-size:var(--t-lg); color:var(--ink); }
