@@ -66,12 +66,14 @@ const DASHBOARD = {
     // immer mit demselben Google-Meet-Link. Vergangene Termine werden automatisch
     // ausgeblendet. Zum Verlängern einfach weitere Freitage nach dem Muster anhängen.
     // Einwahl per Telefon: (DE) +49 30 300195462, PIN: 786 124 469#
+    // Fällt ein Termin aus: ausfall: "Grund" anhängen – er bleibt im Kalender sichtbar
+    // (durchgestrichen), zählt aber nicht als „nächstes Treffen“.
     { datum: "2026-09-18 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
     { datum: "2026-09-25 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
     { datum: "2026-10-02 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
     { datum: "2026-10-09 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
     { datum: "2026-10-16 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
-    { datum: "2026-10-23 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-10-23 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy", ausfall: "Fällt aus – Anne ist im Urlaub 🌴" },
     { datum: "2026-10-30 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
     { datum: "2026-11-06 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
     { datum: "2026-11-13 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
@@ -85,6 +87,11 @@ const DASHBOARD = {
   /* --- News & Updates von dir ------------------------------------------- */
   // Neueste oben. Datum nur als Anzeige-Text.
   news: [
+    {
+      datum: "Terminänderung",
+      titel: "Am 23. Oktober fällt die Sprechstunde aus 🌴",
+      text: "Am Freitag, 23. Oktober, bin ich im Urlaub – die Business Begleiter Sprechstunde fällt an diesem Tag aus. Ab dem 30. Oktober sind wir wie gewohnt freitags um 08:30 Uhr wieder für euch da. 💛",
+    },
     {
       datum: "Neue Termine",
       titel: "Neuer Rhythmus: jeden Freitag 08:30 Uhr 📅",
@@ -131,6 +138,13 @@ const DASHBOARD = {
       link: "https://miro.com/login/",
       cta: "Zu Miro",
     },
+    {
+      platform: "TET-Portal",
+      name: "The Escape Theory Portal",
+      beschreibung: "Dein Login ins TET-Portal.",
+      link: "https://portal.theescapetheory.de/login",
+      cta: "Zum Portal",
+    },
   ],
 };
 </script>
@@ -150,6 +164,11 @@ const DASHBOARD = {
   .cd.live b{ font-size:1.125rem; color:var(--accent-deep); }
   .when{ font-size:var(--t-lg); color:var(--ink); font-weight:500; margin-top:var(--s2); }
   .meta{ font-size:var(--t-sm); color:var(--slate); }
+
+  /* Ausgefallene Termine */
+  .row.ausfall .date{ opacity:.5; }
+  .row.ausfall .t{ text-decoration:line-through; color:var(--slate); }
+  .row .aus{ color:var(--danger); font-weight:600; }
 
   /* Buchung */
   .book-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s4); }
@@ -178,7 +197,7 @@ const DASHBOARD = {
   .link-row .t{ font-weight:600; color:var(--ink); }
   .link-row .s{ font-size:var(--t-sm); color:var(--slate); }
   .link-row .arr{ margin-left:auto; color:var(--slate); flex:none; }
-  .plat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s4); }
+  .plat-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:var(--s4); }
   .plat{ display:flex; flex-direction:column; gap:.25rem; text-decoration:none; color:inherit; border:1px solid var(--hair); border-radius:var(--r-lg); padding:var(--s5); background:var(--paper); transition:all var(--med) var(--ease); }
   .plat:hover{ border-color:#CBDCE8; background:var(--white); box-shadow:var(--sh-2); transform:translateY(-2px); }
   .plat .pn{ font-family:var(--serif); font-weight:600; font-size:var(--t-lg); color:var(--ink); }
@@ -460,7 +479,7 @@ function render(){
     .filter(t => t.dt >= new Date(now.getTime() - 3600*1000))
     .sort((a, b) => a.dt - b.dt);
 
-  const info = D.treffenInfo, nx = upcoming[0];
+  const info = D.treffenInfo, nx = upcoming.find(t => !t.ausfall);
   if (nx) {
     $("nx-titel").textContent = nx.titel || info.titel;
     $("nx-when").textContent  = fmtLong(nx.dt);
@@ -490,14 +509,14 @@ function render(){
   }
   if (D.d4y) $("d4y-link").href = D.d4y.link;
 
-  $("calList").innerHTML = upcoming.length ? upcoming.map((t,i) => `
-    <div class="row">
+  $("calList").innerHTML = upcoming.length ? upcoming.map(t => `
+    <div class="row${t.ausfall ? " ausfall" : ""}">
       <div class="date"><div class="d">${t.dt.getDate()}</div><div class="m">${MON[t.dt.getMonth()]}</div></div>
       <div class="info">
-        <div class="t">${t.titel}${i===0 ? '<span class="soon">als nächstes</span>' : ''}</div>
-        <div class="s">${TAG[t.dt.getDay()]} · ${pad(t.dt.getHours())}:${pad(t.dt.getMinutes())} Uhr</div>
+        <div class="t">${t.titel}${t === nx ? '<span class="soon">als nächstes</span>' : ''}</div>
+        <div class="s">${t.ausfall ? `<span class="aus">${t.ausfall}</span>` : `${TAG[t.dt.getDay()]} · ${pad(t.dt.getHours())}:${pad(t.dt.getMinutes())} Uhr`}</div>
       </div>
-      <a class="btn btn-secondary btn-sm" href="${t.meetLink}" target="_blank" rel="noopener">Beitreten</a>
+      ${t.ausfall ? "" : `<a class="btn btn-secondary btn-sm" href="${t.meetLink}" target="_blank" rel="noopener">Beitreten</a>`}
     </div>`).join("") : `<p class="muted">Aktuell sind keine Termine eingetragen. Schau bald wieder vorbei 💛</p>`;
 
   $("newsList").innerHTML = D.news.map(n => `
