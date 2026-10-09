@@ -62,36 +62,40 @@ const DASHBOARD = {
   /* --- Kalender: alle kommenden Team-Treffen ---------------------------- */
   // Neuen Termin = neue Zeile nach dem Muster. Vergangene einfach löschen.
   teamTreffen: [
-    // NEU ab 18.09.2026: feste wöchentliche Sprechstunde – jeden FREITAG 08:30–09:30 Uhr,
+    // Ab 28.10.2026: feste wöchentliche Sprechstunde – jeden MITTWOCH 09:00–10:00 Uhr,
     // immer mit demselben Google-Meet-Link. Vergangene Termine werden automatisch
-    // ausgeblendet. Zum Verlängern einfach weitere Freitage nach dem Muster anhängen.
-    // Einwahl per Telefon: (DE) +49 30 300195462, PIN: 786 124 469#
+    // ausgeblendet. Zum Verlängern einfach weitere Mittwoche nach dem Muster anhängen.
     // Fällt ein Termin aus: ausfall: "Grund" anhängen – er bleibt im Kalender sichtbar
     // (durchgestrichen), zählt aber nicht als „nächstes Treffen“.
-    { datum: "2026-09-18 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
-    { datum: "2026-09-25 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
-    { datum: "2026-10-02 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
     { datum: "2026-10-09 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
-    { datum: "2026-10-16 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
-    { datum: "2026-10-23 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy", ausfall: "Fällt aus – Anne ist im Urlaub 🌴" },
-    { datum: "2026-10-30 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
-    { datum: "2026-11-06 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
-    { datum: "2026-11-13 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
-    { datum: "2026-11-20 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
-    { datum: "2026-11-27 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
-    { datum: "2026-12-04 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
-    { datum: "2026-12-11 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
-    { datum: "2026-12-18 08:30", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bgz-zdwc-gfy" },
+    { datum: "2026-10-14 13:45", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/fsh-qibz-hbn", dauer: "45 Min · Teilnahme freiwillig" },
+    { datum: "2026-10-28 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2026-11-04 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2026-11-11 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2026-11-18 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2026-11-25 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2026-12-02 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2026-12-09 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2026-12-16 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2026-12-23 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2026-12-30 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2027-01-06 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2027-01-13 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2027-01-20 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2027-01-27 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2027-02-03 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2027-02-10 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2027-02-17 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2027-02-24 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2027-03-03 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2027-03-10 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2027-03-17 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
+    { datum: "2027-03-24 09:00", titel: "Business Begleiter Sprechstunde", meetLink: "https://meet.google.com/bke-tmnv-qpq" },
   ],
 
   /* --- News & Updates von dir ------------------------------------------- */
   // Neueste oben. Datum nur als Anzeige-Text.
   news: [
-    {
-      datum: "Terminänderung",
-      titel: "Am 23. Oktober fällt die Sprechstunde aus 🌴",
-      text: "Am Freitag, 23. Oktober, bin ich im Urlaub – die Business Begleiter Sprechstunde fällt an diesem Tag aus. Ab dem 30. Oktober sind wir wie gewohnt freitags um 08:30 Uhr wieder für euch da. 💛",
-    },
     {
       datum: "Neue Termine",
       titel: "Neuer Rhythmus: jeden Freitag 08:30 Uhr 📅",
