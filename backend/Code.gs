@@ -190,11 +190,6 @@ function antwort_(p) {
     if (p.aktion === 'beitragSchreiben') beitragSchreiben_(ich, p.beitrag || {});
     if (p.aktion === 'kommentarSchreiben') kommentarSchreiben_(ich, p.kommentar || {});
     if (p.aktion === 'loeschen') loeschen_(ich, p.art, p.id);
-    if (p.aktion === 'd4yAntrag') {
-      d4yAntrag_(ich, p.antrag || {});
-      return json_({ ok: true, gesendet: true, ich: { name: ich.name } });
-    }
-    if (p.aktion === 'ich') return json_({ ok: true, ich: { name: ich.name, email: ich.emails[0] } });
 
     const antwort = { ok: true, ich: { name: ich.name }, profile: profile_(ich.emails[0]), beitraege: beitraege_(ich.emails[0]) };
     // Das Austausch-Portal braucht keine Termine – spart Zeit beim Laden.
@@ -482,37 +477,3 @@ function loeschen_(ich, art, id) {
   }
 }
 
-/* ---------- Done-4-You-Anträge ---------- */
-// Landen im Blatt „D4Y-Anträge“ + Mail an Anne. Die Spalten Status, Weitergegeben an,
-// Provision und Notizen sind zum eigenen Nachhalten gedacht.
-const TAB_D4Y = 'D4Y-Anträge';
-const KOPF_D4Y = ['Zeit', 'Name', 'E-Mail', 'Telefon', 'Kontaktweg', 'Bereiche', 'Was soll erledigt werden?',
-                  'Ziel / Ergebnis', 'Zeitrahmen', 'Budget', 'Einverständnis Weitergabe', 'Status',
-                  'Weitergegeben an', 'Provision', 'Notizen'];
-
-function d4yAntrag_(ich, a) {
-  const s = (v, n) => String(v || '').trim().slice(0, n || 2000);
-  const bereiche = (Array.isArray(a.bereiche) ? a.bereiche : []).map(b => s(b, 60)).join(', ');
-  const beschreibung = s(a.beschreibung);
-  if (!beschreibung) throw new Error('Bitte beschreib kurz, was erledigt werden soll.');
-  const werte = [new Date(), ich.name, ich.emails[0], s(a.telefon, 60), s(a.kontaktweg, 40), bereiche, beschreibung,
-                 s(a.ziel), s(a.zeitrahmen, 60), s(a.budget, 60), a.einverstanden ? 'ja' : 'nein', 'Neu', '', '', ''];
-  blatt_(TAB_D4Y, KOPF_D4Y).appendRow(werte);
-
-  const zeilen = KOPF_D4Y.slice(1, 11).map((k, i) => k + ': ' + (werte[i + 1] || '–'));
-  MailApp.sendEmail({
-    to: EINSTELLUNGEN.MEINE_EMAIL,
-    replyTo: ich.emails[0],
-    subject: '💼 Neuer D4Y-Antrag von ' + ich.name + (bereiche ? ' – ' + bereiche : ''),
-    body: 'Neuer Done-4-You-Antrag aus dem Mentee-Bereich:\n\n' + zeilen.join('\n') +
-          '\n\nAlle Anträge stehen im Blatt „' + TAB_D4Y + '“ deiner Tabelle.',
-  });
-  MailApp.sendEmail({
-    to: ich.emails[0],
-    replyTo: EINSTELLUNGEN.MEINE_EMAIL,
-    name: EINSTELLUNGEN.ABSENDER_NAME,
-    subject: 'Dein Done-4-You-Antrag ist bei mir angekommen 💛',
-    body: 'Hallo ' + ich.name.split(' ')[0] + ',\n\ndanke für deinen Done-4-You-Antrag! Ich schaue ihn mir an und melde mich ' +
-          'bei dir mit passenden Expert:innen aus unserem Netzwerk.\n\nDeine Anne',
-  });
-}
