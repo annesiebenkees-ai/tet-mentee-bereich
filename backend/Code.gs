@@ -14,6 +14,11 @@
 
 /* --- HIER KANNST DU ANPASSEN ------------------------------------------------ */
 const EINSTELLUNGEN = {
+  // >>> TELEGRAM: Hier deinen Bot-Token (von @BotFather) und deine Chat-ID
+  // >>> (von @userinfobot) zwischen die Anführungszeichen einfügen:
+  TELEGRAM_TOKEN: '',
+  TELEGRAM_CHAT_ID: '',
+
   KALENDER_ID: 'anne.siebenkees@lovelifepassport.com',   // Kalender, in den YouCanBook.me bucht ('primary' = Hauptkalender)
   ALARM_TAGE: 14,           // Rote Meldung + Mail, wenn so viele Tage kein Termin war & keiner gebucht ist
   RUECKBLICK_TAGE: 180,     // So weit wird nach vergangenen Terminen gesucht
@@ -190,6 +195,10 @@ function antwort_(p) {
     if (p.aktion === 'beitragSchreiben') beitragSchreiben_(ich, p.beitrag || {});
     if (p.aktion === 'kommentarSchreiben') kommentarSchreiben_(ich, p.kommentar || {});
     if (p.aktion === 'loeschen') loeschen_(ich, p.art, p.id);
+    if (p.aktion === 'meldung') {
+      meldung_(ich, p.typ, p.felder || {});
+      return json_({ ok: true, gemeldet: true });
+    }
 
     const antwort = { ok: true, ich: { name: ich.name }, profile: profile_(ich.emails[0]), beitraege: beitraege_(ich.emails[0]) };
     // Das Austausch-Portal braucht keine Termine – spart Zeit beim Laden.
@@ -477,3 +486,42 @@ function loeschen_(ich, art, id) {
   }
 }
 
+
+/* ---------- Anfragen (D4Y-Antrag, Tool-Wunsch, Umfrage) → Tabelle + Telegram ---------- */
+// Jede Einsendung landet im Blatt „Anfragen“ (mit Spalten zum Nachhalten) und kommt
+// als Telegram-Nachricht bei dir an. Die E-Mail über FormSubmit läuft zusätzlich weiter.
+const TAB_ANFRAGEN = 'Anfragen';
+const KOPF_ANFRAGEN = ['Zeit', 'Typ', 'Mentee', 'E-Mail', 'Inhalt', 'Status', 'Weitergegeben an', 'Provision', 'Notizen'];
+
+function meldung_(ich, typ, felder) {
+  typ = String(typ || 'Anfrage').slice(0, 60);
+  const zeilen = Object.keys(felder).slice(0, 30)
+    .map(k => String(k).slice(0, 80) + ': ' + String(felder[k]).trim().slice(0, 1500))
+    .filter(z => !/: $/.test(z));
+  if (!zeilen.length) return;
+  blatt_(TAB_ANFRAGEN, KOPF_ANFRAGEN)
+    .appendRow([new Date(), typ, ich.name, ich.emails[0], zeilen.join('\n'), 'Neu', '', '', '']);
+  const icon = /d4y/i.test(typ) ? '💼' : /wunsch/i.test(typ) ? '🌱' : '💬';
+  telegram_(icon + ' ' + typ + '\nvon ' + ich.name + ' (' + ich.emails[0] + ')\n\n' + zeilen.join('\n'));
+}
+
+function telegram_(text) {
+  const t = EINSTELLUNGEN.TELEGRAM_TOKEN, chat = EINSTELLUNGEN.TELEGRAM_CHAT_ID;
+  if (!t || !chat) return;
+  UrlFetchApp.fetch('https://api.telegram.org/bot' + t + '/sendMessage', {
+    method: 'post', muteHttpExceptions: true,
+    payload: { chat_id: String(chat), text: String(text).slice(0, 4000), disable_web_page_preview: 'true' },
+  });
+}
+
+// Einmal ausführen: schickt eine Test-Nachricht und fragt die nötige Berechtigung ab.
+function telegramTest() {
+  if (!EINSTELLUNGEN.TELEGRAM_TOKEN || !EINSTELLUNGEN.TELEGRAM_CHAT_ID) {
+    throw new Error('Bitte oben TELEGRAM_TOKEN und TELEGRAM_CHAT_ID eintragen.');
+  }
+  const r = UrlFetchApp.fetch('https://api.telegram.org/bot' + EINSTELLUNGEN.TELEGRAM_TOKEN + '/sendMessage', {
+    method: 'post', muteHttpExceptions: true,
+    payload: { chat_id: String(EINSTELLUNGEN.TELEGRAM_CHAT_ID), text: '✅ Der Mentee-Bereich ist mit Telegram verbunden!' },
+  });
+  Logger.log(r.getResponseCode() === 200 ? 'Klappt! Schau in Telegram.' : 'Fehler: ' + r.getContentText());
+}

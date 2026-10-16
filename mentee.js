@@ -84,3 +84,23 @@ const isStandalone = () => window.matchMedia("(display-mode: standalone)").match
 const plattform = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
   ? "ios" : /android/i.test(navigator.userAgent) ? "android" : "desktop";
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+
+/* ---------- Formular-Einsendungen zusätzlich an das Script melden ---------- */
+// → Eintrag im Blatt „Anfragen“ + Telegram-Nachricht an Anne. Die E-Mail (FormSubmit)
+// läuft unabhängig davon weiter; klappt die Meldung nicht, wird trotzdem abgeschickt.
+async function meldung(typ, form){
+  if (!API_URL || !getCode()) return;
+  const felder = {};
+  new FormData(form).forEach((v, k) => { if (!k.startsWith("_") && String(v).trim()) felder[k] = String(v); });
+  try { await Promise.race([api({ aktion: "meldung", typ, felder }), new Promise(r => setTimeout(r, 3000))]); } catch {}
+}
+// Für einfache Formulare (Umfrage, Tool-Wunsch): erst melden, dann normal absenden.
+function meldungBeimAbsenden(form, typ){
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    const btn = form.querySelector('[type="submit"]'); if (btn) { btn.disabled = true; btn.textContent = "Wird gesendet …"; }
+    await meldung(typ, form);
+    form.submit();
+  });
+}
