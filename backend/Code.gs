@@ -28,7 +28,7 @@ const EINSTELLUNGEN = {
 
   MEINE_EMAIL: 'anne.siebenkees@lovelifepassport.com',   // hierhin geht deine Meldung
   ABSENDER_NAME: 'Anne Siebenkees',
-  CHECKIN_LINK: 'https://businessbegleitung-checkin.youcanbook.me/',
+  CHECKIN_LINK: 'https://call-anne-siebenkees-30.youcanbook.me',   // Link in der Erinnerungs-Mail (30-Min-Termin)
   BEREICH_LINK: 'https://annesiebenkees-ai.github.io/tet-mentee-bereich/',
   MAIL_UHRZEIT: 8,          // tägliche Prüfung gegen 8 Uhr morgens
   // ID der Tabelle „TET Mentee-Bereich“ (aus ihrer Adresse). Nötig, wenn das Script
@@ -305,16 +305,16 @@ function erinnerungSenden_(m, termine) {
     to: m.emails.join(','),
     replyTo: EINSTELLUNGEN.MEINE_EMAIL,
     name: EINSTELLUNGEN.ABSENDER_NAME,
-    subject: 'Zeit für deinen nächsten Check-in 💛',
+    subject: 'Zeit für deinen nächsten Termin 💛',
     body: 'Hallo ' + vorname + ',\n\n' + seit + ' – lass uns wieder gemeinsam auf dein Business schauen!\n\n' +
-          'Buch dir hier deinen 15-Minuten-Check-in:\n' + link + '\n\n' +
+          'Buch dir hier deinen nächsten 30-Minuten-Termin:\n' + link + '\n\n' +
           'Ich freu mich auf dich!\nDeine Anne',
     htmlBody:
       '<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#0d1c32;max-width:520px">' +
       '<p>Hallo ' + vorname + ',</p>' +
       '<p>' + seit + ' – lass uns wieder gemeinsam auf dein Business schauen!</p>' +
       '<p style="margin:26px 0"><a href="' + link + '" style="background:#0d1c32;color:#fff;text-decoration:none;' +
-      'padding:13px 24px;border-radius:100px;display:inline-block">15-Minuten-Check-in buchen</a></p>' +
+      'padding:13px 24px;border-radius:100px;display:inline-block">30-Minuten-Termin buchen</a></p>' +
       '<p>Ich freu mich auf dich!<br>Deine Anne</p></div>',
   });
 
@@ -324,7 +324,7 @@ function erinnerungSenden_(m, termine) {
     body: m.name + ' (' + m.emails.join(', ') + ', Status: ' + m.status + ')\n\n' +
           (termine.tageSeit === null ? 'Noch kein 1:1-Termin gefunden.' : 'Letzter Termin vor ' + termine.tageSeit + ' Tagen.') +
           '\nEs ist kein neuer Termin gebucht.\n\n' +
-          'Die Erinnerung mit dem Link zum 15-Min-Check-in ist gerade an ' + vorname + ' rausgegangen.',
+          'Die Erinnerung mit dem Link zum 30-Min-Termin ist gerade an ' + vorname + ' rausgegangen.',
   });
 }
 
@@ -476,3 +476,4 @@ function loeschen_(ich, art, id) {
     lock.releaseLock();
   }
 }
+

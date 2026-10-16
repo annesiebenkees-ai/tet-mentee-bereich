@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>The Escape Theory · Done-4-You Antrag</title>
+<meta name="theme-color" content="#FAFCFD" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" type="image/png" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="escape-os.css" />
+<style>
+  .hero{ padding:var(--s8) 0 calc(var(--s12) + 30px); }
+  .form-wrap{ max-width:760px; margin:0 auto; }
+  .sec{ margin-bottom:var(--s6); }
+  .sec-t{ font-family:var(--mono); font-size:.625rem; letter-spacing:.18em; text-transform:uppercase; color:var(--accent-deep); margin:0 0 var(--s3); }
+  .chips .chip{ font-size:.8125rem; padding:.5rem .875rem; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s4); }
+  @media (max-width:640px){ .row2{ grid-template-columns:1fr; } }
+  .me{ display:flex; gap:var(--s3); align-items:center; background:var(--tint); border:1px solid var(--hair); border-radius:var(--r-md); padding:var(--s3) var(--s4); margin-bottom:var(--s6); font-size:var(--t-sm); }
+  .consent{ background:var(--paper); border:1px solid var(--hair); border-radius:var(--r-md); padding:var(--s4); }
+  .consent .check{ align-items:flex-start; }
+  .consent input{ margin-top:3px; flex:none; }
+  .err{ color:var(--danger); font-size:var(--t-sm); min-height:1.2em; margin:var(--s3) 0; }
+  .done{ text-align:center; padding:var(--s10) var(--s6); }
+  .done .big{ font-size:3rem; }
+  .done h2{ margin:var(--s3) 0 var(--s2); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" id="homeLink" href="index.html"><span class="mark"></span><span class="wm">The Escape <em>Theory</em></span></a>
+  <span class="sep"></span><span class="ctx">Done-4-You</span>
+  <span class="spacer"></span>
+  <a class="btn btn-secondary btn-sm" id="backLink" href="index.html">← Dashboard</a>
+</div>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Aufgaben abgeben</div>
+      <h1>Done-4-You <em>Antrag</em></h1>
+      <p class="lead">Du möchtest Bereiche in deinem Business abgeben? Erzähl mir, worum es geht – ich verbinde dich mit passenden Expert:innen aus unserem Netzwerk.</p>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+    <div class="form-wrap">
+
+      <div class="card" id="hintCard" hidden>
+        <div class="eyebrow">Dein persönlicher Zugang</div>
+        <p class="muted" id="hintText">Den Antrag kannst du stellen, wenn du den Mentee-Bereich über deinen persönlichen Link aus deinem Miro öffnest.</p>
+      </div>
+
+      <form class="card" id="form" action="https://formsubmit.co/anne.siebenkees@lovelifepassport.com" method="POST" novalidate>
+        <input type="hidden" name="_subject" value="💼 Neuer D4Y-Antrag aus dem Mentee-Bereich">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="https://annesiebenkees-ai.github.io/tet-mentee-bereich/d4y.html?danke=1">
+        <input type="hidden" name="_autoresponse" value="Danke für deinen Done-4-You-Antrag! Ich schaue ihn mir an und melde mich bei dir mit passenden Expert:innen aus unserem Netzwerk. Deine Anne 💛">
+        <input type="hidden" name="Bereiche" id="bereicheFeld">
+
+        <div class="sec row2">
+          <div class="field"><label>Dein Name</label><input class="input" name="Name" id="nameFeld" maxlength="80" required /></div>
+          <div class="field"><label>Deine E-Mail</label><input class="input" type="email" name="email" id="mailFeld" maxlength="120" required /></div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-t">1 · Welche Bereiche möchtest du abgeben?</div>
+          <div class="chips" id="bereiche"></div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-t">2 · Worum geht's genau?</div>
+          <div class="field"><label>Was soll erledigt werden? <span class="hint">(Pflichtfeld)</span></label>
+            <textarea class="input" name="Was soll erledigt werden" rows="4" maxlength="2000" placeholder="z. B. Ich brauche jemanden, der 3 Reels pro Woche schneidet und untertitelt …"></textarea></div>
+          <div class="field"><label>Was ist dein Ziel / gewünschtes Ergebnis?</label>
+            <textarea class="input" name="Ziel" rows="2" maxlength="1000" placeholder="z. B. mehr Zeit fürs Coaching, regelmäßiger Content, Launch im Januar …"></textarea></div>
+        </div>
+
+        <div class="sec row2">
+          <div class="field"><label>Zeitrahmen</label>
+            <select class="select input" name="Zeitrahmen">
+              <option value="">Bitte wählen</option><option>So schnell wie möglich</option><option>In den nächsten 4 Wochen</option><option>In 1–3 Monaten</option><option>Noch offen</option>
+            </select></div>
+          <div class="field"><label>Budget (ungefähr)</label>
+            <select class="select input" name="Budget">
+              <option value="">Bitte wählen</option><option>unter 500 €</option><option>500–1.500 €</option><option>1.500–5.000 €</option><option>über 5.000 €</option><option>Noch offen</option>
+            </select></div>
+        </div>
+
+        <div class="sec row2">
+          <div class="field"><label>Telefon / WhatsApp <span class="hint">(optional)</span></label>
+            <input class="input" name="Telefon" maxlength="60" placeholder="+49 …" /></div>
+          <div class="field"><label>Wie dürfen wir dich kontaktieren?</label>
+            <select class="select input" name="Kontaktweg">
+              <option>E-Mail</option><option>Telefon</option><option>WhatsApp</option>
+            </select></div>
+        </div>
+
+        <div class="consent">
+          <label class="check"><input type="checkbox" name="Einverständnis Weitergabe" value="ja" />
+            <span>Ich bin einverstanden, dass Anne meine Angaben und Kontaktdaten an passende Dienstleister:innen aus ihrem Netzwerk weitergibt, damit diese mich kontaktieren und mir ein Angebot machen können.</span></label>
+        </div>
+
+        <div class="err" id="err"></div>
+        <button class="btn btn-primary btn-lg" type="submit" id="send">Antrag absenden</button>
+      </form>
+
+      <div class="card done" id="done" hidden>
+        <div class="big">🎉</div>
+        <h2>Danke! Dein Antrag ist bei mir angekommen.</h2>
+        <p class="muted">Ich schaue ihn mir an und melde mich bei dir mit passenden Expert:innen aus unserem Netzwerk. Eine Bestätigung bekommst du per Mail.</p>
+        <p style="margin-top:var(--s5)"><a class="btn btn-secondary" id="doneBack" href="index.html">← Zurück zum Dashboard</a></p>
+      </div>
+
+    </div>
+  </div>
+  <footer>
+    <div class="f-brand">The Escape Theory</div>
+    <div style="margin-top:.375rem">Done-4-You · Mit 💛 für dich</div>
+  </footer>
+</main>
+
+<script src="mentee.js"></script>
+<script>
+const BEREICHE = ["Social Media & Content", "Reels & Video-Schnitt", "Ads (Meta / Google)", "Funnel & Landingpage",
+  "Website", "E-Mail-Marketing & Automation", "Texte & Copywriting", "Design & Branding",
+  "Technik & Tools", "Virtuelle Assistenz", "Sonstiges"];
+const gewaehlt = new Set();
+["homeLink","backLink","doneBack"].forEach(id => $(id).href = withCode("index.html"));
+
+$("bereiche").innerHTML = BEREICHE.map(b => `<button type="button" class="chip" data-b="${esc(b)}">${esc(b)}</button>`).join("");
+$("bereiche").addEventListener("click", e => {
+  const c = e.target.closest(".chip"); if (!c) return;
+  const b = c.dataset.b; gewaehlt.has(b) ? gewaehlt.delete(b) : gewaehlt.add(b);
+  c.classList.toggle("is-on", gewaehlt.has(b));
+});
+
+$("form").addEventListener("submit", e => {
+  e.preventDefault();
+  const f = $("form");
+  const q = n => f.querySelector(`[name="${n}"]`);
+  $("bereicheFeld").value = [...gewaehlt].join(", ");
+  const fehler =
+    !q("Name").value.trim() ? "Bitte gib deinen Namen an." :
+    !/^\S+@\S+\.\S+$/.test(q("email").value.trim()) ? "Bitte gib eine gültige E-Mail-Adresse an." :
+    !gewaehlt.size ? "Bitte wähl mindestens einen Bereich aus." :
+    !q("Was soll erledigt werden").value.trim() ? "Bitte beschreib kurz, was erledigt werden soll." :
+    !q("Einverständnis Weitergabe").checked ? "Bitte bestätige, dass ich deine Angaben weitergeben darf – sonst kann ich dich nicht vermitteln." : "";
+  if (fehler) { $("err").textContent = fehler; return; }
+  $("err").textContent = ""; $("send").disabled = true; $("send").textContent = "Wird gesendet …";
+  f.submit();
+});
+
+// Nach dem Absenden leitet FormSubmit auf ?danke=1 zurück → Bestätigung zeigen
+if (new URLSearchParams(location.search).get("danke") === "1") {
+  $("form").hidden = true; $("done").hidden = false;
+}
+// Name aus dem persönlichen Zugang vorausfüllen (E-Mail tippt der Mentee selbst)
+const alt = gemerkt("dashboard");
+if (alt && alt.ich) $("nameFeld").value = alt.ich.name;
+</script>
+</body>
+</html>
