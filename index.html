@@ -41,17 +41,7 @@ const DASHBOARD = {
 
   /* --- 1:1 Termine buchen (deine Buchungslinks einsetzen) --------------- */
   buchung: {
-    link15: "https://businessbegleitung-checkin.youcanbook.me/",   // ← 15-Min Check-in Link
     link30: "https://call-anne-siebenkees-30.youcanbook.me",       // ← 30-Min Strategie Link
-  },
-
-  /* --- KPI-Week: monatliches KPI-Tracking ------------------------------- */
-  // `anker` = ein bekanntes KPI-Week-Datum. Das Dashboard rollt es AUTOMATISCH
-  // monatlich weiter und zeigt immer die nächste anstehende KPI-Week + Erinnerung.
-  // Du musst hier also nie wieder das Datum ändern.
-  kpiWeek: {
-    anker: "2026-07-27",   // ← ein KPI-Week-Termin (Tag im Monat zählt), rollt monatlich weiter
-    link: "https://airtable.com/appuUyAbs2BOPJAjK/pagsTOJsMsSM9loEM/form",
   },
 
   /* --- Done-4-You (D4Y): Bereiche im Business abgeben ------------------- */
@@ -303,8 +293,7 @@ const DASHBOARD = {
           <h2>Wir haben uns zu lange nicht gesehen</h2>
           <p id="alarmText"></p>
           <div class="acts">
-            <a class="btn btn-primary" id="alarm-15" target="_blank" rel="noopener">15-Min Check-in buchen</a>
-            <a class="btn btn-danger" id="alarm-30" target="_blank" rel="noopener">30-Min Strategie-Call</a>
+            <a class="btn btn-primary" id="alarm-30" target="_blank" rel="noopener">Jetzt 30-Min-Termin buchen</a>
           </div>
         </div>
       </div>
@@ -368,31 +357,17 @@ const DASHBOARD = {
         <div class="eyebrow">Termin bei mir buchen</div>
         <h2>Freier Zugriff auf <em>meinen Kalender</em></h2>
         <p class="intro">Bucht euch eure Termine selbst – ganz wie ihr sie braucht.</p>
-        <div class="book-grid">
-          <div class="book">
-            <div class="dur">15<small>Min</small></div>
-            <p>Check-in für die schnellen Dinge und zum Am-Ball-Bleiben.</p>
-            <a class="btn btn-secondary btn-full" id="bk-15" target="_blank" rel="noopener">Check-in buchen</a>
-          </div>
+        <div class="book-grid" style="grid-template-columns:1fr">
           <div class="book">
             <div class="dur">30<small>Min</small></div>
-            <p>Strategie, Funnel &amp; Tiefenarbeit – wenn's um die großen Schritte geht.</p>
-            <a class="btn btn-primary btn-full" id="bk-30" target="_blank" rel="noopener">Strategie-Call buchen</a>
+            <p>Dein 1:1-Termin mit mir – für Strategie, Funnel, Tiefenarbeit und alles, was dich gerade bewegt.</p>
+            <a class="btn btn-primary" id="bk-30" target="_blank" rel="noopener" style="align-self:flex-start">Termin buchen</a>
           </div>
         </div>
       </div>
 
-      <!-- KPI-Week -->
-      <div class="card">
-        <div class="eyebrow">Einmal im Monat</div>
-        <h2>KPI-<em>Week</em></h2>
-        <div class="when" id="kpi-when" style="font-size:var(--t-body)"></div>
-        <p class="intro" style="margin-top:.25rem">Trag einmal im Monat deine Zahlen ein – so sehen wir gemeinsam, was wirklich wirkt.</p>
-        <a class="btn btn-primary" id="kpi-link" target="_blank" rel="noopener">Deine KPIs eintragen</a>
-      </div>
-
       <!-- Done-4-You -->
-      <div class="card">
+      <div class="card span">
         <div class="eyebrow">Aufgaben abgeben</div>
         <h2>Done-4-You <em>Antrag</em></h2>
         <p class="intro">Du möchtest Bereiche in deinem Business abgeben? Stell hier deinen D4Y-Antrag – wir kümmern uns darum.</p>
@@ -505,19 +480,8 @@ function render(){
     $("nx-link").hidden = true;
   }
 
-  $("bk-15").href = D.buchung.link15;
   $("bk-30").href = D.buchung.link30;
 
-  // KPI-Week rollt automatisch monatlich vom Anker-Datum weiter
-  if (D.kpiWeek) {
-    const today = new Date(); today.setHours(0,0,0,0);
-    let k = parseDate(D.kpiWeek.anker + " 00:00");
-    while (k < today) k.setMonth(k.getMonth() + 1);
-    const days = Math.round((k - today) / 86400000);
-    const rel = days === 0 ? "diese Woche – jetzt dran!" : days === 1 ? "morgen" : `in ${days} Tagen`;
-    $("kpi-when").textContent = `Nächste: ${TAG[k.getDay()]}, ${k.getDate()}. ${MONL[k.getMonth()]} · ${rel}`;
-    $("kpi-link").href = D.kpiWeek.link;
-  }
   if (D.d4y) $("d4y-link").href = D.d4y.link;
 
   $("calList").innerHTML = upcoming.length ? upcoming.map(t => `
@@ -605,14 +569,13 @@ function renderPersonal(d){
         <div class="s">${fmtLong(dt)}${x.minuten ? " · " + x.minuten + " Min" : ""}</div>
       </div>
     </div>`;
-  }).join("") : `<p class="muted">Aktuell hast du keinen Termin bei mir gebucht. Buch dir gleich hier unten deinen nächsten Check-in. 💛</p>`;
+  }).join("") : `<p class="muted">Aktuell hast du keinen Termin bei mir gebucht. Buch dir gleich hier unten deinen nächsten Termin. 💛</p>`;
 
   // Rote Meldung
   if (t.alarm) {
     $("alarmText").textContent = t.tageSeit === null
       ? "Du hast noch keinen 1:1-Termin bei mir gebucht. Buch dir jetzt deinen ersten Termin, damit wir gemeinsam am Ball bleiben."
       : `Dein letzter Termin bei mir ist schon ${t.tageSeit} Tage her, und du hast noch keinen neuen gebucht. Buch dir jetzt deinen nächsten Termin, damit wir gemeinsam am Ball bleiben.`;
-    $("alarm-15").href = DASHBOARD.buchung.link15;
     $("alarm-30").href = DASHBOARD.buchung.link30;
     $("alarmCard").hidden = false;
   } else {
