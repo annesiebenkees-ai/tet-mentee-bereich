@@ -84,7 +84,7 @@
     <h1>Wie waren deine Tools? 💛</h1>
     <p class="intro">Ich habe dir Claude-Code-Tools in deinem Mentee-Bereich bereitgestellt. Dein ehrliches Feedback hilft mir, sie besser zu machen — 2 Minuten, alles freiwillig.</p>
 
-    <form action="https://formsubmit.co/anne.siebenkees@lovelifepassport.com" method="POST">
+    <form id="meldeForm" action="https://formsubmit.co/anne.siebenkees@lovelifepassport.com" method="POST">
       <!-- FormSubmit-Steuerung -->
       <input type="hidden" name="_subject" value="Neues Tool-Feedback aus dem Mentee-Bereich 💛">
       <input type="hidden" name="_template" value="table">
@@ -142,6 +142,8 @@
   </div>
 </div>
 
+<script src="mentee.js"></script>
+<script>meldungBeimAbsenden(document.getElementById("meldeForm"), "Tool-Feedback (Umfrage)");</script>
 <script>
   // Nach dem Absenden leitet FormSubmit auf ?danke=1 zurück → Danke-Zustand zeigen.
   if (new URLSearchParams(location.search).get("danke") === "1") {

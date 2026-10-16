@@ -142,7 +142,7 @@ $("bereiche").addEventListener("click", e => {
   c.classList.toggle("is-on", gewaehlt.has(b));
 });
 
-$("form").addEventListener("submit", e => {
+$("form").addEventListener("submit", async e => {
   e.preventDefault();
   const f = $("form");
   const q = n => f.querySelector(`[name="${n}"]`);
@@ -155,6 +155,7 @@ $("form").addEventListener("submit", e => {
     !q("Einverständnis Weitergabe").checked ? "Bitte bestätige, dass ich deine Angaben weitergeben darf – sonst kann ich dich nicht vermitteln." : "";
   if (fehler) { $("err").textContent = fehler; return; }
   $("err").textContent = ""; $("send").disabled = true; $("send").textContent = "Wird gesendet …";
+  await meldung("D4Y-Antrag", f);
   f.submit();
 });
 
