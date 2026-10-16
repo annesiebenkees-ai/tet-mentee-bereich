@@ -28,7 +28,7 @@ const EINSTELLUNGEN = {
 
   MEINE_EMAIL: 'anne.siebenkees@lovelifepassport.com',   // hierhin geht deine Meldung
   ABSENDER_NAME: 'Anne Siebenkees',
-  CHECKIN_LINK: 'https://businessbegleitung-checkin.youcanbook.me/',
+  CHECKIN_LINK: 'https://call-anne-siebenkees-30.youcanbook.me',   // Link in der Erinnerungs-Mail (30-Min-Termin)
   BEREICH_LINK: 'https://annesiebenkees-ai.github.io/tet-mentee-bereich/',
   MAIL_UHRZEIT: 8,          // tägliche Prüfung gegen 8 Uhr morgens
   // ID der Tabelle „TET Mentee-Bereich“ (aus ihrer Adresse). Nötig, wenn das Script
@@ -190,6 +190,11 @@ function antwort_(p) {
     if (p.aktion === 'beitragSchreiben') beitragSchreiben_(ich, p.beitrag || {});
     if (p.aktion === 'kommentarSchreiben') kommentarSchreiben_(ich, p.kommentar || {});
     if (p.aktion === 'loeschen') loeschen_(ich, p.art, p.id);
+    if (p.aktion === 'd4yAntrag') {
+      d4yAntrag_(ich, p.antrag || {});
+      return json_({ ok: true, gesendet: true, ich: { name: ich.name } });
+    }
+    if (p.aktion === 'ich') return json_({ ok: true, ich: { name: ich.name, email: ich.emails[0] } });
 
     const antwort = { ok: true, ich: { name: ich.name }, profile: profile_(ich.emails[0]), beitraege: beitraege_(ich.emails[0]) };
     // Das Austausch-Portal braucht keine Termine – spart Zeit beim Laden.
@@ -305,16 +310,16 @@ function erinnerungSenden_(m, termine) {
     to: m.emails.join(','),
     replyTo: EINSTELLUNGEN.MEINE_EMAIL,
     name: EINSTELLUNGEN.ABSENDER_NAME,
-    subject: 'Zeit für deinen nächsten Check-in 💛',
+    subject: 'Zeit für deinen nächsten Termin 💛',
     body: 'Hallo ' + vorname + ',\n\n' + seit + ' – lass uns wieder gemeinsam auf dein Business schauen!\n\n' +
-          'Buch dir hier deinen 15-Minuten-Check-in:\n' + link + '\n\n' +
+          'Buch dir hier deinen nächsten 30-Minuten-Termin:\n' + link + '\n\n' +
           'Ich freu mich auf dich!\nDeine Anne',
     htmlBody:
       '<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#0d1c32;max-width:520px">' +
       '<p>Hallo ' + vorname + ',</p>' +
       '<p>' + seit + ' – lass uns wieder gemeinsam auf dein Business schauen!</p>' +
       '<p style="margin:26px 0"><a href="' + link + '" style="background:#0d1c32;color:#fff;text-decoration:none;' +
-      'padding:13px 24px;border-radius:100px;display:inline-block">15-Minuten-Check-in buchen</a></p>' +
+      'padding:13px 24px;border-radius:100px;display:inline-block">30-Minuten-Termin buchen</a></p>' +
       '<p>Ich freu mich auf dich!<br>Deine Anne</p></div>',
   });
 
@@ -324,7 +329,7 @@ function erinnerungSenden_(m, termine) {
     body: m.name + ' (' + m.emails.join(', ') + ', Status: ' + m.status + ')\n\n' +
           (termine.tageSeit === null ? 'Noch kein 1:1-Termin gefunden.' : 'Letzter Termin vor ' + termine.tageSeit + ' Tagen.') +
           '\nEs ist kein neuer Termin gebucht.\n\n' +
-          'Die Erinnerung mit dem Link zum 15-Min-Check-in ist gerade an ' + vorname + ' rausgegangen.',
+          'Die Erinnerung mit dem Link zum 30-Min-Termin ist gerade an ' + vorname + ' rausgegangen.',
   });
 }
 
@@ -475,4 +480,39 @@ function loeschen_(ich, art, id) {
   } finally {
     lock.releaseLock();
   }
+}
+
+/* ---------- Done-4-You-Anträge ---------- */
+// Landen im Blatt „D4Y-Anträge“ + Mail an Anne. Die Spalten Status, Weitergegeben an,
+// Provision und Notizen sind zum eigenen Nachhalten gedacht.
+const TAB_D4Y = 'D4Y-Anträge';
+const KOPF_D4Y = ['Zeit', 'Name', 'E-Mail', 'Telefon', 'Kontaktweg', 'Bereiche', 'Was soll erledigt werden?',
+                  'Ziel / Ergebnis', 'Zeitrahmen', 'Budget', 'Einverständnis Weitergabe', 'Status',
+                  'Weitergegeben an', 'Provision', 'Notizen'];
+
+function d4yAntrag_(ich, a) {
+  const s = (v, n) => String(v || '').trim().slice(0, n || 2000);
+  const bereiche = (Array.isArray(a.bereiche) ? a.bereiche : []).map(b => s(b, 60)).join(', ');
+  const beschreibung = s(a.beschreibung);
+  if (!beschreibung) throw new Error('Bitte beschreib kurz, was erledigt werden soll.');
+  const werte = [new Date(), ich.name, ich.emails[0], s(a.telefon, 60), s(a.kontaktweg, 40), bereiche, beschreibung,
+                 s(a.ziel), s(a.zeitrahmen, 60), s(a.budget, 60), a.einverstanden ? 'ja' : 'nein', 'Neu', '', '', ''];
+  blatt_(TAB_D4Y, KOPF_D4Y).appendRow(werte);
+
+  const zeilen = KOPF_D4Y.slice(1, 11).map((k, i) => k + ': ' + (werte[i + 1] || '–'));
+  MailApp.sendEmail({
+    to: EINSTELLUNGEN.MEINE_EMAIL,
+    replyTo: ich.emails[0],
+    subject: '💼 Neuer D4Y-Antrag von ' + ich.name + (bereiche ? ' – ' + bereiche : ''),
+    body: 'Neuer Done-4-You-Antrag aus dem Mentee-Bereich:\n\n' + zeilen.join('\n') +
+          '\n\nAlle Anträge stehen im Blatt „' + TAB_D4Y + '“ deiner Tabelle.',
+  });
+  MailApp.sendEmail({
+    to: ich.emails[0],
+    replyTo: EINSTELLUNGEN.MEINE_EMAIL,
+    name: EINSTELLUNGEN.ABSENDER_NAME,
+    subject: 'Dein Done-4-You-Antrag ist bei mir angekommen 💛',
+    body: 'Hallo ' + ich.name.split(' ')[0] + ',\n\ndanke für deinen Done-4-You-Antrag! Ich schaue ihn mir an und melde mich ' +
+          'bei dir mit passenden Expert:innen aus unserem Netzwerk.\n\nDeine Anne',
+  });
 }

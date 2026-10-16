@@ -46,7 +46,7 @@ const DASHBOARD = {
 
   /* --- Done-4-You (D4Y): Bereiche im Business abgeben ------------------- */
   d4y: {
-    link: "https://airtable.com/appuUyAbs2BOPJAjK/pagTQnAvJc3TpbEqF/form",
+    link: "d4y.html",   // eigenes Formular – Anträge landen im Blatt „D4Y-Anträge“ + per Mail bei dir
   },
 
   /* --- Kalender: alle kommenden Team-Treffen ---------------------------- */
@@ -370,8 +370,8 @@ const DASHBOARD = {
       <div class="card span">
         <div class="eyebrow">Aufgaben abgeben</div>
         <h2>Done-4-You <em>Antrag</em></h2>
-        <p class="intro">Du möchtest Bereiche in deinem Business abgeben? Stell hier deinen D4Y-Antrag – wir kümmern uns darum.</p>
-        <a class="btn btn-secondary" id="d4y-link" target="_blank" rel="noopener">D4Y-Antrag ausfüllen</a>
+        <p class="intro">Du möchtest Bereiche in deinem Business abgeben? Stell hier deinen D4Y-Antrag – ich verbinde dich mit passenden Expert:innen aus unserem Netzwerk.</p>
+        <a class="btn btn-primary" id="d4y-link">D4Y-Antrag ausfüllen</a>
       </div>
 
       <!-- Kalender -->
@@ -482,7 +482,7 @@ function render(){
 
   $("bk-30").href = D.buchung.link30;
 
-  if (D.d4y) $("d4y-link").href = D.d4y.link;
+  if (D.d4y) $("d4y-link").href = /^https?:/.test(D.d4y.link) ? D.d4y.link : withCode(D.d4y.link);
 
   $("calList").innerHTML = upcoming.length ? upcoming.map(t => `
     <div class="row${t.ausfall ? " ausfall" : ""}">
