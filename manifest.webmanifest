@@ -4,8 +4,8 @@
   "description": "Dein Mentee-Bereich: Termine, Team-Treffen, Austausch & Material.",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#ECF3F8",
-  "theme_color": "#FAFCFD",
+  "background_color": "#ECEAF4",
+  "theme_color": "#ECEAF4",
   "lang": "de",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
