@@ -14,11 +14,6 @@
 
 /* --- HIER KANNST DU ANPASSEN ------------------------------------------------ */
 const EINSTELLUNGEN = {
-  // >>> TELEGRAM: Hier deinen Bot-Token (von @BotFather) und deine Chat-ID
-  // >>> (von @userinfobot) zwischen die Anführungszeichen einfügen:
-  TELEGRAM_TOKEN: '',
-  TELEGRAM_CHAT_ID: '',
-
   KALENDER_ID: 'anne.siebenkees@lovelifepassport.com',   // Kalender, in den YouCanBook.me bucht ('primary' = Hauptkalender)
   ALARM_TAGE: 14,           // Rote Meldung + Mail, wenn so viele Tage kein Termin war & keiner gebucht ist
   RUECKBLICK_TAGE: 180,     // So weit wird nach vergangenen Terminen gesucht
@@ -35,7 +30,18 @@ const EINSTELLUNGEN = {
   ABSENDER_NAME: 'Anne Siebenkees',
   CHECKIN_LINK: 'https://call-anne-siebenkees-30.youcanbook.me',   // Link in der Erinnerungs-Mail (30-Min-Termin)
   BEREICH_LINK: 'https://annesiebenkees-ai.github.io/tet-mentee-bereich/',
-  MAIL_UHRZEIT: 8,          // tägliche Prüfung gegen 8 Uhr morgens
+  MAIL_UHRZEIT: 8,
+
+  // Funnel-Mapping: einmal pro Kalendermonat mit jedem aktiven Mentee.
+  // Ein Termin zählt automatisch als Funnel-Mapping, wenn eines dieser Wörter in
+  // Titel oder Beschreibung steht (z. B. bei „Welche Themen …?“ in YouCanBook.me).
+  // Sonst trägst du das Datum im Cockpit per Klick ein (Spalte „Funnelmapping“).
+  FUNNEL_WORTE: ['funnel'],
+  // Ab diesem Tag im Monat bekommt, wer noch kein Funnel-Mapping hat und keinen
+  // Termin mehr im Monat gebucht hat, EINE Erinnerungs-Mail.
+  FUNNEL_ERINNERUNG_AB_TAG: 15,
+  // Wer das Cockpit (Übersicht über alle Mentees) sehen darf:
+  TEAM_STATUS: ['Team'],          // tägliche Prüfung gegen 8 Uhr morgens
   // ID der Tabelle „TET Mentee-Bereich“ (aus ihrer Adresse). Nötig, wenn das Script
   // als eigene Datei läuft; ist es direkt in der Tabelle eingebaut, wird diese genutzt.
   TABELLEN_ID: '1Y20RZgmugoX2ulqJSHY83ldEgvPJn_BUnGXTkZur9qI',
@@ -45,7 +51,8 @@ const EINSTELLUNGEN = {
 const TAB_MENTEES = 'Mentees';
 const TAB_PROFILE = 'Profile';
 const KOPF_MENTEES = ['Name', 'E-Mail', 'Status', 'Laufzeit bis', 'Zugangscode',
-                      'Persönlicher Link', 'AM', 'Funnelmapping', 'Letzte Erinnerung'];
+                      'Persönlicher Link', 'AM', 'Funnelmapping', 'Letzte Erinnerung',
+                      'Funnel-Erinnerung', 'Link im Miro', 'Zuletzt geöffnet'];
 const KOPF_PROFILE = ['E-Mail', 'Name', 'Business', 'Über mich', 'Ich biete', 'Ich suche',
                       'Instagram', 'Website', 'Foto-URL', 'E-Mail zeigen', 'Aktualisiert'];
 const TAB_BEITRAEGE = 'Beiträge';
@@ -146,7 +153,9 @@ function datum_(v) {
 let MENTEES_MEMO = null;
 function mentees_() {
   if (MENTEES_MEMO) return MENTEES_MEMO;
+  kopfErgaenzen_();
   const t = tabelle_(TAB_MENTEES);
+  const team = EINSTELLUNGEN.TEAM_STATUS.map(s => s.toLowerCase());
   const heute = new Date(); heute.setHours(0, 0, 0, 0);
   const ohne = EINSTELLUNGEN.KEIN_ZUGANG_STATUS.map(s => s.toLowerCase());
   const erinnern = EINSTELLUNGEN.ERINNERUNG_STATUS.map(s => s.toLowerCase());
@@ -164,10 +173,25 @@ function mentees_() {
       erinnern: erinnern.indexOf(status.toLowerCase()) >= 0,
       link: String(wert_(t, r, 'Persönlicher Link')),
       letzteErinnerung: wert_(t, r, 'Letzte Erinnerung'),
+      team: team.indexOf(status.toLowerCase()) >= 0,
+      am: String(wert_(t, r, 'AM')),
+      bis: bis,
+      funnel: datum_(wert_(t, r, 'Funnelmapping')),
+      funnelErinnerung: String(wert_(t, r, 'Funnel-Erinnerung')),
+      miro: /^(ja|x|✓|true|wahr)$/i.test(String(wert_(t, r, 'Link im Miro'))),
+      geoeffnet: datum_(wert_(t, r, 'Zuletzt geöffnet')),
     };
   }).filter(m => m.name && m.emails.length && m.zugang);
   MENTEES_MEMO = liste;
   return liste;
+}
+
+// Neue Spalten (z. B. „Link im Miro“) automatisch rechts anhängen, falls sie fehlen.
+function kopfErgaenzen_() {
+  const sh = ss_().getSheetByName(TAB_MENTEES);
+  if (!sh || !sh.getLastColumn()) return;
+  const da = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(k => String(k).trim());
+  KOPF_MENTEES.forEach(k => { if (da.indexOf(k) < 0) { da.push(k); sh.getRange(1, da.length).setValue(k).setFontWeight('bold'); } });
 }
 
 function menteeFinden_(code) {
@@ -195,12 +219,18 @@ function antwort_(p) {
     if (p.aktion === 'beitragSchreiben') beitragSchreiben_(ich, p.beitrag || {});
     if (p.aktion === 'kommentarSchreiben') kommentarSchreiben_(ich, p.kommentar || {});
     if (p.aktion === 'loeschen') loeschen_(ich, p.art, p.id);
+    if (p.aktion === 'cockpit' || p.aktion === 'cockpitSetzen') {
+      if (!ich.team) return json_({ ok: false, fehler: 'Das Cockpit ist nur für Anne.' });
+      if (p.aktion === 'cockpitSetzen') cockpitSetzen_(p.ziel, p.feld, p.wert);
+      return json_({ ok: true, ich: { name: ich.name, team: true }, cockpit: cockpit_() });
+    }
     if (p.aktion === 'meldung') {
       meldung_(ich, p.typ, p.felder || {});
       return json_({ ok: true, gemeldet: true });
     }
 
-    const antwort = { ok: true, ich: { name: ich.name }, profile: profile_(ich.emails[0]), beitraege: beitraege_(ich.emails[0]) };
+    geoeffnetMerken_(ich);
+    const antwort = { ok: true, ich: { name: ich.name, team: ich.team }, profile: profile_(ich.emails[0]), beitraege: beitraege_(ich.emails[0]) };
     // Das Austausch-Portal braucht keine Termine – spart Zeit beim Laden.
     if (p.bereich !== 'austausch') {
       const termine = termine_(ich.emails, true);
@@ -211,6 +241,7 @@ function antwort_(p) {
         setzen_(tabelle_(TAB_MENTEES), ich.zeile, 'Letzte Erinnerung', new Date());
       }
       antwort.termine = termine;
+      if (ich.erinnern) antwort.funnel = funnel_(ich, termine);
     }
     return json_(antwort);
   } catch (err) {
@@ -235,6 +266,7 @@ function kalenderEvents_() {
   ).filter(ev => !ignorieren.some(w => (ev.getTitle() || '').toLowerCase().includes(w)))
    .map(ev => ({
      titel: ev.getTitle(),
+     funnel: EINSTELLUNGEN.FUNNEL_WORTE.some(w => ((ev.getTitle() || '') + ' ' + (ev.getDescription() || '')).toLowerCase().includes(w)),
      start: ev.getStartTime(),
      ende: ev.getEndTime(),
      suchtext: ((ev.getDescription() || '') + ' ' +
@@ -276,7 +308,9 @@ function termineBerechnen_(emails, events) {
     .map(ev => ({ titel: ev.titel, start: ev.start.toISOString(), minuten: Math.round((ev.ende - ev.start) / 60000) }));
   const letzter = passend.filter(ev => ev.ende < jetzt).map(ev => ev.start).sort((a, b) => b - a)[0] || null;
   const tageSeit = letzter ? Math.floor((jetzt - letzter) / 86400000) : null;
+  const letztesFunnel = passend.filter(ev => ev.funnel && ev.ende < jetzt).map(ev => ev.start).sort((a, b) => b - a)[0] || null;
   return {
+    letztesFunnel: letztesFunnel ? letztesFunnel.toISOString() : null,
     kommend: kommend,
     letzter: letzter ? letzter.toISOString() : null,
     tageSeit: tageSeit,
@@ -289,17 +323,31 @@ function termineBerechnen_(emails, events) {
 // Läuft automatisch einmal am Tag. Pro „Pause“ geht genau EINE Erinnerung raus.
 // Sobald der Mentee wieder einen Termin bucht, wird das zurückgesetzt.
 function taeglichePruefung() {
+  kopfErgaenzen_();
   const t = tabelle_(TAB_MENTEES);
   const events = kalenderEvents_();
   mentees_().filter(m => m.erinnern).forEach(m => {
     const termine = termine_(m.emails, false, events);
+    // Funnel-Mapping aus dem Kalender erkannt → Datum in die Tabelle übernehmen
+    if (termine.letztesFunnel) {
+      const f = new Date(termine.letztesFunnel); f.setHours(0, 0, 0, 0);
+      if (!m.funnel || f > m.funnel) { setzen_(t, m.zeile, 'Funnelmapping', f); m.funnel = f; }
+    }
+    let gemailt = false;
     if (!termine.alarm) {
       if (m.letzteErinnerung) setzen_(t, m.zeile, 'Letzte Erinnerung', '');
-      return;
+    } else if (!m.letzteErinnerung) {
+      erinnerungSenden_(m, termine);
+      setzen_(t, m.zeile, 'Letzte Erinnerung', new Date());
+      gemailt = true;
     }
-    if (m.letzteErinnerung) return; // schon erinnert
-    erinnerungSenden_(m, termine);
-    setzen_(t, m.zeile, 'Letzte Erinnerung', new Date());
+    // Funnel-Mapping: höchstens eine Erinnerung pro Monat, nie am selben Tag wie die 14-Tage-Mail
+    const fn = funnel_(m, termine);
+    if (!gemailt && fn.status === 'offen' && new Date().getDate() >= EINSTELLUNGEN.FUNNEL_ERINNERUNG_AB_TAG &&
+        m.funnelErinnerung !== fn.monatKey) {
+      funnelErinnerungSenden_(m, fn);
+      setzen_(t, m.zeile, 'Funnel-Erinnerung', fn.monatKey);
+    }
   });
 }
 
@@ -487,9 +535,9 @@ function loeschen_(ich, art, id) {
 }
 
 
-/* ---------- Anfragen (D4Y-Antrag, Tool-Wunsch, Umfrage) → Tabelle + Telegram ---------- */
-// Jede Einsendung landet im Blatt „Anfragen“ (mit Spalten zum Nachhalten) und kommt
-// als Telegram-Nachricht bei dir an. Die E-Mail über FormSubmit läuft zusätzlich weiter.
+/* ---------- Anfragen (D4Y-Antrag, Tool-Wunsch, Umfrage) → Tabelle ---------- */
+// Jede Einsendung landet zusätzlich im Blatt „Anfragen“ (mit Spalten zum Nachhalten,
+// z. B. Weitergegeben an / Provision). Die E-Mail über FormSubmit läuft unverändert.
 const TAB_ANFRAGEN = 'Anfragen';
 const KOPF_ANFRAGEN = ['Zeit', 'Typ', 'Mentee', 'E-Mail', 'Inhalt', 'Status', 'Weitergegeben an', 'Provision', 'Notizen'];
 
@@ -501,27 +549,85 @@ function meldung_(ich, typ, felder) {
   if (!zeilen.length) return;
   blatt_(TAB_ANFRAGEN, KOPF_ANFRAGEN)
     .appendRow([new Date(), typ, ich.name, ich.emails[0], zeilen.join('\n'), 'Neu', '', '', '']);
-  const icon = /d4y/i.test(typ) ? '💼' : /wunsch/i.test(typ) ? '🌱' : '💬';
-  telegram_(icon + ' ' + typ + '\nvon ' + ich.name + ' (' + ich.emails[0] + ')\n\n' + zeilen.join('\n'));
 }
 
-function telegram_(text) {
-  const t = EINSTELLUNGEN.TELEGRAM_TOKEN, chat = EINSTELLUNGEN.TELEGRAM_CHAT_ID;
-  if (!t || !chat) return;
-  UrlFetchApp.fetch('https://api.telegram.org/bot' + t + '/sendMessage', {
-    method: 'post', muteHttpExceptions: true,
-    payload: { chat_id: String(chat), text: String(text).slice(0, 4000), disable_web_page_preview: 'true' },
+/* ---------- Funnel-Mapping (einmal pro Monat) ---------- */
+const MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August',
+                'September', 'Oktober', 'November', 'Dezember'];
+
+// erledigt = diesen Monat schon gemappt · geplant = noch ein Termin in diesem Monat gebucht · offen
+function funnel_(m, termine) {
+  const jetzt = new Date();
+  const start = new Date(jetzt.getFullYear(), jetzt.getMonth(), 1);
+  const ende = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 1);
+  let letztes = m.funnel;
+  const auto = termine.letztesFunnel ? new Date(termine.letztesFunnel) : null;
+  if (auto && (!letztes || auto > letztes)) letztes = auto;
+  const termin = (termine.kommend || []).find(k => new Date(k.start) < ende);
+  return {
+    status: letztes && letztes >= start ? 'erledigt' : termin ? 'geplant' : 'offen',
+    letztes: letztes ? letztes.toISOString() : null,
+    termin: termin ? termin.start : null,
+    monat: MONATE[jetzt.getMonth()],
+    monatKey: jetzt.getFullYear() + '-' + ('0' + (jetzt.getMonth() + 1)).slice(-2),
+  };
+}
+
+function funnelErinnerungSenden_(m, fn) {
+  const vorname = m.name.split(' ')[0];
+  const link = EINSTELLUNGEN.CHECKIN_LINK;
+  const text = 'im ' + fn.monat + ' haben wir noch kein Funnel-Mapping gemacht. Einmal im Monat schauen wir ' +
+               'gemeinsam auf deinen Funnel – so siehst du schwarz auf weiß, was funktioniert und wo wir nachschärfen.';
+  MailApp.sendEmail({
+    to: m.emails.join(','),
+    replyTo: EINSTELLUNGEN.MEINE_EMAIL,
+    name: EINSTELLUNGEN.ABSENDER_NAME,
+    subject: 'Unser Funnel-Mapping im ' + fn.monat + ' 📊',
+    body: 'Hallo ' + vorname + ',\n\n' + text + '\n\nBuch dir noch im ' + fn.monat + ' deinen 30-Minuten-Termin:\n' +
+          link + '\n\nIch freu mich auf dich!\nDeine Anne',
+    htmlBody:
+      '<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#0d1c32;max-width:520px">' +
+      '<p>Hallo ' + vorname + ',</p><p>' + text + '</p>' +
+      '<p style="margin:26px 0"><a href="' + link + '" style="background:#0d1c32;color:#fff;text-decoration:none;' +
+      'padding:13px 24px;border-radius:100px;display:inline-block">Termin fürs Funnel-Mapping buchen</a></p>' +
+      '<p>Ich freu mich auf dich!<br>Deine Anne</p></div>',
   });
 }
 
-// Einmal ausführen: schickt eine Test-Nachricht und fragt die nötige Berechtigung ab.
-function telegramTest() {
-  if (!EINSTELLUNGEN.TELEGRAM_TOKEN || !EINSTELLUNGEN.TELEGRAM_CHAT_ID) {
-    throw new Error('Bitte oben TELEGRAM_TOKEN und TELEGRAM_CHAT_ID eintragen.');
+// Merkt sich (höchstens einmal am Tag), wann ein Mentee den Bereich zuletzt geöffnet hat.
+// So siehst du im Cockpit, wer seinen Link aus dem Miro schon benutzt.
+function geoeffnetMerken_(ich) {
+  if (ich.team) return;
+  const heute = new Date(); heute.setHours(0, 0, 0, 0);
+  if (ich.geoeffnet && ich.geoeffnet >= heute) return;
+  setzen_(tabelle_(TAB_MENTEES), ich.zeile, 'Zuletzt geöffnet', heute);
+}
+
+/* ---------- Cockpit für Anne ---------- */
+function cockpit_() {
+  const iso = d => d ? d.toISOString() : null;
+  return mentees_().filter(m => !m.team).map(m => {
+    const t = termine_(m.emails, true);
+    return {
+      name: m.name, code: m.code, status: m.status, am: m.am, link: m.link,
+      bis: iso(m.bis), erinnern: m.erinnern,
+      naechster: t.kommend && t.kommend[0] ? t.kommend[0].start : null,
+      letzter: t.letzter, tageSeit: t.tageSeit,
+      alarm: m.erinnern && t.alarm,
+      funnel: m.erinnern ? funnel_(m, t) : null,
+      miro: m.miro, geoeffnet: iso(m.geoeffnet),
+    };
+  });
+}
+
+function cockpitSetzen_(code, feld, wert) {
+  const m = mentees_().find(x => x.code === String(code || '').toUpperCase());
+  if (!m) return;
+  const t = tabelle_(TAB_MENTEES);
+  if (feld === 'funnel') {
+    const heute = new Date(); heute.setHours(0, 0, 0, 0);
+    setzen_(t, m.zeile, 'Funnelmapping', wert ? heute : '');
   }
-  const r = UrlFetchApp.fetch('https://api.telegram.org/bot' + EINSTELLUNGEN.TELEGRAM_TOKEN + '/sendMessage', {
-    method: 'post', muteHttpExceptions: true,
-    payload: { chat_id: String(EINSTELLUNGEN.TELEGRAM_CHAT_ID), text: '✅ Der Mentee-Bereich ist mit Telegram verbunden!' },
-  });
-  Logger.log(r.getResponseCode() === 200 ? 'Klappt! Schau in Telegram.' : 'Fehler: ' + r.getContentText());
+  if (feld === 'miro') setzen_(t, m.zeile, 'Link im Miro', wert ? 'ja' : '');
+  MENTEES_MEMO = null;
 }
