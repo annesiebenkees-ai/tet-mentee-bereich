@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>The Escape Theory · Mentee-Cockpit</title>
+<meta name="theme-color" content="#FAFCFD" />
+<meta name="robots" content="noindex" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" type="image/png" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="escape-os.css" />
+<style>
+  .hero{ padding:var(--s8) 0 calc(var(--s12) + 30px); }
+  .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:var(--s4); margin-bottom:var(--s6); }
+  @media (max-width:820px){ .stats{ grid-template-columns:repeat(2,1fr); } }
+  .stat{ background:var(--paper); border:1px solid var(--hair); border-radius:var(--r-lg); padding:var(--s4) var(--s5); box-shadow:var(--sh-1); cursor:pointer; text-align:left; font:inherit; color:inherit; }
+  .stat:hover{ border-color:var(--deep); }
+  .stat .n{ font-family:var(--serif); font-size:2.25rem; font-weight:600; line-height:1; color:var(--ink); }
+  .stat .l{ font-size:var(--t-sm); color:var(--slate); margin-top:.375rem; }
+  .stat.warn .n{ color:var(--accent-deep); }
+  .stat.ok .n{ color:var(--ok); }
+  .filter{ margin-bottom:var(--s5); }
+  .list{ display:grid; gap:var(--s3); }
+  .m{ background:var(--paper); border:1px solid var(--hair); border-radius:var(--r-lg); padding:var(--s4) var(--s5); box-shadow:var(--sh-1); }
+  .m.todo{ border-left:4px solid var(--accent); }
+  .m-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:.25rem var(--s3); margin-bottom:var(--s3); }
+  .m-name{ font-family:var(--serif); font-weight:600; font-size:var(--t-h3); color:var(--ink); }
+  .m-meta{ font-size:var(--t-sm); color:var(--slate); }
+  .m-rows{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--s3); }
+  @media (max-width:820px){ .m-rows{ grid-template-columns:1fr; } }
+  .r{ background:var(--bg); border-radius:var(--r-md); padding:var(--s3); font-size:var(--t-sm); display:flex; flex-direction:column; gap:.375rem; }
+  .r .k{ font-family:var(--mono); font-size:.625rem; letter-spacing:.16em; text-transform:uppercase; color:var(--slate); }
+  .r .v{ color:var(--ink); }
+  .r .v.bad{ color:var(--danger); font-weight:500; }
+  .r .v.good{ color:var(--ok); font-weight:500; }
+  .r .v.mid{ color:var(--accent-deep); font-weight:500; }
+  .r .acts{ display:flex; flex-wrap:wrap; gap:.375rem; margin-top:auto; }
+  .mini{ font:inherit; font-size:.75rem; padding:.3rem .7rem; border-radius:var(--r-pill); border:1px solid var(--hair); background:var(--paper); color:var(--ink); cursor:pointer; text-decoration:none; }
+  .mini:hover{ border-color:var(--deep); }
+  .mini.primary{ background:var(--ink); border-color:var(--ink); color:#fff; }
+  .mini:disabled{ opacity:.5; cursor:wait; }
+  .undo{ background:none; border:0; padding:0; font:inherit; font-size:.75rem; color:var(--slate); text-decoration:underline; cursor:pointer; }
+  .leer{ text-align:center; padding:var(--s8) var(--s4); color:var(--slate); }
+  .stand{ font-size:var(--t-sm); color:var(--slate); margin-bottom:var(--s4); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" id="homeLink" href="index.html"><span class="mark"></span><span class="wm">The Escape <em>Theory</em></span></a>
+  <span class="sep"></span><span class="ctx">Cockpit</span>
+  <span class="spacer"></span>
+  <a class="btn btn-secondary btn-sm" id="backLink" href="index.html">← Dashboard</a>
+</div>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Nur für dich, Anne</div>
+      <h1>Dein Mentee-<em>Cockpit</em></h1>
+      <p class="lead" id="lead">Wen du diesen Monat noch zum Funnel-Mapping brauchst, wer zu lange keinen Termin hatte und bei wem der Link im Miro noch fehlt.</p>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+    <div class="card" id="hintCard" hidden><p class="muted" id="hintText"></p></div>
+
+    <div id="inhalt" hidden>
+      <div class="stats" id="stats"></div>
+      <div class="chips filter" id="filter"></div>
+      <div class="stand" id="stand"></div>
+      <div class="list" id="list"></div>
+    </div>
+  </div>
+  <footer>
+    <div class="f-brand">The Escape Theory</div>
+    <div style="margin-top:.375rem">Mentee-Cockpit · Mit 💛 für dich</div>
+  </footer>
+</main>
+
+<script src="mentee.js"></script>
+<script>
+["homeLink","backLink"].forEach(id => $(id).href = withCode("index.html"));
+
+const FILTER = [
+  { k: "todo",   l: "Alle To-dos" },
+  { k: "funnel", l: "Funnel-Mapping offen" },
+  { k: "termin", l: "Zu lange ohne Termin" },
+  { k: "miro",   l: "Link im Miro offen" },
+  { k: "alle",   l: "Alle Mentees" },
+];
+let filter = "todo", daten = null;
+
+const kurz = iso => { if (!iso) return ""; const d = new Date(iso); return `${d.getDate()}. ${MONL[d.getMonth()]}`; };
+const funnelOffen = m => m.funnel && m.funnel.status === "offen";
+const miroOffen = m => !m.miro && !m.geoeffnet;
+const todos = m => [funnelOffen(m), !!m.alarm, miroOffen(m)].filter(Boolean).length;
+
+function zeigen(){
+  const L = daten.cockpit || [];
+  const monat = (L.find(m => m.funnel) || {}).funnel?.monat || MONL[new Date().getMonth()];
+  const n = f => L.filter(f).length;
+  $("stats").innerHTML = [
+    { f: "funnel", n: n(funnelOffen), l: `Funnel-Mapping im ${monat} offen`, c: n(funnelOffen) ? "warn" : "ok" },
+    { f: "alle",   n: n(m => m.funnel && m.funnel.status !== "offen"), l: "erledigt oder eingeplant", c: "ok" },
+    { f: "termin", n: n(m => m.alarm), l: "seit über 14 Tagen ohne Termin", c: n(m => m.alarm) ? "warn" : "ok" },
+    { f: "miro",   n: n(miroOffen), l: "Link im Miro noch offen", c: n(miroOffen) ? "warn" : "ok" },
+  ].map(s => `<button class="stat ${s.c}" data-f="${s.f}"><div class="n">${s.n}</div><div class="l">${esc(s.l)}</div></button>`).join("");
+  $("filter").innerHTML = FILTER.map(f => `<button class="chip${f.k === filter ? " is-on" : ""}" data-f="${f.k}">${esc(f.l)}</button>`).join("");
+
+  const sicht = L.filter(m =>
+      filter === "alle" ? true : filter === "funnel" ? funnelOffen(m) : filter === "termin" ? m.alarm
+    : filter === "miro" ? miroOffen(m) : todos(m) > 0)
+    .sort((a, b) => todos(b) - todos(a) || a.name.localeCompare(b.name, "de"));
+  $("stand").textContent = sicht.length ? `${sicht.length} von ${L.length} Mentees` : "";
+  $("list").innerHTML = sicht.length ? sicht.map(karte).join("")
+    : `<div class="leer">🎉 Hier ist gerade nichts zu tun.</div>`;
+}
+
+function karte(m){
+  const fn = m.funnel;
+  const funnel = !fn
+    ? `<div class="v">— (Status ${esc(m.status)})</div>`
+    : fn.status === "erledigt"
+    ? `<div class="v good">✓ erledigt am ${kurz(fn.letztes)}</div><div class="acts"><button class="undo" data-a="funnel" data-w="" data-c="${esc(m.code)}">rückgängig</button></div>`
+    : fn.status === "geplant"
+    ? `<div class="v mid">📅 im Termin am ${kurz(fn.termin)}</div>${fn.letztes ? `<div>zuletzt: ${kurz(fn.letztes)}</div>` : ""}
+       <div class="acts"><button class="mini" data-a="funnel" data-w="1" data-c="${esc(m.code)}">✓ Heute gemappt</button></div>`
+    : `<div class="v bad">offen</div><div>${fn.letztes ? "zuletzt: " + kurz(fn.letztes) : "noch nie eingetragen"}</div>
+       <div class="acts"><button class="mini primary" data-a="funnel" data-w="1" data-c="${esc(m.code)}">✓ Heute gemappt</button></div>`;
+
+  const termin = m.naechster
+    ? `<div class="v good">📅 ${kurz(m.naechster)}</div>`
+    : m.alarm
+    ? `<div class="v bad">${m.tageSeit === null ? "noch nie gebucht" : `seit ${m.tageSeit} Tagen keiner`}</div>`
+    : `<div class="v">keiner gebucht</div>`;
+  const zuletzt = m.letzter ? `<div>zuletzt: ${kurz(m.letzter)}</div>` : "";
+
+  const miro = m.miro
+    ? `<div class="v good">✓ hinterlegt</div>${m.geoeffnet ? `<div>zuletzt geöffnet: ${kurz(m.geoeffnet)}</div>` : ""}<div class="acts"><button class="undo" data-a="miro" data-w="" data-c="${esc(m.code)}">rückgängig</button></div>`
+    : m.geoeffnet
+    ? `<div class="v good">✓ wird genutzt</div><div>zuletzt geöffnet: ${kurz(m.geoeffnet)}</div>`
+    : `<div class="v bad">noch offen</div>
+       <div class="acts"><button class="mini" data-kopie="${esc(m.link)}">🔗 Link kopieren</button>
+       <button class="mini primary" data-a="miro" data-w="1" data-c="${esc(m.code)}">✓ Im Miro hinterlegt</button></div>`;
+
+  return `<div class="m${todos(m) ? " todo" : ""}">
+    <div class="m-head"><span class="m-name">${esc(m.name)}</span>
+      <span class="m-meta">${esc(m.status)}${m.am ? " · AM: " + esc(m.am) : ""}${m.bis ? " · bis " + kurz(m.bis) + " " + new Date(m.bis).getFullYear() : ""}</span></div>
+    <div class="m-rows">
+      <div class="r"><div class="k">Funnel-Mapping</div>${funnel}</div>
+      <div class="r"><div class="k">Nächster 1:1-Termin</div>${termin}${zuletzt}</div>
+      <div class="r"><div class="k">Link im Miro</div>${miro}</div>
+    </div>
+  </div>`;
+}
+
+document.addEventListener("click", async e => {
+  const f = e.target.closest("[data-f]");
+  if (f) { filter = f.dataset.f; zeigen(); return; }
+  const k = e.target.closest("[data-kopie]");
+  if (k) {
+    try { await navigator.clipboard.writeText(k.dataset.kopie); k.textContent = "✓ Kopiert"; }
+    catch { prompt("Link kopieren:", k.dataset.kopie); }
+    return;
+  }
+  const b = e.target.closest("[data-a]");
+  if (!b) return;
+  b.disabled = true; b.textContent = "Speichert …";
+  try {
+    const d = await api({ aktion: "cockpitSetzen", ziel: b.dataset.c, feld: b.dataset.a, wert: b.dataset.w });
+    if (!d.ok) throw new Error(d.fehler);
+    daten = d; merken("cockpit", d); zeigen();
+  } catch (err) {
+    b.disabled = false; b.textContent = "Nochmal versuchen";
+    alert("Das hat gerade nicht geklappt. " + (err.message || ""));
+  }
+});
+
+function hinweis(t){ $("hintText").textContent = t; $("hintCard").hidden = false; $("inhalt").hidden = true; }
+
+(async function(){
+  if (!getCode()) return hinweis("Öffne das Cockpit über deinen persönlichen Link.");
+  const alt = gemerkt("cockpit");
+  if (alt) { daten = alt; $("inhalt").hidden = false; zeigen(); }
+  else $("list").innerHTML = `<p class="muted">Wird geladen …</p>`, $("inhalt").hidden = false;
+  try {
+    const d = await api({ aktion: "cockpit" });
+    if (!d.ok) return hinweis(d.fehler || "Das Cockpit konnte nicht geladen werden.");
+    if (!d.cockpit) return hinweis("Fast geschafft: Damit das Cockpit Daten zeigt, muss das Google-Script noch einmal aktualisiert werden (neue Version bereitstellen).");
+    daten = d; merken("cockpit", d); $("inhalt").hidden = false; zeigen();
+  } catch {
+    if (!alt) hinweis("Das Cockpit konnte gerade nicht geladen werden. Lade die Seite gleich noch einmal neu.");
+  }
+})();
+</script>
+</body>
+</html>

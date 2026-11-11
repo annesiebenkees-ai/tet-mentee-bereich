@@ -256,6 +256,16 @@ const DASHBOARD = {
   .steps .ico{ display:inline-flex; vertical-align:-3px; width:16px; height:16px; color:var(--focus); }
   .app-tabs{ display:flex; gap:.375rem; margin:var(--s3) 0 0; }
   @media (max-width:640px){ .app-card{ grid-template-columns:1fr; } .phone{ display:none; } .row .t{ font-size:var(--t-sm); } }
+  /* Funnel-Mapping + Cockpit-Teaser */
+  .funnel, .cockpit-teaser{ display:flex; gap:var(--s4); align-items:flex-start; }
+  .funnel .ic, .cockpit-teaser .ic{ flex:none; width:44px; height:44px; border-radius:50%; background:var(--tint); display:flex; align-items:center; justify-content:center; font-size:1.25rem; }
+  .funnel h2, .cockpit-teaser h2{ margin:.125rem 0 .25rem; }
+  .funnel p{ margin-bottom:var(--s3); }
+  .funnel.offen{ border-left:4px solid var(--accent); }
+  .funnel.erledigt{ border-left:4px solid var(--ok); }
+  .cockpit-teaser{ text-decoration:none; color:inherit; align-items:center; border-left:4px solid var(--accent); }
+  .cockpit-teaser > div:nth-child(2){ flex:1; }
+  @media (max-width:640px){ .cockpit-teaser{ flex-wrap:wrap; } }
 </style>
 </head>
 <body>
@@ -296,6 +306,28 @@ const DASHBOARD = {
           <div class="acts">
             <a class="btn btn-primary" id="alarm-30" target="_blank" rel="noopener">Jetzt 30-Min-Termin buchen</a>
           </div>
+        </div>
+      </div>
+
+      <!-- Nur für Anne: Cockpit -->
+      <a class="card span cockpit-teaser" id="cockpitCard" hidden>
+        <div class="ic">📋</div>
+        <div>
+          <div class="eyebrow">Nur für dich, Anne</div>
+          <h2>Dein Mentee-<em>Cockpit</em></h2>
+          <p class="muted">Funnel-Mappings des Monats, wer zu lange keinen Termin hatte und bei wem der Link im Miro noch fehlt.</p>
+        </div>
+        <span class="btn btn-primary">Öffnen →</span>
+      </a>
+
+      <!-- Funnel-Mapping des Monats -->
+      <div class="card span funnel" id="funnelCard" hidden>
+        <div class="ic" id="fnIc">📊</div>
+        <div class="fn-body">
+          <div class="eyebrow" id="fnEyebrow">Funnel-Mapping</div>
+          <h2 id="fnTitel"></h2>
+          <p class="muted" id="fnText"></p>
+          <a class="btn btn-primary" id="fnBtn" target="_blank" rel="noopener" hidden>30-Min-Termin buchen</a>
         </div>
       </div>
 
@@ -543,7 +575,7 @@ async function loadPersonal(){
   if (alt) renderPersonal(alt);            // sofort den letzten Stand zeigen
   try {
     const d = await api({});
-    if (!d.ok) { setCode(""); ["myCard","exCard","who","topEx","alarmCard"].forEach(id => $(id).hidden = true); showHint(d.fehler); return; }
+    if (!d.ok) { setCode(""); ["myCard","exCard","who","topEx","alarmCard","funnelCard","cockpitCard"].forEach(id => $(id).hidden = true); showHint(d.fehler); return; }
     merken("dashboard", d);
     renderPersonal(d);
   } catch {
@@ -571,6 +603,30 @@ function renderPersonal(d){
       </div>
     </div>`;
   }).join("") : `<p class="muted">Aktuell hast du keinen Termin bei mir gebucht. Buch dir gleich hier unten deinen nächsten Termin. 💛</p>`;
+
+  // Nur für Anne: Link zum Cockpit
+  $("cockpitCard").hidden = !(d.ich && d.ich.team);
+  $("cockpitCard").href = withCode("cockpit.html");
+
+  // Funnel-Mapping des Monats
+  const fn = d.funnel;
+  $("funnelCard").hidden = !fn;
+  if (fn) {
+    const wann = iso => { const x = new Date(iso); return `${x.getDate()}. ${MONL[x.getMonth()]}`; };
+    $("funnelCard").className = "card span funnel " + fn.status;
+    $("fnEyebrow").textContent = "Funnel-Mapping · " + fn.monat;
+    $("fnIc").textContent = fn.status === "erledigt" ? "✅" : fn.status === "geplant" ? "📅" : "📊";
+    $("fnTitel").innerHTML = fn.status === "erledigt" ? "Funnel-Mapping <em>erledigt</em>"
+      : fn.status === "geplant" ? "Dein Funnel-Mapping ist <em>eingeplant</em>"
+      : `Diesen Monat noch <em>kein Funnel-Mapping</em>`;
+    $("fnText").textContent = fn.status === "erledigt"
+      ? `Wir haben deinen Funnel am ${wann(fn.letztes)} gemappt. Stark! Im nächsten Monat schauen wir wieder gemeinsam drauf.`
+      : fn.status === "geplant"
+      ? `In deinem Termin am ${wann(fn.termin)} mappen wir gemeinsam deinen Funnel. Bring gern deine aktuellen Zahlen mit.`
+      : `Einmal im Monat mappen wir gemeinsam deinen Funnel. So siehst du, was funktioniert und wo wir nachschärfen. Buch dir noch im ${fn.monat} deinen Termin.`;
+    $("fnBtn").hidden = fn.status !== "offen";
+    $("fnBtn").href = DASHBOARD.buchung.link30;
+  }
 
   // Rote Meldung
   if (t.alarm) {
