@@ -41,7 +41,17 @@ const EINSTELLUNGEN = {
   // Termin mehr im Monat gebucht hat, EINE Erinnerungs-Mail.
   FUNNEL_ERINNERUNG_AB_TAG: 15,
   // Wer das Cockpit (Übersicht über alle Mentees) sehen darf:
-  TEAM_STATUS: ['Team'],          // tägliche Prüfung gegen 8 Uhr morgens
+  TEAM_STATUS: ['Team'],
+
+  // Verdienst-Ticker (nur in deinem privaten Mentoring-Cockpit): Termine mit diesen Kürzeln im Titel.
+  VERGUETUNG: [
+    { kuerzel: '#noc',  euro: 50,  art: '1:1' },
+    { kuerzel: '#gcba', euro: 100, art: 'Gruppencall' },
+    { kuerzel: '#gcpr', euro: 100, art: 'Gruppencall' },
+  ],
+  // Steht eines dieser Wörter im Titel, wird der Betrag geteilt (Social Media Call mit Sam):
+  GETEILT_WORTE: ['Social Media Call'],
+  GETEILT_ANTEIL: 0.5,          // tägliche Prüfung gegen 8 Uhr morgens
   // ID der Tabelle „TET Mentee-Bereich“ (aus ihrer Adresse). Nötig, wenn das Script
   // als eigene Datei läuft; ist es direkt in der Tabelle eingebaut, wird diese genutzt.
   TABELLEN_ID: '1Y20RZgmugoX2ulqJSHY83ldEgvPJn_BUnGXTkZur9qI',
@@ -219,6 +229,11 @@ function antwort_(p) {
     if (p.aktion === 'beitragSchreiben') beitragSchreiben_(ich, p.beitrag || {});
     if (p.aktion === 'kommentarSchreiben') kommentarSchreiben_(ich, p.kommentar || {});
     if (p.aktion === 'loeschen') loeschen_(ich, p.art, p.id);
+    // Verdienst-Ticker fürs private Mentoring-Cockpit (nur dein Team-Code, nie auf der Mentee-Seite)
+    if (p.aktion === 'verdienst') {
+      if (!ich.team) return json_({ ok: false, fehler: 'Nur für Anne.' });
+      return json_({ ok: true, verdienst: verdienst_() });
+    }
     if (p.aktion === 'cockpit' || p.aktion === 'cockpitSetzen') {
       if (!ich.team) return json_({ ok: false, fehler: 'Das Cockpit ist nur für Anne.' });
       if (p.aktion === 'cockpitSetzen') cockpitSetzen_(p.ziel, p.feld, p.wert);
@@ -630,4 +645,47 @@ function cockpitSetzen_(code, feld, wert) {
   }
   if (feld === 'miro') setzen_(t, m.zeile, 'Link im Miro', wert ? 'ja' : '');
   MENTEES_MEMO = null;
+}
+
+/* ---------- Verdienst-Ticker (nur für Anne) ---------- */
+// Zählt deine bezahlten Termine im aktuellen und im letzten Monat aus dem Kalender.
+// Abgesagte (gelöschte) Termine fallen automatisch raus, abgelehnte Einladungen auch.
+function verdienst_() {
+  const cache = CacheService.getScriptCache();
+  const hit = cache.get('verdienst');
+  if (hit) return JSON.parse(hit);
+
+  const cal = EINSTELLUNGEN.KALENDER_ID === 'primary'
+    ? CalendarApp.getDefaultCalendar() : CalendarApp.getCalendarById(EINSTELLUNGEN.KALENDER_ID);
+  const jetzt = new Date();
+  const start = new Date(jetzt.getFullYear(), jetzt.getMonth(), 1);
+  const ende = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 1);
+  const vorStart = new Date(jetzt.getFullYear(), jetzt.getMonth() - 1, 1);
+  const geteilt = EINSTELLUNGEN.GETEILT_WORTE.map(w => w.toLowerCase());
+  const v = {
+    monat: MONATE[jetzt.getMonth()], vormonat: MONATE[vorStart.getMonth()],
+    verdient: 0, geplant: 0, vormonatSumme: 0,
+    anzahl: { einzel: 0, gruppe: 0, geteilt: 0 }, termine: [],
+  };
+  cal.getEvents(vorStart, ende).forEach(ev => {
+    const titel = ev.getTitle() || '';
+    const klein = titel.toLowerCase();
+    const regel = EINSTELLUNGEN.VERGUETUNG.find(r => klein.includes(r.kuerzel));
+    if (!regel) return;
+    try { if (ev.getMyStatus() === CalendarApp.GuestStatus.NO) return; } catch (_) {}
+    const istGeteilt = geteilt.some(w => klein.includes(w));
+    const euro = istGeteilt ? regel.euro * EINSTELLUNGEN.GETEILT_ANTEIL : regel.euro;
+    if (ev.getStartTime() < start) { v.vormonatSumme += euro; return; }
+    const vorbei = ev.getEndTime() <= jetzt;
+    if (vorbei) v.verdient += euro; else v.geplant += euro;
+    if (istGeteilt) v.anzahl.geteilt++; else if (regel.art === '1:1') v.anzahl.einzel++; else v.anzahl.gruppe++;
+    v.termine.push({
+      titel: titel.replace(/\s*#\w+/g, '').trim(), start: ev.getStartTime().toISOString(),
+      euro: euro, vorbei: vorbei, art: istGeteilt ? 'geteilt' : regel.art,
+    });
+  });
+  v.termine.sort((a, b) => a.start < b.start ? -1 : 1);
+  v.stand = jetzt.toISOString();
+  cache.put('verdienst', JSON.stringify(v), 600);
+  return v;
 }
