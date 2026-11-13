@@ -7,7 +7,11 @@
    Die alten Variablennamen (--ink, --slate, --tint …) bleiben als Aliase,
    damit die Seiten ohne Umbau die neuen Werte bekommen.
    ================================================================= */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@font-face{
+  font-family:"Manrope";
+  src:url("milchglas/manrope.ttf") format("truetype");
+  font-weight:200 800; font-style:normal; font-display:swap;
+}
 
 :root{
   /* --- Milchglas-Tokens --- */
@@ -102,18 +106,13 @@ h1 em, h2 em, h3 em{ color:var(--mg-text); font-weight:inherit; }
   box-shadow:0 1px 0 rgba(255,255,255,.7), 0 10px 30px rgba(70,60,140,.06);
 }
 .brand{ display:flex; align-items:center; gap:.625rem; text-decoration:none; min-width:0; }
-/* Logo-Platzhalter mit fester Größe: später nur die Datei tauschen
-   (tet-logo-hell.svg als background-image auf .wm, tet-zeichen-hell.svg auf .mark). */
-.brand .mark{ display:none; width:28px; height:28px; flex:none; border-radius:50%; background:var(--mg-text); position:relative; }
-.brand .mark::after{ content:""; position:absolute; right:5px; bottom:5px; width:7px; height:7px; border-radius:50%; background:var(--mg-akzent); }
+/* Logo (Pearl, hell): Wortmarke 148×30, unter 375px nur das Bildzeichen.
+   Der Text im HTML bleibt für Screenreader, sichtbar ist nur die Datei. */
+.brand .mark{ display:none; width:32px; height:32px; flex:none; background:url("milchglas/tet-zeichen-hell.svg") no-repeat center/contain; }
 .brand .wm{
-  display:inline-flex; align-items:center; width:148px; height:30px; flex:none; overflow:hidden;
-  font-size:0; background:no-repeat left center/contain;
+  display:block; width:148px; height:30px; flex:none; overflow:hidden; text-indent:200%; white-space:nowrap;
+  background:url("milchglas/tet-logo-hell.svg") no-repeat left center/contain;
 }
-.brand .wm::before{
-  content:"the escape theory"; font-size:1.0625rem; font-weight:800; letter-spacing:-.03em; color:var(--mg-text); white-space:nowrap;
-}
-.brand .wm::after{ content:""; width:7px; height:7px; border-radius:50%; background:var(--mg-akzent); margin-left:2px; align-self:flex-end; margin-bottom:9px; box-shadow:0 0 0 1px rgba(22,20,31,.12); }
 .topbar .sep{ width:1px; height:24px; background:var(--mg-linie); flex:none; }
 .topbar .ctx{ font-weight:700; font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--mg-text-leise); white-space:nowrap; }
 .topbar .spacer{ flex:1; }
