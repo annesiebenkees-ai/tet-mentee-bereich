@@ -4,43 +4,42 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>The Escape Theory · Mentee-Cockpit</title>
-<meta name="theme-color" content="#FAFCFD" />
+<meta name="theme-color" content="#ECEAF4" />
 <meta name="robots" content="noindex" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" href="icons/icon-192.png" />
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" href="milchglas/manrope.ttf" as="font" type="font/ttf" crossorigin />
 <link rel="stylesheet" href="escape-os.css" />
 <style>
   .hero{ padding:var(--s8) 0 calc(var(--s12) + 30px); }
   .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:var(--s4); margin-bottom:var(--s6); }
   @media (max-width:820px){ .stats{ grid-template-columns:repeat(2,1fr); } }
-  .stat{ background:var(--paper); border:1px solid var(--hair); border-radius:var(--r-lg); padding:var(--s4) var(--s5); box-shadow:var(--sh-1); cursor:pointer; text-align:left; font:inherit; color:inherit; }
-  .stat:hover{ border-color:var(--deep); }
-  .stat .n{ font-family:var(--serif); font-size:2.25rem; font-weight:600; line-height:1; color:var(--ink); }
+  .stat{ background:var(--mg-glas); border:1px solid var(--mg-glas-linie); border-radius:var(--r-lg); padding:var(--s4) var(--s5); box-shadow:var(--mg-glas-schatten); backdrop-filter:var(--mg-unschaerfe); -webkit-backdrop-filter:var(--mg-unschaerfe); cursor:pointer; text-align:left; font:inherit; color:inherit; }
+  .stat:hover{ background:var(--mg-glas-stark); }
+  .stat .n{ font-size:2.25rem; font-weight:800; letter-spacing:-.03em; line-height:1; color:var(--ink); }
   .stat .l{ font-size:var(--t-sm); color:var(--slate); margin-top:.375rem; }
-  .stat.warn .n{ color:var(--accent-deep); }
+  .stat.warn .n{ color:var(--mg-gefahr); }
   .stat.ok .n{ color:var(--ok); }
   .filter{ margin-bottom:var(--s5); }
   .list{ display:grid; gap:var(--s3); }
-  .m{ background:var(--paper); border:1px solid var(--hair); border-radius:var(--r-lg); padding:var(--s4) var(--s5); box-shadow:var(--sh-1); }
-  .m.todo{ border-left:4px solid var(--accent); }
+  .m{ background:var(--mg-glas); border:1px solid var(--mg-glas-linie); border-radius:var(--r-lg); padding:var(--s4) var(--s5); box-shadow:var(--mg-glas-schatten); backdrop-filter:var(--mg-unschaerfe); -webkit-backdrop-filter:var(--mg-unschaerfe); }
+  .m.todo{ background:var(--mg-glas-stark); }
   .m-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:.25rem var(--s3); margin-bottom:var(--s3); }
-  .m-name{ font-family:var(--serif); font-weight:600; font-size:var(--t-h3); color:var(--ink); }
+  .m-name{ font-weight:700; letter-spacing:-.02em; font-size:var(--t-h3); color:var(--ink); }
   .m-meta{ font-size:var(--t-sm); color:var(--slate); }
   .m-rows{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--s3); }
   @media (max-width:820px){ .m-rows{ grid-template-columns:1fr; } }
-  .r{ background:var(--bg); border-radius:var(--r-md); padding:var(--s3); font-size:var(--t-sm); display:flex; flex-direction:column; gap:.375rem; }
-  .r .k{ font-family:var(--mono); font-size:.625rem; letter-spacing:.16em; text-transform:uppercase; color:var(--slate); }
+  .r{ background:var(--mg-weich); border-radius:var(--r-md); padding:var(--s3); font-size:var(--t-sm); display:flex; flex-direction:column; gap:.375rem; }
+  .r .k{ font-weight:700; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--slate); }
   .r .v{ color:var(--ink); }
   .r .v.bad{ color:var(--danger); font-weight:500; }
   .r .v.good{ color:var(--ok); font-weight:500; }
   .r .v.mid{ color:var(--accent-deep); font-weight:500; }
   .r .acts{ display:flex; flex-wrap:wrap; gap:.375rem; margin-top:auto; }
-  .mini{ font:inherit; font-size:.75rem; padding:.3rem .7rem; border-radius:var(--r-pill); border:1px solid var(--hair); background:var(--paper); color:var(--ink); cursor:pointer; text-decoration:none; }
-  .mini:hover{ border-color:var(--deep); }
-  .mini.primary{ background:var(--ink); border-color:var(--ink); color:#fff; }
+  .mini{ font:inherit; font-size:.8125rem; font-weight:700; min-height:34px; padding:.3rem .85rem; border-radius:var(--r-pill); border:0; background:var(--mg-flaeche); color:var(--ink); cursor:pointer; text-decoration:none; }
+  .mini:hover{ background:#fff; }
+  .mini.primary{ background:var(--ink); color:var(--mg-text-auf-dunkel); }
   .mini:disabled{ opacity:.5; cursor:wait; }
   .undo{ background:none; border:0; padding:0; font:inherit; font-size:.75rem; color:var(--slate); text-decoration:underline; cursor:pointer; }
   .leer{ text-align:center; padding:var(--s8) var(--s4); color:var(--slate); }

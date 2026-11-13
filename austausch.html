@@ -4,15 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>The Escape Theory · Austausch-Portal</title>
-<meta name="theme-color" content="#FAFCFD" />
+<meta name="theme-color" content="#ECEAF4" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" type="image/png" href="icons/icon-192.png" />
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="TET Mentees" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" href="milchglas/manrope.ttf" as="font" type="font/ttf" crossorigin />
 <link rel="stylesheet" href="escape-os.css" />
 <style>
   .hero{ padding:var(--s8) 0 calc(var(--s12) + 30px); }
@@ -20,15 +19,16 @@
   .side{ position:sticky; top:76px; display:flex; flex-direction:column; gap:var(--s4); }
   @media (max-width:900px){ .layout{ grid-template-columns:1fr; } .side{ display:none; } }
 
-  .seg{ display:inline-flex; background:var(--white); border:1px solid var(--hair); border-radius:var(--r-pill); padding:3px; box-shadow:var(--sh-1); margin-bottom:var(--s5); }
+  .seg{ display:inline-flex; background:var(--mg-glas-stark); border:1px solid var(--mg-glas-linie); border-radius:var(--r-pill); padding:4px; box-shadow:var(--mg-glas-schatten); margin-bottom:var(--s5); }
   .seg button{ border:0; background:none; cursor:pointer; padding:.5rem 1.125rem; border-radius:var(--r-pill); font-weight:600; font-size:var(--t-sm); color:var(--slate); transition:all var(--fast) var(--ease); }
-  .seg button.is-on{ background:var(--tint); color:var(--ink); box-shadow:inset 0 0 0 1px var(--deep); }
+  .seg button{ min-height:40px; }
+  .seg button.is-on{ background:var(--mg-text); color:var(--mg-text-auf-dunkel); font-weight:700; }
 
   /* Composer */
   .composer .top{ display:flex; gap:var(--s3); align-items:flex-start; }
   .composer textarea{ min-height:96px; }
   .composer .bar{ display:flex; flex-wrap:wrap; gap:var(--s3); align-items:center; justify-content:space-between; margin-top:var(--s3); }
-  .composer .lbl{ font-family:var(--mono); font-size:.625rem; letter-spacing:.16em; text-transform:uppercase; color:var(--slate); margin:var(--s3) 0 var(--s2); }
+  .composer .lbl{ font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--slate); margin:var(--s3) 0 var(--s2); }
 
   /* Feed */
   .filters{ display:flex; flex-wrap:wrap; gap:.5rem; margin:var(--s5) 0 var(--s4); }
@@ -61,14 +61,14 @@
   .pf{ display:flex; flex-direction:column; gap:var(--s2); }
   .pf.me{ border-color:var(--accent-tint); background:linear-gradient(180deg,var(--accent-soft),var(--white) 40%); }
   .pf .head{ display:flex; gap:var(--s3); align-items:center; margin-bottom:var(--s2); }
-  .pf .nm{ font-family:var(--serif); font-weight:600; font-size:var(--t-lg); color:var(--ink); line-height:1.2; }
+  .pf .nm{ font-weight:600; font-size:var(--t-lg); color:var(--ink); line-height:1.2; }
   .pf .biz{ font-size:var(--t-sm); color:var(--slate); }
-  .pf .lbl{ font-family:var(--mono); font-size:.5625rem; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-deep); margin-top:var(--s2); }
+  .pf .lbl{ font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent-deep); margin-top:var(--s2); }
   .pf p{ font-size:var(--t-sm); white-space:pre-line; }
   .pf .links{ display:flex; flex-wrap:wrap; gap:var(--s2); margin-top:auto; padding-top:var(--s3); }
 
   .side .card{ padding:var(--s5); }
-  .side h3{ font-family:var(--serif); font-weight:600; font-size:var(--t-lg); color:var(--ink); margin-bottom:var(--s2); }
+  .side h3{ font-weight:600; font-size:var(--t-lg); color:var(--ink); margin-bottom:var(--s2); }
   .side ul{ margin:0; padding-left:1.1rem; font-size:var(--t-sm); color:var(--body); }
   .side li{ margin-bottom:.25rem; }
   .empty{ text-align:center; padding:var(--s10) var(--s5); }
@@ -121,7 +121,7 @@
             <div class="chips" id="katPick"></div>
             <div class="bar">
               <span class="muted" id="postMsg"></span>
-              <button class="btn btn-primary" type="submit" id="postBtn">Posten</button>
+              <button class="btn btn-haupt" type="submit" id="postBtn">Posten</button>
             </div>
           </form>
 

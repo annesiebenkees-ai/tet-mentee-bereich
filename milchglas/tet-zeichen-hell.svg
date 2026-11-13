@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="cleanBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ECEAF4" stop-opacity=".18"/>
+      <stop offset=".35" stop-color="#ECEAF4" stop-opacity=".025"/>
+      <stop offset=".58" stop-color="#16141F" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity=".32"/>
+    </linearGradient>
+    <radialGradient id="cleanSheen" cx=".42" cy="-.15" r=".97" gradientTransform="translate(0 .035) scale(1 .77)">
+      <stop offset="0" stop-color="#ECEAF4" stop-opacity=".37"/>
+      <stop offset=".31" stop-color="#ECEAF4" stop-opacity=".19"/>
+      <stop offset=".61" stop-color="#ECEAF4" stop-opacity=".045"/>
+      <stop offset=".88" stop-color="#ECEAF4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cleanEdge" x1="0" y1="0" x2=".25" y2="1">
+      <stop offset="0" stop-color="#ECEAF4" stop-opacity=".32"/>
+      <stop offset=".20" stop-color="#ECEAF4" stop-opacity=".11"/>
+      <stop offset=".58" stop-color="#ECEAF4" stop-opacity=".015"/>
+      <stop offset="1" stop-color="#ECEAF4" stop-opacity=".06"/>
+    </linearGradient>
+    <linearGradient id="cleanLimeBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ECEAF4" stop-opacity=".18"/>
+      <stop offset=".42" stop-color="#D7F25A" stop-opacity="0"/>
+      <stop offset="1" stop-color="#16141F" stop-opacity=".12"/>
+    </linearGradient>
+    <radialGradient id="cleanLimeSheen" cx=".41" cy="-.21" r=".94" gradientTransform="translate(0 .04) scale(1 .75)">
+      <stop offset="0" stop-color="#ECEAF4" stop-opacity=".52"/>
+      <stop offset=".35" stop-color="#ECEAF4" stop-opacity=".22"/>
+      <stop offset=".70" stop-color="#ECEAF4" stop-opacity=".025"/>
+      <stop offset="1" stop-color="#ECEAF4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cleanLimeGlint" x1="0" y1="0" x2="1" y2=".7">
+      <stop offset="0" stop-color="#ECEAF4" stop-opacity=".78"/>
+      <stop offset=".52" stop-color="#ECEAF4" stop-opacity=".30"/>
+      <stop offset="1" stop-color="#ECEAF4" stop-opacity=".03"/>
+    </linearGradient>
+    <filter id="cleanShadow" x="-.2" y="-.2" width="1.4" height="1.5" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy=".45" stdDeviation=".40" flood-color="#16141F" flood-opacity=".16"/>
+    </filter>
+    <symbol id="cleanTile" viewBox="0 0 14 14">
+      <rect width="14" height="14" rx="4.5" fill="#16141F"/>
+      <rect width="14" height="14" rx="4.5" fill="url(#cleanBody)"/>
+      <rect width="14" height="14" rx="4.5" fill="url(#cleanSheen)"/>
+      <rect x=".075" y=".075" width="13.85" height="13.85" rx="4.425" fill="none" stroke="url(#cleanEdge)" stroke-width=".15"/>
+    </symbol>
+    <symbol id="cleanMark" viewBox="0 0 48 48">
+      <g filter="url(#cleanShadow)">
+        <use href="#cleanTile" x="7" y="15" width="14" height="14"/>
+        <use href="#cleanTile" x="7" y="33" width="14" height="14"/>
+        <use href="#cleanTile" x="25" y="33" width="14" height="14"/>
+        <g transform="rotate(14 35 13)" filter="url(#limeContact)">
+          <rect x="27" y="5" width="16" height="16" rx="5.5" fill="#D7F25A"/>
+          <rect x="27" y="5" width="16" height="16" rx="5.5" fill="url(#cleanLimeBody)"/>
+          <rect x="27" y="5" width="16" height="16" rx="5.5" fill="url(#cleanLimeSheen)"/>
+          <rect x="27.06" y="5.06" width="15.88" height="15.88" rx="5.44" fill="none" stroke="#16141F" stroke-opacity=".10" stroke-width=".12"/><path d="M27.65 10.5C27.65 7.6 30.1 5.65 33.1 5.65H36.9C39.2 5.65 41.1 6.9 41.9 9" fill="none" stroke="url(#cleanLimeGlint)" stroke-width=".17" stroke-linecap="round"/>
+        </g>
+      </g>
+    </symbol>
+  <filter id="limeContact" x="-.25" y="-.25" width="1.5" height="1.6" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy=".35" stdDeviation=".40" flood-color="#16141F" flood-opacity=".08"/></filter></defs>
+  <use href="#cleanMark" width="48" height="48"/>
+</svg>
