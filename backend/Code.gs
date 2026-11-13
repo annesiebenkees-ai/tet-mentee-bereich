@@ -232,7 +232,7 @@ function antwort_(p) {
     // Verdienst-Ticker fürs private Mentoring-Cockpit (nur dein Team-Code, nie auf der Mentee-Seite)
     if (p.aktion === 'verdienst') {
       if (!ich.team) return json_({ ok: false, fehler: 'Nur für Anne.' });
-      return json_({ ok: true, verdienst: verdienst_() });
+      return json_({ ok: true, verdienst: verdienst_(p.frisch === true) });
     }
     if (p.aktion === 'cockpit' || p.aktion === 'cockpitSetzen') {
       if (!ich.team) return json_({ ok: false, fehler: 'Das Cockpit ist nur für Anne.' });
@@ -650,9 +650,9 @@ function cockpitSetzen_(code, feld, wert) {
 /* ---------- Verdienst-Ticker (nur für Anne) ---------- */
 // Zählt deine bezahlten Termine im aktuellen und im letzten Monat aus dem Kalender.
 // Abgesagte (gelöschte) Termine fallen automatisch raus, abgelehnte Einladungen auch.
-function verdienst_() {
+function verdienst_(frisch) {
   const cache = CacheService.getScriptCache();
-  const hit = cache.get('verdienst');
+  const hit = frisch ? null : cache.get('verdienst');
   if (hit) return JSON.parse(hit);
 
   const cal = EINSTELLUNGEN.KALENDER_ID === 'primary'
