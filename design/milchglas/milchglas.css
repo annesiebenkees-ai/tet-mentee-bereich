@@ -1,0 +1,318 @@
+/* =====================================================================
+   Design Milchglas (DESIGN.md der Marke vom 28.10.2026), Auftrag „Studio in Milchglas“ vom 06.11.2026.
+   Beschreibung: docs/kreise/grundlage.md, Abschnitt „Design Milchglas hinter dem Schalter“ und `grundlage.design-schalter`.
+
+   JEDE Regel hier steht unter [data-design="milchglas"]. Das Attribut setzt nur client/src/grundlage/design.js,
+   und nur, wenn die Adresse ?design=milchglas traegt (oder der Tab es sich gemerkt hat). Ohne Attribut greift keine
+   Zeile dieser Datei: das bisherige Design bleibt pixelgleich. Nie Werte auf :root legen (grund.css bleibt unveraendert),
+   nie Regeln ohne den Attribut-Selektor. Ausnahme: @font-face, das nur Schriften bereitstellt und nichts verwendet.
+
+   Nicht angefasst, auch nicht unter dem Schalter: die Farben der Kundin, Marke, Karussell-Vorschauen, gerechnete
+   Bilder und Videos. Dort stehen feste Farben im Inhalt, die Rollen dieser Datei greifen nur in die Huelle.
+
+   Aufbau: erst Schrift und die Werte nach Rolle (die vorhandenen Namen --water, --ink … werden neu belegt, dazu die
+   --mg-* fuer die Kreise), dann Grund, dann Huelle, Bausteine, Handy.
+   ===================================================================== */
+
+/* ---------- Schrift: nur Manrope, selbst gehostet (SIL Open Font License, OFL.txt im Ordner milchglas/) ---------- */
+@font-face {
+  font-family: "Manrope";
+  src: url("./milchglas/manrope.ttf") format("truetype");
+  font-weight: 200 800; font-style: normal; font-display: swap;
+}
+
+/* ---------- Werte nach Rolle ----------
+   Die Kreise stellen ihre festen Farben so um: var(--mg-text, #36444e). Der Rueckfall ist die bisherige Farbe, ohne
+   Schalter gilt sie unveraendert. */
+[data-design="milchglas"] {
+  /* Grund */
+  --mg-grund: #ECEAF4;            /* Lilac Fog */
+  --mg-grund-deckend: #F7F6FB;    /* Flaeche, wo nichts durchscheinen darf */
+  /* Flaechen und Glas */
+  --mg-flaeche: rgba(255, 255, 255, .85);
+  --mg-glas: linear-gradient(140deg, rgba(255, 255, 255, .74), rgba(255, 255, 255, .52));
+  --mg-glas-stark: linear-gradient(140deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .72));
+  --mg-glas-linie: rgba(255, 255, 255, .85);
+  --mg-glas-schatten: inset 0 1px 0 rgba(255, 255, 255, .95), 0 18px 48px rgba(70, 60, 140, .10);
+  --mg-glas-schatten-stark: inset 0 1px 0 rgba(255, 255, 255, .95), 0 28px 70px rgba(70, 60, 140, .18);
+  --mg-unschaerfe: blur(26px) saturate(165%);
+  --mg-dunkel: linear-gradient(180deg, #2A2636 0%, #18161F 34%, #111018 100%);
+  --mg-dunkel-linie: rgba(255, 255, 255, .20);
+  --mg-weich: rgba(22, 20, 31, .06);        /* Pillen, Icon-Grund, Platzhalter */
+  --mg-weich-stark: rgba(22, 20, 31, .10);
+  /* Text */
+  --mg-text: #16141F;             /* Tinte */
+  --mg-text-leise: #5B5770;       /* Zweittext */
+  --mg-text-auftakt: #8A86A0;     /* nur Auftakt einer Ueberschrift, Platzhalter */
+  --mg-text-auf-dunkel: #ECEAF4;
+  --mg-text-auf-dunkel-leise: rgba(236, 234, 244, .70);
+  /* Linien */
+  --mg-linie: rgba(22, 20, 31, .10);
+  --mg-linie-leicht: rgba(22, 20, 31, .06);
+  --mg-feld-rand: rgba(22, 20, 31, .12);
+  --mg-feld-rand-hover: rgba(22, 20, 31, .22);
+  /* Akzent: Lime nur fuer die eine Handlung, als Textfarbe dient immer Tinte */
+  --mg-akzent: #D7F25A;
+  --mg-auf-akzent: #16141F;
+  --mg-akzent-knopf: linear-gradient(180deg, #E8FA8C 0%, #D7F25A 52%, #C4E13A 100%);
+  /* Licht (nur als weiches Licht hinter dem Glas, nie Text, nie Flaeche) */
+  --mg-licht-lavendel: rgba(201, 195, 230, 1);
+  --mg-licht-violett: rgba(123, 116, 242, .30);
+  --mg-licht-lime: rgba(215, 242, 90, .50);
+  /* Zustaende */
+  --mg-gefahr: #B42318;  --mg-gefahr-grund: #F8D7D3;  --mg-gefahr-rand: rgba(180, 35, 24, .28);
+  --mg-ok: #2F7D4A;      --mg-ok-grund: #DCEFD9;
+  --mg-laeuft-grund: rgba(201, 195, 230, .55);  /* „laeuft“: Lavendel statt Blau */
+  --mg-fokus: #16141F;   --mg-fokus-ring: rgba(22, 20, 31, .18);
+  /* Ecken und Schatten */
+  --mg-r-feld: 14px;  --mg-r-karte: 24px;  --mg-r-gross: 28px;  --mg-r-rund: 999px;
+  --mg-sh-leicht: 0 1px 2px rgba(70, 60, 140, .05), 0 6px 18px rgba(70, 60, 140, .06);
+
+  /* Die vorhandenen Namen der Huelle, nach Rolle neu belegt (nicht Farbe gegen Farbe) */
+  --water: #C9C3E6;               /* Lavendel: zarte Flaechen, Linien in Zitaten */
+  --deep: #16141F;
+  --tint: #EFEDF6;                /* Fuellrolle (Hover); deckend, weil sticky Teile sonst durchscheinen */
+  --paper: #F7F6FB;
+  --white: #FFFFFF;
+  --ink: #16141F; --body: #16141F; --slate: #5B5770;
+  --accent: #D7F25A; --accent-deep: #16141F;
+  --accent-tint: rgba(215, 242, 90, .35); --accent-soft: rgba(215, 242, 90, .18);
+  --hair: rgba(22, 20, 31, .10); --hair2: rgba(22, 20, 31, .06);
+  --focus: #16141F; --focus-ring: rgba(22, 20, 31, .18);
+  --danger: #B42318; --danger-tint: #F8D7D3;
+  --ok: #2F7D4A; --ok-tint: #DCEFD9;
+  /* Schrift: nur Manrope, keine Mono, keine zweite Schrift */
+  --serif: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sans: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r-xs: 8px; --r-sm: 12px; --r-md: 16px; --r-lg: 24px; --r-xl: 28px;
+  --sh-1: var(--mg-sh-leicht);
+  --sh-2: var(--mg-glas-schatten);
+  --sh-3: var(--mg-glas-schatten-stark);
+  --sh-accent: 0 8px 20px rgba(120, 140, 30, .22);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  color-scheme: light;
+}
+
+/* ---------- Grund: Lilac Fog mit drei weichen Lichtern ----------
+   Das Studio laeuft im iframe und sieht nicht, was im Portal dahinter liegt: Das Licht zeichnet es selbst, fest hinter
+   allem (position: fixed, ein Pseudo-Element, damit iOS keinen fixierten Hintergrund braucht). */
+[data-design="milchglas"] { background: var(--mg-grund); }
+[data-design="milchglas"] body { background: transparent; color: var(--mg-text); font-weight: 500; }
+[data-design="milchglas"] body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(70vmax 70vmax at -10% -20%, var(--mg-licht-lavendel), transparent 60%),
+    radial-gradient(55vmax 55vmax at 110% 30%, var(--mg-licht-violett), transparent 62%),
+    radial-gradient(60vmax 60vmax at 40% 130%, var(--mg-licht-lime), transparent 62%),
+    var(--mg-grund);
+}
+[data-design="milchglas"] ::selection { background: rgba(215, 242, 90, .55); color: var(--mg-text); }
+
+/* ---------- Schrift ---------- */
+[data-design="milchglas"] :is(h1, h2, h3, h4) { font-family: var(--sans); font-weight: 700; letter-spacing: -.02em; color: var(--mg-text); }
+[data-design="milchglas"] h1 { font-size: clamp(1.75rem, 1.2vw + 1.25rem, 2.5rem); letter-spacing: -.028em; line-height: 1.07; }
+[data-design="milchglas"] :is(h1, h2) em { font-style: normal; }
+[data-design="milchglas"] h3 { font-weight: 700; }
+[data-design="milchglas"] .leise, [data-design="milchglas"] .still { color: var(--mg-text-leise); }
+/* Etiketten: 14 px, 700, Grossbuchstaben erlaubt, .08em, grau, ohne Akzentpunkt */
+[data-design="milchglas"] :is(.kennung, .weg-gruppe > .name, .flaeche .c-kennung, .klein) {
+  font-family: var(--sans); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--mg-text-leise);
+}
+[data-design="milchglas"] :is(.kennung, .flaeche .c-kennung) { font-size: .8125rem; }
+[data-design="milchglas"] .weg-gruppe > .name { font-size: .75rem; }
+[data-design="milchglas"] .kennung::before { display: none; }
+[data-design="milchglas"] .kopfzeile .wer { font-family: var(--sans); font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--mg-text-leise); }
+[data-design="milchglas"] .punkte .zahl { font-family: var(--sans); font-weight: 600; letter-spacing: 0; color: var(--mg-text-leise); }
+[data-design="milchglas"] .kopf p { color: var(--mg-text-leise); }
+[data-design="milchglas"] :focus-visible { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--mg-fokus); }
+
+/* ---------- Kopfzeile: Glas, Logo ---------- */
+[data-design="milchglas"] .kopfzeile {
+  background: rgba(236, 234, 244, .84); border-bottom: 0;
+  -webkit-backdrop-filter: var(--mg-unschaerfe); backdrop-filter: var(--mg-unschaerfe);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .7), 0 10px 30px rgba(70, 60, 140, .06);
+}
+/* Das TET-Logo in der Marke Milchglas (Pearl, hell), die fertige Datei unveraendert; die Wortmarke bleibt fuer Vorleser da. */
+[data-design="milchglas"] .marke-zeichen { width: 148px; height: 30px; background: url("./milchglas/tet-logo-hell.svg") no-repeat left center / contain; }
+[data-design="milchglas"] .wortmarke { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+[data-design="milchglas"] .kopfzeile .trenner { background: var(--mg-linie); }
+[data-design="milchglas"] .menue { border: 0; border-radius: var(--mg-r-rund); background: var(--mg-weich); }
+
+/* ---------- Leiste: Glas, Eintraege ganz rund, der aktive in Tinte ---------- */
+[data-design="milchglas"] .leiste {
+  background: var(--mg-glas-stark); border: 1px solid var(--mg-glas-linie); border-left: 0; border-top: 0; border-bottom: 0;
+  box-shadow: var(--mg-glas-schatten);
+  -webkit-backdrop-filter: var(--mg-unschaerfe); backdrop-filter: var(--mg-unschaerfe);
+}
+[data-design="milchglas"] .weg { border-radius: var(--mg-r-rund); font-size: .90625rem; font-weight: 600; color: var(--mg-text-leise); min-height: 40px; }
+[data-design="milchglas"] .weg svg, [data-design="milchglas"] .weg:hover svg { color: currentColor; }
+[data-design="milchglas"] .weg:hover { background: rgba(22, 20, 31, .05); color: var(--mg-text); }
+[data-design="milchglas"] .weg.aktiv { background: var(--mg-text); color: var(--mg-text-auf-dunkel); font-weight: 700; }
+[data-design="milchglas"] .weg.aktiv svg { color: currentColor; }
+[data-design="milchglas"] .weg.aktiv::before { display: none; }
+[data-design="milchglas"] .weg.spaeter-weg, [data-design="milchglas"] .weg.spaeter-weg svg { color: var(--mg-text-leise); }
+[data-design="milchglas"] .weg .spaeter { font-family: var(--sans); font-size: .6875rem; font-weight: 700; letter-spacing: 0; border-color: var(--mg-linie); color: inherit; }
+[data-design="milchglas"] .leiste-fuss { border-top-color: var(--mg-linie); color: var(--mg-text-leise); }
+[data-design="milchglas"] .studio.offen .schleier { background: rgba(22, 20, 31, .32); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+
+/* ---------- Flaechen und Karten: Glas ---------- */
+[data-design="milchglas"] :is(.flaeche, .schritt, .cta-karte, .app-hinweis, .schluessel-hinweis, .meldung) {
+  background: var(--mg-glas); border: 1px solid var(--mg-glas-linie); box-shadow: var(--mg-glas-schatten);
+  -webkit-backdrop-filter: var(--mg-unschaerfe); backdrop-filter: var(--mg-unschaerfe);
+}
+[data-design="milchglas"] .flaeche { border-radius: var(--mg-r-karte); }
+[data-design="milchglas"] .cta-karte { border-radius: var(--mg-r-karte); }
+[data-design="milchglas"] .schritt { border-radius: var(--mg-r-karte); }
+[data-design="milchglas"] a.flaeche:hover, [data-design="milchglas"] .flaeche.waehlbar:hover { background: var(--mg-glas-stark); border-color: var(--mg-glas-linie); box-shadow: var(--mg-glas-schatten-stark); }
+[data-design="milchglas"] .flaeche > h2 + p, [data-design="milchglas"] .flaeche .erklaerung { color: var(--mg-text-leise); }
+[data-design="milchglas"] .leer {
+  background: var(--mg-glas); border: 1.5px dashed rgba(22, 20, 31, .18); border-radius: var(--mg-r-karte);
+  -webkit-backdrop-filter: var(--mg-unschaerfe); backdrop-filter: var(--mg-unschaerfe);
+}
+[data-design="milchglas"] .leer p { color: var(--mg-text-leise); }
+/* Schritte: die Nummer in einem ruhigen Feld, fertig in Lime */
+[data-design="milchglas"] .schritt .abschnitt { font-family: var(--sans); font-weight: 800; color: var(--mg-text); background: var(--mg-weich); border-right: 1px solid var(--mg-linie); }
+[data-design="milchglas"] .schritt.fertig .abschnitt { background: var(--mg-akzent); color: var(--mg-auf-akzent); border-right-color: var(--mg-linie); }
+[data-design="milchglas"] .schritt p { color: var(--mg-text-leise); }
+/* Hinweise der Huelle */
+[data-design="milchglas"] .schluessel-hinweis { border-left: 1px solid var(--mg-glas-linie); border-radius: var(--mg-r-karte); color: var(--mg-text); }
+[data-design="milchglas"] .app-hinweis { border-left: 1px solid var(--mg-glas-linie); border-radius: var(--mg-r-karte); color: var(--mg-text); }
+[data-design="milchglas"] .hinweis { border-radius: var(--mg-r-feld); }
+[data-design="milchglas"] .hinweis.fehler { background: var(--mg-gefahr-grund); color: var(--mg-gefahr); border-color: var(--mg-gefahr-rand); }
+[data-design="milchglas"] .hinweis.gut { background: var(--mg-ok-grund); color: var(--mg-ok); }
+[data-design="milchglas"] .abschnitt blockquote { background: var(--mg-flaeche); border-left-color: var(--mg-licht-lavendel); font-family: var(--sans); font-style: normal; font-weight: 500; }
+
+/* ---------- Knoepfe: ganz rund, 700 ---------- */
+[data-design="milchglas"] .knopf { border-radius: var(--mg-r-rund); font-weight: 700; --bg: var(--mg-flaeche); --fg: var(--mg-text); --bd: var(--mg-feld-rand); }
+[data-design="milchglas"] .knopf.gross { border-radius: var(--mg-r-rund); }
+/* Hauptknopf „Lime wie Glas“: Lime mit Tinte-Schrift, nie Weiss auf Lime. Ohne Punkt-Welle und Funken (Studio braucht sie nicht). */
+[data-design="milchglas"] .knopf.haupt {
+  --bd: transparent; color: var(--mg-auf-akzent); background: var(--mg-akzent-knopf); min-height: 44px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), inset 0 -2px 4px rgba(70, 90, 0, .16), 0 0 0 1px rgba(22, 20, 31, .08), 0 8px 20px rgba(120, 140, 30, .24);
+}
+[data-design="milchglas"] .knopf.haupt:hover { filter: none; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), inset 0 -2px 4px rgba(70, 90, 0, .16), 0 0 0 1px rgba(22, 20, 31, .08), 0 12px 28px rgba(120, 140, 30, .34); }
+[data-design="milchglas"] .knopf.haupt:focus-visible { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--mg-fokus); }
+[data-design="milchglas"] .knopf.zweit { --bd: var(--mg-feld-rand); box-shadow: 0 1px 2px rgba(22, 20, 31, .04); }
+[data-design="milchglas"] .knopf.zweit:hover { background: #fff; border-color: var(--mg-feld-rand-hover); }
+[data-design="milchglas"] .knopf.still { --bg: transparent; --fg: var(--mg-text); --bd: transparent; }
+[data-design="milchglas"] .knopf.still:hover { background: var(--mg-weich); color: var(--mg-text); }
+[data-design="milchglas"] .knopf.gefahr { --fg: var(--mg-gefahr); --bd: var(--mg-gefahr-rand); }
+[data-design="milchglas"] .knopf.gefahr:hover { background: var(--mg-gefahr-grund); }
+
+/* ---------- Felder: Ecke 14, Rand Tinte 12 %, Weiss 85 % ---------- */
+[data-design="milchglas"] .eingabe {
+  border: 1px solid var(--mg-feld-rand); border-radius: var(--mg-r-feld); background: var(--mg-flaeche); font-weight: 500; color: var(--mg-text);
+}
+[data-design="milchglas"] .eingabe::placeholder { color: var(--mg-text-auftakt); }
+[data-design="milchglas"] .eingabe:hover { border-color: var(--mg-feld-rand-hover); }
+[data-design="milchglas"] .eingabe:focus { border-color: var(--mg-fokus); box-shadow: 0 0 0 3px var(--mg-fokus-ring); background: #fff; }
+[data-design="milchglas"] .eingabe:disabled { background: rgba(22, 20, 31, .04); color: var(--mg-text-leise); }
+[data-design="milchglas"] .feld .hilfe { color: var(--mg-text-leise); }
+[data-design="milchglas"] .feld .falsch { color: var(--mg-gefahr); }
+[data-design="milchglas"] .farbfeld input[type="color"] { border: 1px solid var(--mg-feld-rand); border-radius: var(--mg-r-feld); background: var(--mg-flaeche); }
+[data-design="milchglas"] :is(input[type="checkbox"], input[type="radio"]) { accent-color: #16141F; }
+
+/* ---------- Stand-Pillen: normale Schreibweise, 700 ---------- */
+[data-design="milchglas"] .stand { font-family: var(--sans); font-size: .75rem; font-weight: 700; letter-spacing: 0; text-transform: none; }
+[data-design="milchglas"] .stand.gut { background: var(--mg-ok-grund); color: var(--mg-ok); }
+[data-design="milchglas"] .stand.offen { background: transparent; color: var(--mg-text-leise); border-color: rgba(22, 20, 31, .18); }
+[data-design="milchglas"] .stand.laeuft { background: var(--mg-laeuft-grund); color: var(--mg-text); }
+[data-design="milchglas"] .stand.fehler { background: var(--mg-gefahr-grund); color: var(--mg-gefahr); }
+[data-design="milchglas"] .stand.noetig { background: var(--mg-akzent); color: var(--mg-auf-akzent); }
+[data-design="milchglas"] .stand.ruhig { background: var(--mg-weich); color: var(--mg-text-leise); }
+[data-design="milchglas"] .quelle { font-family: var(--sans); font-size: .6875rem; font-weight: 700; letter-spacing: .02em; text-transform: none; color: var(--mg-text); background: var(--mg-weich); }
+[data-design="milchglas"] .quelle:hover { background: var(--mg-weich-stark); }
+
+/* ---------- Fortschritt: Spur Tinte 8 %, Fuellung Lime ---------- */
+[data-design="milchglas"] .balken { background: rgba(22, 20, 31, .08); }
+[data-design="milchglas"] .balken i { background: var(--mg-akzent-knopf); box-shadow: inset 0 0 0 1px rgba(22, 20, 31, .10); }
+[data-design="milchglas"] .skelett { background: linear-gradient(90deg, var(--hair2) 25%, var(--hair) 37%, var(--hair2) 63%); background-size: 400% 100%; }
+
+/* ---------- Meldungen, Pop-ins, Fenster ---------- */
+[data-design="milchglas"] .meldung { border-radius: var(--mg-r-feld); border-left-width: 1px; color: var(--mg-text); background: var(--mg-glas-stark); }
+[data-design="milchglas"] .meldung::before { background: var(--mg-text); }
+/* Pop-in „laeuft“: dunkles Glas, Lime leuchtet darauf wie Neon; „fertig“ und „geht nicht“ bleiben hell (Rolle Zustand). */
+[data-design="milchglas"] .popin {
+  border: 1px solid var(--mg-glas-linie); border-radius: var(--mg-r-karte); background: var(--mg-glas-stark); box-shadow: var(--mg-glas-schatten-stark);
+  -webkit-backdrop-filter: var(--mg-unschaerfe); backdrop-filter: var(--mg-unschaerfe);
+}
+[data-design="milchglas"] .popin:not(.geht-nicht):not(.fertig) {
+  background: var(--mg-dunkel); color: var(--mg-text-auf-dunkel); border-color: rgba(255, 255, 255, .10);
+  box-shadow: inset 0 1px 0 var(--mg-dunkel-linie), 0 18px 48px rgba(22, 20, 31, .28);
+}
+[data-design="milchglas"] .popin:not(.geht-nicht):not(.fertig) strong { color: #fff; }
+[data-design="milchglas"] .popin:not(.geht-nicht):not(.fertig) small { color: var(--mg-text-auf-dunkel-leise); }
+[data-design="milchglas"] .popin:not(.geht-nicht):not(.fertig) a { color: var(--mg-akzent); }
+[data-design="milchglas"] .popin:not(.geht-nicht):not(.fertig) .balken { background: rgba(236, 234, 244, .14); }
+[data-design="milchglas"] .popin:not(.geht-nicht):not(.fertig) .balken i { box-shadow: 0 0 10px rgba(215, 242, 90, .55); }
+[data-design="milchglas"] .popin:not(.geht-nicht):not(.fertig) .popin-weg { color: var(--mg-text-auf-dunkel-leise); }
+[data-design="milchglas"] .popin:not(.geht-nicht):not(.fertig) .popin-weg:hover { background: rgba(255, 255, 255, .10); color: #fff; }
+[data-design="milchglas"] .popin.geht-nicht { background: var(--mg-gefahr-grund); border-color: var(--mg-gefahr-rand); }
+[data-design="milchglas"] .popin.fertig { background: var(--mg-ok-grund); border-color: rgba(47, 125, 74, .28); }
+[data-design="milchglas"] .popin strong { color: var(--mg-text); }
+[data-design="milchglas"] .popin small, [data-design="milchglas"] .popin-mehr { color: var(--mg-text-leise); }
+[data-design="milchglas"] .fenster { background: rgba(22, 20, 31, .32); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+[data-design="milchglas"] .fenster-box {
+  background: linear-gradient(140deg, rgba(251, 250, 254, .97), rgba(241, 239, 248, .95)); border: 1px solid var(--mg-glas-linie);
+  border-radius: var(--mg-r-gross); box-shadow: var(--mg-glas-schatten-stark);
+}
+[data-design="milchglas"] .fenster-zu { border: 0; border-radius: var(--mg-r-rund); background: var(--mg-weich); color: var(--mg-text); }
+[data-design="milchglas"] .fenster-zu:hover { background: var(--mg-weich-stark); color: var(--mg-text); }
+
+/* ---------- Fehlerseiten und Kleinteile ---------- */
+[data-design="milchglas"] .app-eintrag { color: var(--mg-text); }
+
+/* ---------- Am Handy ---------- */
+@media (max-width: 880px) {
+  /* Als Schublade ueber dem Inhalt deckend: unter einer ausgefahrenen Leiste legt WebKit keinen Blur, der Inhalt schiene scharf durch. */
+  [data-design="milchglas"] .leiste {
+    background: linear-gradient(140deg, #FBFAFE, #F1EFF8); border: 0; border-radius: 0 var(--mg-r-gross) var(--mg-r-gross) 0;
+    box-shadow: var(--mg-glas-schatten-stark); -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  [data-design="milchglas"] .menue { width: var(--tipp); height: var(--tipp); }
+}
+@media (max-width: 880px), (pointer: coarse) {
+  /* Tippziele mindestens 44 px; die Regeln aus grund.css (F44) bleiben, hier nur, was Milchglas neu formt. */
+  [data-design="milchglas"] .weg { min-height: var(--tipp); }
+  [data-design="milchglas"] .knopf { min-height: var(--tipp); min-width: var(--tipp); }
+  [data-design="milchglas"] .eingabe { min-height: var(--tipp); }
+  [data-design="milchglas"] .popin-weg, [data-design="milchglas"] .fenster-zu { min-width: var(--tipp); min-height: var(--tipp); }
+}
+@media (max-width: 374px) {
+  /* Wo es eng wird, nur das Zeichen (Mindestgroesse 28 px). */
+  [data-design="milchglas"] .marke-zeichen { width: 32px; height: 32px; background-image: url("./milchglas/tet-zeichen-hell.svg"); background-position: center; }
+}
+
+/* ---------- Transparenz reduzieren: alles Glas wird deckend ---------- */
+@media (prefers-reduced-transparency: reduce) {
+  [data-design="milchglas"] :is(.kopfzeile, .leiste, .flaeche, .schritt, .cta-karte, .app-hinweis, .schluessel-hinweis, .meldung, .leer, .popin, .fenster, .studio.offen .schleier) {
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  [data-design="milchglas"] :is(.kopfzeile, .leiste, .flaeche, .schritt, .cta-karte, .app-hinweis, .schluessel-hinweis, .meldung, .leer) { background: var(--mg-grund); }
+  [data-design="milchglas"] .popin.geht-nicht { background: var(--mg-gefahr-grund); }
+  [data-design="milchglas"] .popin.fertig { background: var(--mg-ok-grund); }
+  [data-design="milchglas"] .popin:not(.geht-nicht):not(.fertig) { background: #18161F; }
+}
+
+/* ---------- Hilfe: Fragezeichen und Feld (10.11.2026) ---------- */
+[data-design="milchglas"] .hilfe-knopf { border: 1px solid var(--mg-glas-linie, rgba(255, 255, 255, .7)); background: var(--mg-glas); color: var(--mg-text); }
+[data-design="milchglas"] .hilfe-knopf:hover { background: var(--mg-weich); }
+[data-design="milchglas"] .hilfe-knopf.aktiv { background: var(--mg-text); color: var(--mg-text-auf-dunkel); border-color: var(--mg-text); }
+[data-design="milchglas"] .hilfe-hintergrund { background: rgba(22, 20, 31, .3); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+[data-design="milchglas"] .hilfe-feld {
+  background: var(--mg-glas-stark); border: 0; border-left: 1px solid var(--mg-glas-linie); border-radius: var(--mg-r-karte) 0 0 var(--mg-r-karte);
+  box-shadow: var(--mg-glas-schatten-stark); color: var(--mg-text);
+  -webkit-backdrop-filter: var(--mg-unschaerfe); backdrop-filter: var(--mg-unschaerfe);
+}
+[data-design="milchglas"] .hilfe-feld :is(.leise, .still) { color: var(--mg-text-leise); }
+[data-design="milchglas"] .hilfe-zu { background: var(--mg-weich); color: var(--mg-text); }
+[data-design="milchglas"] .hilfe-zu:hover { background: var(--mg-weich-stark); }
+[data-design="milchglas"] .hilfe-alle { color: var(--mg-text); }
+@media (max-width: 767px) {
+  [data-design="milchglas"] .hilfe-feld { border-left: 0; border-top: 1px solid var(--mg-glas-linie); border-radius: var(--mg-r-gross) var(--mg-r-gross) 0 0; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  [data-design="milchglas"] .hilfe-feld { background: var(--mg-grund-deckend); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  [data-design="milchglas"] .hilfe-hintergrund { -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
