@@ -70,6 +70,7 @@
     <div class="card" id="hintCard" hidden><p class="muted" id="hintText"></p></div>
 
     <div id="inhalt" hidden>
+      <div class="verdienst" id="verdienst" hidden style="margin-bottom:var(--s5)"></div>
       <div class="stats" id="stats"></div>
       <div class="chips filter" id="filter"></div>
       <div class="stand" id="stand"></div>
@@ -101,6 +102,8 @@ const miroOffen = m => !m.miro && !m.geoeffnet;
 const todos = m => [funnelOffen(m), !!m.alarm, miroOffen(m)].filter(Boolean).length;
 
 function zeigen(){
+  $("verdienst").hidden = !daten.verdienst;
+  if (daten.verdienst) $("verdienst").innerHTML = verdienstHtml(daten.verdienst);
   const L = daten.cockpit || [];
   const monat = (L.find(m => m.funnel) || {}).funnel?.monat || MONL[new Date().getMonth()];
   const n = f => L.filter(f).length;

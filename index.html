@@ -310,6 +310,9 @@ const DASHBOARD = {
         </div>
       </div>
 
+      <!-- Nur für Anne: Verdienst-Ticker -->
+      <div class="verdienst span" id="verdienstCard" hidden></div>
+
       <!-- Nur für Anne: Cockpit -->
       <a class="card span cockpit-teaser" id="cockpitCard" hidden>
         <div class="ic">📋</div>
@@ -576,7 +579,7 @@ async function loadPersonal(){
   if (alt) renderPersonal(alt);            // sofort den letzten Stand zeigen
   try {
     const d = await api({});
-    if (!d.ok) { setCode(""); ["myCard","exCard","who","topEx","alarmCard","funnelCard","cockpitCard"].forEach(id => $(id).hidden = true); showHint(d.fehler); return; }
+    if (!d.ok) { setCode(""); ["myCard","exCard","who","topEx","alarmCard","funnelCard","cockpitCard","verdienstCard"].forEach(id => $(id).hidden = true); showHint(d.fehler); return; }
     merken("dashboard", d);
     renderPersonal(d);
   } catch {
@@ -604,6 +607,10 @@ function renderPersonal(d){
       </div>
     </div>`;
   }).join("") : `<p class="muted">Aktuell hast du keinen Termin bei mir gebucht. Buch dir gleich hier unten deinen nächsten Termin. 💛</p>`;
+
+  // Nur für Anne: Verdienst-Ticker
+  $("verdienstCard").hidden = !d.verdienst;
+  if (d.verdienst) $("verdienstCard").innerHTML = verdienstHtml(d.verdienst);
 
   // Nur für Anne: Link zum Cockpit
   $("cockpitCard").hidden = !(d.ich && d.ich.team);

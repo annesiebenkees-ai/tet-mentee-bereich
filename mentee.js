@@ -104,3 +104,29 @@ function meldungBeimAbsenden(form, typ){
     form.submit();
   });
 }
+
+/* ---------- Verdienst-Ticker (nur für Anne) ---------- */
+const euro = n => n.toLocaleString("de-DE", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }) + " €";
+function verdienstHtml(v){
+  const erwartet = v.verdient + v.geplant;
+  const anteil = erwartet ? Math.round(v.verdient / erwartet * 100) : 0;
+  const a = v.anzahl || {};
+  const teile = [a.einzel ? `${a.einzel}× 1:1` : "", a.gruppe ? `${a.gruppe}× Gruppencall` : "", a.geteilt ? `${a.geteilt}× Social Media Call (geteilt)` : ""].filter(Boolean).join(" · ");
+  const liste = (v.termine || []).map(t => {
+    const d = new Date(t.start);
+    return `<li class="${t.vorbei ? "ist" : "kommt"}"><span>${d.getDate()}.${d.getMonth() + 1}.</span><span class="tt">${esc(t.titel)}</span><b>${euro(t.euro)}</b></li>`;
+  }).join("");
+  return `
+    <div class="vd-kopf">
+      <div class="eyebrow">Dein Verdienst · ${esc(v.monat)}</div>
+      <div class="vd-stand">Stand ${fmtRel(v.stand)}</div>
+    </div>
+    <div class="vd-zahl">${euro(v.verdient)}</div>
+    <div class="vd-sub">verdient bisher${v.geplant ? ` · <b>+ ${euro(v.geplant)}</b> schon gebucht → <b>${euro(erwartet)}</b> erwartet` : ""}</div>
+    <div class="vd-spur"><i style="width:${anteil}%"></i></div>
+    <div class="vd-fuss">
+      <span>${teile || "Noch keine bezahlten Termine in diesem Monat."}</span>
+      <span>${esc(v.vormonat)}: <b>${euro(v.vormonatSumme)}</b></span>
+    </div>
+    ${liste ? `<details class="vd-liste"><summary>Alle Termine im ${esc(v.monat)}</summary><ul>${liste}</ul></details>` : ""}`;
+}
